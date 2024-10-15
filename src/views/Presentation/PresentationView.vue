@@ -8,7 +8,6 @@ import Header from "../../examples/Header.vue";
 //Vue Material Kit 2 components
 
 // sections
-import PresentationCounter from "./Sections/PresentationCounter.vue";
 import PresentationExample from "./Sections/PresentationExample.vue";
 import data from "./Sections/Data/designBlocksData";
 
@@ -52,12 +51,44 @@ onUnmounted(() => {
     </div>
   </Header>
 
-  <div class="card card-body shadow-blur mx-3 mx-md-7 mt-n8">
-    <PresentationCounter />
-    <!-- <PresentationInformation /> -->
+  <div class="card card-body mx-3 mx-md-7">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10">
+        <div class="card p-4">
+          <form class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <label for="resortSelect" class="form-label">방문리조트 선택</label>
+              <select v-model="selectedResort" id="resortSelect" class="form-select">
+                <option value="" disabled>지점선택</option>
+                <option value="resort1">리조트 1</option>
+                <option value="resort2">리조트 2</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label for="checkIn" class="form-label">체크인</label>
+              <input type="date" v-model="checkInDate" id="checkIn" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+              <label for="checkOut" class="form-label">체크아웃</label>
+              <input type="date" v-model="checkOutDate" id="checkOut" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+              <label for="roomCount" class="form-label">객실 수</label>
+              <input type="number" v-model="roomCount" min="1" id="roomCount" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+              <button type="button" @click="searchRooms" class="btn btn-primary w-100">객실 검색</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- <PresentationCounter /> -->
     <PresentationExample :data="data" />
-    <!-- <PresentationPages /> -->
-    <!-- <BuiltByDevelopers /> -->
 
   </div>
   <DefaultFooter />
