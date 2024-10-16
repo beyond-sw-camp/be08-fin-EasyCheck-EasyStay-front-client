@@ -26,6 +26,33 @@
                 </KakaoMap>
             </div>
         </div>
+
+        <!-- 경로 안내 메시지 및 위치 안내 섹션 -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <h4>리조트 위치안내</h4>
+                <div class="d-flex justify-content-center align-items-center mt-3">
+                    <i class="fas fa-car mr-2"></i>
+                    <span>자차 이용</span>
+                </div>
+                <div class="mt-2">
+                    <p>주소: <span>{{ currentLocation.name }} (서울 출발 기준 약 2시간 소요)</span></p>
+                    <div class="path-info d-flex justify-content-center align-items-center">
+                        <span>서울</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span>강일IC</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span>춘천JC</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span>동홍천양양고속도로</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span>양양JC</span>
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        <span>롯데리조트속초</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -37,6 +64,15 @@ const centerCoordinate = ref({
     lat: 37.4972146715141,
     lng: 126.927607128836
 });
+
+// 서울시청 좌표
+const seoulCityHallCoordinate = {
+    lat: 37.5662952,
+    lng: 126.97794509999994
+};
+
+// 현재 선택된 리조트 또는 호텔 위치를 저장할 변수
+const currentLocation = ref({ name: '선택된 리조트 또는 호텔 이름' });
 
 const resorts = [
     { id: 1, name: '설악 쏘라노', lat: 38.2101595305386, lng: 128.527388761735 },
@@ -50,12 +86,15 @@ const hotels = [
     { id: 3, name: '쉐라톤 그랜드 인천', lat: 37.3902250644638, lng: 126.645426431439 }
 ];
 
-// 리조트 또는 호텔 클릭 시 지도 중심 업데이트 함수
+// 지도 중심을 이동하고 경로 안내를 업데이트하는 함수
 const moveToLocation = (location) => {
     centerCoordinate.value = {
         lat: location.lat,
         lng: location.lng
     };
+
+    // 선택된 리조트 또는 호텔의 이름 업데이트
+    currentLocation.value = location;
 };
 </script>
 
