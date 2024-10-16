@@ -34,6 +34,7 @@
       -ms-flex-direction: column;
       -o-flex-direction: column;
       flex-direction: column;
+      height: 320px;
 
       .card-body {
         justify-content: center;
@@ -59,8 +60,8 @@
         top: 0;
         content: "";
         border-radius: $border-radius-lg;
-        background-image: $text-gradient-bg-success;
-        opacity: 0.85;
+        background-image: $text-gradient-bg-dark;
+        opacity: 0.4;
       }
     }
 
