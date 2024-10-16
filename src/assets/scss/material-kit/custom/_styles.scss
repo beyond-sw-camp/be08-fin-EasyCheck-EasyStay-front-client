@@ -1,0 +1,71 @@
+// 로그인 페이지
+.custom-login-container {
+  background-color: rgba(255, 255, 255, 1); 
+}
+
+.line {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+  padding-bottom: 5px;
+}
+
+.custom-btn {
+  // scss-docs-start btn-css-vars
+  --#{$prefix}btn-padding-x: #{$btn-padding-x};
+  --#{$prefix}btn-padding-y: #{$btn-padding-y};
+  --#{$prefix}btn-font-family: #{$btn-font-family};
+  @include rfs($btn-font-size, --#{$prefix}btn-font-size);
+  --#{$prefix}btn-font-weight: #{$btn-font-weight};
+  --#{$prefix}btn-line-height: #{$btn-line-height};
+  --#{$prefix}btn-color: #{$body-color};
+  --#{$prefix}btn-bg: transparent;
+  --#{$prefix}btn-border-width: #{$btn-border-width};
+  --#{$prefix}btn-border-color: transparent;
+  --#{$prefix}btn-border-radius: #{$btn-border-radius};
+  --#{$prefix}btn-box-shadow: #{$btn-box-shadow};
+  --#{$prefix}btn-disabled-opacity: #{$btn-disabled-opacity};
+  --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} rgba(var(--#{$prefix}btn-focus-shadow-rgb), .5);
+  // scss-docs-end btn-css-vars
+
+  display: inline-block;
+  padding: var(--#{$prefix}btn-padding-y) var(--#{$prefix}btn-padding-x);
+  font-family: var(--#{$prefix}btn-font-family);
+  @include font-size(var(--#{$prefix}btn-font-size));
+  font-weight: var(--#{$prefix}btn-font-weight);
+  line-height: var(--#{$prefix}btn-line-height);
+  color: var(--#{$prefix}btn-color);
+  text-align: center;
+  text-decoration: if($link-decoration == none, null, none);
+  white-space: $btn-white-space;
+  vertical-align: middle;
+  cursor: if($enable-button-pointers, pointer, null);
+  user-select: none;
+  border: var(--#{$prefix}btn-border-width) solid var(--#{$prefix}btn-border-color);
+  @include border-radius(var(--#{$prefix}btn-border-radius));
+  @include gradient-bg(var(--#{$prefix}btn-bg));
+  @include box-shadow(var(--#{$prefix}btn-box-shadow));
+  @include transition($btn-transition);
+
+  &:hover {
+    color: var(--#{$prefix}btn-hover-color);
+    text-decoration: if($link-hover-decoration == underline, none, null);
+    background-color: var(--#{$prefix}btn-hover-bg);
+    border-color: var(--#{$prefix}btn-hover-border-color);
+  }
+
+  padding: 0.25rem 0.5rem; // 상하 0.25rem, 좌우 0.5rem으로 패딩 조정
+  font-size: 0.7rem; // 폰트 크기 조정 (필요에 따라 조정)
+  border-radius: 0.2rem; // 경계 반경 조정 (필요에 따라 조정)
+
+  outline: 0.1px solid gray; // outline 색상을 회색으로 변경하고 두께는 그대로 유지
+  outline-offset: 1px; // outline과 버튼 사이의 간격 조정
+  outline-style: solid; 
+
+  .btn-check:focus + &,
+  &:focus {
+    color: var(--#{$prefix}btn-hover-color);
+    @include gradient-bg(var(--#{$prefix}btn-hover-bg));
+    border-color: var(--#{$prefix}btn-hover-border-color);
+    box-shadow: var(--#{$prefix}btn-box-shadow), var(--#{$prefix}btn-focus-box-shadow);
+  }
+}
