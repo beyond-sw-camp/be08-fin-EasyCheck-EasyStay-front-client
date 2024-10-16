@@ -6,6 +6,8 @@ import vClickOutside from 'v-click-outside';
 import "./assets/css/nucleo-icons.css";
 import "./assets/css/nucleo-svg.css";
 import { setupPlugins } from "./plugins";
+import { useKakao } from "vue3-kakao-maps/@utils";
+useKakao(import.meta.env.VITE_PUBLIC_KAKAO_API_KEY);
 
 const app = createApp(App);
 
