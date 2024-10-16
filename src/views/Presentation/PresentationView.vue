@@ -2,9 +2,10 @@
 import { onMounted, onUnmounted } from "vue";
 
 //example components
-import NavbarDefault from "../..//examples/navbars/NavbarDefault.vue";
+import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
+import KakaoMap from "../../components/map/KakaoMap.vue";
 //Vue Material Kit 2 components
 
 // sections
@@ -89,7 +90,7 @@ onUnmounted(() => {
     </div>
     <!-- <PresentationCounter /> -->
     <PresentationExample :data="data" />
-
+    <KakaoMap />
   </div>
   <DefaultFooter />
 </template>
