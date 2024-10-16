@@ -82,11 +82,11 @@
         top: $form-label-top-focused;
       }
       label {
-        color: $success;
+        color: black;
       }
       &.is-valid {
         label {
-          color: $success;
+          color: black;
         }
 
         .form-control {
@@ -204,17 +204,17 @@
     &.is-focused,
     &.is-filled {
       .form-label + .form-control {
-        border-color: $success !important;
+        border-color: black !important;
         border-top-color: transparent !important;
-        box-shadow: inset 1px 0 $success, inset -1px 0 $success,
-          inset 0 -1px $success;
+        box-shadow: inset 1px 0 black, inset -1px 0 $black,
+          inset 0 -1px black;
       }
 
       .form-label {
         width: 100%;
         height: 100%;
         font-size: $form-label-font-size-focused !important;
-        color: $success;
+        color: black;
         display: flex;
         line-height: $line-height-sm !important;
 
@@ -225,8 +225,8 @@
 
         &:before,
         &:after {
-          border-top-color: $success;
-          box-shadow: inset 0 1px $success;
+          border-top-color: black;
+          box-shadow: inset 0 1px black;
         }
       }
     }
@@ -241,18 +241,18 @@
       &.is-focused,
       &.is-filled {
         .form-label + .form-control {
-          border-color: $success !important;
-          box-shadow: inset 1px 0 $success, inset -1px 0 $success,
-            inset 0 -1px $success;
+          border-color: black !important;
+          box-shadow: inset 1px 0 black, inset -1px 0 black,
+            inset 0 -1px black;
           border-top-color: transparent !important;
         }
         .form-label {
-          color: $success;
+          color: black;
 
           &:before,
           &:after {
-            border-top-color: $success;
-            box-shadow: inset 0 1px $success;
+            border-top-color: black;
+            box-shadow: inset 0 1px black;
           }
         }
       }
