@@ -8,7 +8,6 @@ import Header from "@/examples/Header.vue";
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-
 onMounted(() => {
   setMaterialInput();
 });
@@ -55,7 +54,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 푸터 -->
     <footer class="footer fixed-bottom py-2 w-100">
       <div class="container">
         <div class="row align-items-center justify-content-lg-between">
@@ -92,7 +90,6 @@ onMounted(() => {
         </div>
       </div>
     </footer>
-    
   </Header>
 </template>
 

@@ -13,7 +13,6 @@ import MaterialButton from "@/components/MaterialButton.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
-
 onMounted(() => {
   setMaterialInput();
 });
@@ -206,7 +205,7 @@ onMounted(() => {
           </div>
         </div>
       </footer>
-
+      
     </div>
   </Header>
 </template>
