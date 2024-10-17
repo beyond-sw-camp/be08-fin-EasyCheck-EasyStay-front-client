@@ -23,7 +23,9 @@ import ElDropdowns from "../layouts/sections/elements/dropdowns/DropdownsView.vu
 import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressBarsView.vue";
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
-import RoomView from "@/views/Rooms/RoomView.vue";
+import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
+import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -150,11 +152,16 @@ const router = createRouter({
     {
       path: "/accommodation",
       name: "Accommodation",
-      component: RoomView,
+      component: AccommodationView,
       props: (route) => ({
         // queryParam이 지정되지 않는다면 기본값으로 들어가게 설정
         accommodationId: route.query.accommodationId || 1,
       }),
+    },
+    {
+      path: "/room/:roomId",
+      name: "Room",
+      component: RoomDetailView,
     },
   ],
 });
