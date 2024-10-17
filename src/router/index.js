@@ -23,8 +23,11 @@ import ElDropdowns from "../layouts/sections/elements/dropdowns/DropdownsView.vu
 import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressBarsView.vue";
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
+
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+
+import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -162,6 +165,11 @@ const router = createRouter({
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
+    },
+    {
+      path: "/join",
+      name: "Join",
+      component: JoinView,
     },
   ],
 });
