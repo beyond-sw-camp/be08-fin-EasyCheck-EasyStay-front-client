@@ -114,7 +114,7 @@ watch(
             <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
                 <ul class="navbar-nav navbar-nav-hover ms-auto  align-items-center">
                     <li class="nav-item mx-2">
-                        <RouterLink :to="{ name: 'signin-basic' }" role="button"
+                        <RouterLink :to="{ name: 'login' }" role="button"
                             class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()"
                             aria-expanded="false">
                             <i class="material-icons opacity-6 me-2 text-md text-dark">person</i>
