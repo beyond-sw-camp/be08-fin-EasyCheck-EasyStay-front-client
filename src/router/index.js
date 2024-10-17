@@ -29,7 +29,7 @@ import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 
 import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
 import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
-import JoinComplete from "@/views/LandingPages/SignIn/JoinComplete.vue";
+import JoinCompleteView from "@/views/LandingPages/SignIn/JoinCompleteView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -181,7 +181,7 @@ const router = createRouter({
     {
       path: "/joinComplete",
       name: "JoinComplete",
-      component: JoinComplete,
+      component: JoinCompleteView,
     },
   ],
 });
