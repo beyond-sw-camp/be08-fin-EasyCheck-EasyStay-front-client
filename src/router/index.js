@@ -24,6 +24,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 import RoomView from "@/views/Rooms/RoomView.vue";
+import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -154,6 +155,14 @@ const router = createRouter({
       props: (route) => ({
         // queryParam이 지정되지 않는다면 기본값으로 들어가게 설정
         accommodationId: route.query.accommodationId || 1,
+      }),
+    },
+    {
+      path: "/themepark",
+      name: "ThemePark",
+      component: ThemeParkView,
+      props: (route) => ({
+        themeParkId: route.query.themeParkId || 1,
       }),
     },
   ],
