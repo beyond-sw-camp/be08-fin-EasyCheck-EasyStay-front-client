@@ -3,7 +3,7 @@
 import { onMounted } from "vue";
 
 // example components
-import DefaultNavbar from "@/examples/navbars/NavbarDefault.vue";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
 //Vue Material Kit 2 components
@@ -17,8 +17,9 @@ onMounted(() => {
   setMaterialInput();
 });
 </script>
+
 <template>
-  <DefaultNavbar transparent />
+  <NavbarDefault />
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -26,7 +27,6 @@ onMounted(() => {
         <div class="row">
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-center line">
-              <!-- style="top: -30px; left: 0; right: 0; z-index: 10;" -->
               <h4 class="text-black font-weight-bolder mb-0 mt-4">로그인</h4>
               <div class="row mt-3 justify-content-center">
                 EasyStay와 함께 편안한 휴식과 특별한 순간이 기다리고 있습니다. <br>
@@ -36,12 +36,14 @@ onMounted(() => {
           </div>
         </div>
 
+        <!-- 회원 로그인 -->
         <div class="row custom-login-board mb-4">
           <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
                 <h4 class="text-center mb-4">회원 로그인</h4>
                 <form role="form" class="text-start">
+
                   <MaterialInput id="email1" class="input-group-outline my-3"
                     :label="{ text: '아이디', class: 'form-label' }" type="email" />
                   <MaterialInput id="password1" class="input-group-outline mb-3"
@@ -59,19 +61,21 @@ onMounted(() => {
                     |
                     <a href="#" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</a>
                   </p>
+
                 </form>
               </div>
             </div>
           </div>
 
+          <!-- 비회원 로그인 -->
           <div class="col-lg-4 col-md-8 col-12 ms-lg-5">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
                 <h4 class="text-center mb-4">비회원 로그인</h4>
                 <form role="form" class="text-start">
+
                   <MaterialInput id="value" class="input-group-outline my-3"
                     :label="{ text: '성함', class: 'form-label' }" type="text" />
-
                   <div class="input-group d-flex justify-content-center align-items-center">
                     <div class="row w-100 g-0">
                       <div class="col">
@@ -108,6 +112,7 @@ onMounted(() => {
                     </div>
                   </div>
 
+                  <!-- 개인정보 약관안내 -->
                   <div class="form-check mb-3 d-flex align-items-center">
                     <MaterialButton class="custom-btn me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
                       개인정보 약관안내
@@ -154,13 +159,16 @@ onMounted(() => {
                     <MaterialButton class="my-4 mb-2" variant="gradient" color="dark" fullWidth>Sign in
                     </MaterialButton>
                   </div>
+
                 </form>
+
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- 푸터 -->
       <footer class="footer position-absolute bottom-2 py-2 w-100">
         <div class="container">
           <div class="row align-items-center justify-content-lg-between">
@@ -197,6 +205,7 @@ onMounted(() => {
           </div>
         </div>
       </footer>
+      
     </div>
   </Header>
 </template>

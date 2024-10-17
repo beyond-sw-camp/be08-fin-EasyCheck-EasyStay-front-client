@@ -3,18 +3,18 @@
 import { onMounted } from "vue";
 
 // example components
-import DefaultNavbar from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 onMounted(() => {
   setMaterialInput();
 });
 </script>
 
 <template>
-  <DefaultNavbar transparent />
+  <NavbarDefault />
   <Header>
     <div class="page-header align-items-start min-vh-100">
       <span class="mask bg-white opacity-6"></span>

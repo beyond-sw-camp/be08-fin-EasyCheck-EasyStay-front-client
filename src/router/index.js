@@ -25,6 +25,8 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 import RoomView from "@/views/Rooms/RoomView.vue";
 import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
+import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
+import JoinComplete from "@/views/LandingPages/SignIn/JoinComplete.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -161,6 +163,16 @@ const router = createRouter({
       path: "/join",
       name: "Join",
       component: JoinView,
+    },
+    {
+      path: "/join/member",
+      name: "JoinMember",
+      component: MemberView,
+    },
+    {
+      path: "/joinComplete",
+      name: "JoinComplete",
+      component: JoinComplete,
     }
   ],
 });
