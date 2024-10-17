@@ -1,9 +1,9 @@
 <template>
-  <navbar-default :sticky="true"/>
+  <NavbarDefault :sticky="true" />
   <ThemeParkInfo />
   <div class="container-fluid px-4">
     <div class="section-divider"></div>
-    <attraction-info />
+    <AttractionInfo />
   </div>
 </template>
 
