@@ -9,7 +9,7 @@ export const useAccommodationStore = defineStore('accommodationStore', {
 
   getters: {
     allAccommodations: (state) => state.accommodations,
-    accommodation: (state) => state.accommodation,
+    accommodationById: (state) => state.accommodation,
   },
 
   actions: {
@@ -27,7 +27,7 @@ export const useAccommodationStore = defineStore('accommodationStore', {
     // 모든 시설 조회 API 호출
     async fetchAccommodations(page = 0, size = 10) {
       try {
-        const response = await axios.get('/api/v1/accommodations', {
+        const response = await axios.get(`/api/v1/accommodations`, {
           params: { page, size },
         });
         this.accommodations = response.data;
