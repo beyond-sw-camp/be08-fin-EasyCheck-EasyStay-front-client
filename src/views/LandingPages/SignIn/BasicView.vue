@@ -19,7 +19,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <NavbarDefault />
+  <div class="position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <NavbarDefault :sticky="true" />
+      </div>
+    </div>
+  </div>
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -98,15 +104,15 @@ onMounted(() => {
                     <div class="row w-100 g-0">
                       <div class="col">
                         <MaterialInput id="value" class="input-group-outline"
-                        :label="{ text: '인증번호', class: 'form-label'}" type="text"
-                        style="width: 100%; margin-right: 0;" />
+                          :label="{ text: '인증번호', class: 'form-label' }" type="text"
+                          style="width: 100%; margin-right: 0;" />
                       </div>
                       <div class="col-auto">
                         <div class="input-group-append">
                           <MaterialButton class="btn btn-black text-whtie"
-                          style="border-top-left-radius: 0; border-bottom-left-radius: 0;" type="button">
-                          인증번호 확인
-                        </MaterialButton>
+                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;" type="button">
+                            인증번호 확인
+                          </MaterialButton>
                         </div>
                       </div>
                     </div>
@@ -205,7 +211,7 @@ onMounted(() => {
           </div>
         </div>
       </footer>
-      
+
     </div>
   </Header>
 </template>
