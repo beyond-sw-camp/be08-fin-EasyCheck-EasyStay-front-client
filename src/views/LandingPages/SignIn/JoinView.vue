@@ -17,6 +17,7 @@ onMounted(() => {
   setMaterialInput();
 });
 </script>
+
 <template>
   <DefaultNavbar transparent />
   <Header>
@@ -26,8 +27,7 @@ onMounted(() => {
         <div class="row">
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-center line">
-              <!-- style="top: -30px; left: 0; right: 0; z-index: 10;" -->
-              <h4 class="text-black font-weight-bolder mb-0 mt-4">로그인</h4>
+              <h4 class="text-black font-weight-bolder mb-0 mt-4">회원가입</h4>
               <div class="row mt-3 justify-content-center">
                 EasyStay와 함께 편안한 휴식과 특별한 순간이 기다리고 있습니다. <br>
                 회원으로 다양한 혜택을 누려보세요!
@@ -40,7 +40,8 @@ onMounted(() => {
           <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
-                <h4 class="text-center mb-4">회원 로그인</h4>
+                <span class="material-icons custom-icon">person</span>
+                <h4 class="text-center mb-4">일반 회원</h4>
                 <form role="form" class="text-start">
                   <MaterialInput id="email1" class="input-group-outline my-3"
                     :label="{ text: '아이디', class: 'form-label' }" type="email" />
@@ -67,7 +68,7 @@ onMounted(() => {
           <div class="col-lg-4 col-md-8 col-12 ms-lg-5">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
-                <h4 class="text-center mb-4">비회원 로그인</h4>
+                <h4 class="text-center mb-4">법인 회원</h4>
                 <form role="form" class="text-start">
                   <MaterialInput id="value" class="input-group-outline my-3"
                     :label="{ text: '성함', class: 'form-label' }" type="text" />

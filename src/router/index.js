@@ -24,6 +24,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 import RoomView from "@/views/Rooms/RoomView.vue";
+import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -156,6 +157,11 @@ const router = createRouter({
         accommodationId: route.query.accommodationId || 1,
       }),
     },
+    {
+      path: "/join",
+      name: "Join",
+      component: JoinView,
+    }
   ],
 });
 

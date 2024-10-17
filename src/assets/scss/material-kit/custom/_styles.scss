@@ -69,3 +69,14 @@
     box-shadow: var(--#{$prefix}btn-box-shadow), var(--#{$prefix}btn-focus-box-shadow);
   }
 }
+
+.submit-btn {
+  position: absolute;
+}
+
+.custom-input-group {
+  flex: 1;
+  height: 38px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
