@@ -1,6 +1,6 @@
 <template>
   <section class="my-3 py-3">
-    <h3 class="text-start text-black mx-5 mb-5 mb-lg-7">시설 안내</h3>
+    <h3 class="text-start text-black px-6 mb-5 mb-lg-7">시설 안내</h3>
     <div class="container-fluid px-6">
       <Splide :options="splideOptions">
         <SplideSlide
