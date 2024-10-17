@@ -19,6 +19,7 @@ $gray-600: #6c757d !default;
 $gray-700: #495057 !default;
 $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
+
 $black: #000 !default;
 
 // fusv-enable
@@ -1240,7 +1241,7 @@ $nav-pills-border-radius: 0.75rem !default;
 $nav-pills-link-active-color: $dark !default;
 $nav-pills-link-active-bg: $white !default;
 $nav-pills-link-transition: background-color 0.3s ease !default;
-$nav-pills-background: $gray-100 !default;
+$nav-pills-background: $white !default;
 $nav-pills-vertical-background: transparent !default;
 $nav-pills-vertical-radius: 1.1875rem !default;
 $nav-pills-vertical-link-radius: 0.875rem !default;
