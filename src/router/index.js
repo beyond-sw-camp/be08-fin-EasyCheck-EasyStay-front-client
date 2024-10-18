@@ -171,6 +171,8 @@ const router = createRouter({
       props: (route) => ({
         themeParkId: route.query.themeParkId || 1,
       }),
+    },
+    {
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
