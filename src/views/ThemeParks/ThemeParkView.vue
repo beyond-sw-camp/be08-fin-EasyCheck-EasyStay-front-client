@@ -1,16 +1,27 @@
 <template>
   <NavbarDefault :sticky="true" />
-  <ThemeParkInfo />
+  <ThemeParkInfo :themeParkName="themeParkName" />
   <div class="container-fluid px-4">
     <div class="section-divider"></div>
     <AttractionInfo />
   </div>
+  <div class="container-fluid d-flex justify-content-center my-5">
+    <MaterialButton color="danger" size="large" variant="gradient">
+      {{ themeParkName }} 이용권 구매하기
+    </MaterialButton>
+  </div>
+  <div class="section-divider my-4"></div>
+  <InformationSection />
 </template>
 
 <script setup>
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import ThemeParkInfo from "@/views/ThemeParks/ThemeParkInfo.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
+import MaterialButton from "@/components/MaterialButton.vue";
+import InformationSection from "./InformationSection.vue";
+
+const themeParkName = "속초 워터피아";
 </script>
 
 <style lang="scss" scoped>
