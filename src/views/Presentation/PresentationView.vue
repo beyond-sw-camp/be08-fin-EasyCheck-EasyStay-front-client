@@ -19,25 +19,25 @@ const images = [image1, image2, image3, image4, image5, image6];
 const currentImage = ref(images[0]);
 const isFading = ref(false);
 const isPlaying = ref(true);
-let imageIndex = 0;
+const imageIndex = ref(0);
 let intervalId = null;
 
 const changeImage = (newIndex) => {
   isFading.value = true;
   setTimeout(() => {
-    imageIndex = newIndex;
-    currentImage.value = images[imageIndex];
+    imageIndex.value = newIndex;
+    currentImage.value = images[imageIndex.value];
     isFading.value = false;
   }, 500);
 };
 
 const nextImage = () => {
-  const nextIndex = (imageIndex + 1) % images.length;
+  const nextIndex = (imageIndex.value + 1) % images.length;
   changeImage(nextIndex);
 };
 
 const prevImage = () => {
-  const prevIndex = (imageIndex - 1 + images.length) % images.length;
+  const prevIndex = (imageIndex.value - 1 + images.length) % images.length;
   changeImage(prevIndex);
 };
 
@@ -84,8 +84,8 @@ onUnmounted(() => {
 
   <Header>
     <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
-      <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1};`">
-      </div>
+      <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
+        };`"></div>
       <div class="container">
         <div class="row">
           <div class="col-lg-7 text-center mx-auto position-relative">
@@ -106,7 +106,7 @@ onUnmounted(() => {
         <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
           @click="goToImage(index)"></span>
         <button @click="togglePlayPause" class="play-pause-btn">
-          {{ isPlaying ? '||' : '▶' }}
+          {{ isPlaying ? "||" : "▶" }}
         </button>
       </div>
     </div>
@@ -142,7 +142,9 @@ onUnmounted(() => {
             </div>
 
             <div class="col-md-4">
-              <button type="button" @click="searchRooms" class="btn btn-primary w-100">객실 검색</button>
+              <button type="button" @click="searchRooms" class="btn btn-primary w-100">
+                객실 검색
+              </button>
             </div>
           </form>
         </div>
