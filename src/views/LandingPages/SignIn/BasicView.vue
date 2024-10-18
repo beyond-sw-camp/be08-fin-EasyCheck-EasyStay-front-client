@@ -65,7 +65,7 @@ onMounted(() => {
                   <p class="mt-4 text-sm text-center">
                     <RouterLink to="/users/signUp" class="text-dark text-gradient font-weight-bold">회원가입</RouterLink>
                     |
-                    <RouterLink to="/users/findId" class="text-dark text-gradient font-weight-bold">아이디 찾기</RouterLink>
+                    <RouterLink to="/users/findIdAuthentication" class="text-dark text-gradient font-weight-bold">아이디 찾기</RouterLink>
                     |
                     <a href="#" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</a>
                   </p>
