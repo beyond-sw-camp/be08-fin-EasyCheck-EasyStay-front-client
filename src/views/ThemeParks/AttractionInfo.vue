@@ -6,7 +6,7 @@
         이용 안내
       </MaterialButton>
     </div>
-    <div class="container-fluid px-4">
+    <div class="container-fluid px-1">
       <Splide :options="splideOptions" class="custom-splide mb-lg-5">
         <SplideSlide
           v-for="attraction in attractions"

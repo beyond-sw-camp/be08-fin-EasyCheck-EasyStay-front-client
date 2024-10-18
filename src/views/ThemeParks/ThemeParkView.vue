@@ -1,35 +1,72 @@
 <template>
   <NavbarDefault :sticky="true" />
-  <ThemeParkInfo :themeParkName="themeParkName" />
-  <div class="container-fluid px-4">
+  <MainImage :themeParkName="themeParks[currentThemeParkIndex].name" />
+
+  <section class="px-8 py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="nav-wrapper position-relative end-0">
+            <ul class="nav nav-tabs p-1 justify-content-center" role="tablist">
+              <li
+                class="nav-item"
+                v-for="(themePark, index) in themeParks"
+                :key="index"
+              >
+                <button
+                  class="nav-link px-4 py-2"
+                  :class="{ active: currentThemeParkIndex === index }"
+                  @click="changeThemePark(index)"
+                  role="tab"
+                >
+                  {{ themePark.name }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-fluid px-8">
     <div class="section-divider"></div>
-    <AttractionInfo />
+    <AttractionInfo :themeParkId="themeParks[currentThemeParkIndex].id" />
   </div>
+
   <div class="container-fluid d-flex justify-content-center my-5">
     <MaterialButton color="danger" size="large" variant="gradient">
-      {{ themeParkName }} 이용권 구매하기
+      {{ themeParks[currentThemeParkIndex].name }} 이용권 구매하기
     </MaterialButton>
   </div>
+
   <div class="section-divider my-4"></div>
-  <InformationSection :themeParkName="themeParkName" />
+  <NoticeInfo class="px-8" />
 </template>
 
 <script setup>
+import { ref } from "vue";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-import ThemeParkInfo from "@/views/ThemeParks/ThemeParkInfo.vue";
+import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import InformationSection from "./InformationSection.vue";
+import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
-const themeParkName = "속초 워터피아";
+const themeParks = ref([
+  { id: 1, name: "설악 워터피아" },
+  { id: 2, name: "인피니티 풀" },
+  { id: 3, name: "라라키즈 어드벤처" },
+  { id: 4, name: "미니 골프 포렌드" },
+]);
+
+const currentThemeParkIndex = ref(0);
+
+const changeThemePark = (index) => {
+  currentThemeParkIndex.value = index;
+};
 </script>
 
-<style lang="scss" scoped>
-.flex {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+<style scoped>
 .section-divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #ccc, transparent);
@@ -47,5 +84,38 @@ const themeParkName = "속초 워터피아";
     padding: 0 10px;
     font-size: 0.8rem;
   }
+}
+
+.nav-wrapper {
+  padding: 0.5rem 0;
+}
+
+.nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  justify-content: center;
+}
+
+.nav-item {
+  flex: 1 1 auto;
+  min-width: 120px;
+  max-width: calc(100% / 3);
+  text-align: center;
+}
+
+.nav-link {
+  color: #343a40;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+}
+
+.nav-link.active {
+  background-color: #007bff;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 </style>
