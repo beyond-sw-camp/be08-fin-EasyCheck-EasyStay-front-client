@@ -25,11 +25,14 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
+
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
-import SignUpView from "@/views/LandingPages/SignIn/SignUpView.vue";
-import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
-import JoinCompleteView from "@/views/LandingPages/SignIn/JoinCompleteView.vue";
+
+import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
+import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
+import MemberView from "@/views/LandingPages/SignIn/SignUp/MemberView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
