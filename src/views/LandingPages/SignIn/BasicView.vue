@@ -1,5 +1,6 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
+import { RouterLink } from "vue-router";
 import { onMounted } from "vue";
 
 // example components
@@ -43,8 +44,8 @@ onMounted(() => {
         </div>
 
         <!-- 회원 로그인 -->
-        <div class="row custom-login-board mb-4">
-          <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
+        <div class="custom-login-board mb-4">
+          <div class="row justify-content-center col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
                 <h4 class="text-center mb-4">회원 로그인</h4>
@@ -61,7 +62,7 @@ onMounted(() => {
                     </MaterialButton>
                   </div>
                   <p class="mt-4 text-sm text-center">
-                    <router-link to="/join" class="text-dark text-gradient font-weight-bold">회원가입</router-link>
+                    <RouterLink to="/users/signUp" class="text-dark text-gradient font-weight-bold">회원가입</RouterLink>
                     |
                     <a href="#" class="text-dark text-gradient font-weight-bold">아이디 찾기</a>
                     |
@@ -74,7 +75,7 @@ onMounted(() => {
           </div>
 
           <!-- 비회원 로그인 -->
-          <div class="col-lg-4 col-md-8 col-12 ms-lg-5">
+          <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="card z-index-0 fadeIn3 fadeInBottom">
               <div class="card-body">
                 <h4 class="text-center mb-4">비회원 로그인</h4>
@@ -215,3 +216,14 @@ onMounted(() => {
     </div>
   </Header>
 </template>
+
+<style scoped>
+.custom-login-board {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  margin: 0 auto; /* 카드 중앙 정렬 */
+}
+</style>
