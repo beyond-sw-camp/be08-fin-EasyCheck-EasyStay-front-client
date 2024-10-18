@@ -21,14 +21,21 @@ function goToMain() {
 }
 
 function goToLogin() {
-  router.push('/pages/landing-pages/basic');
+  router.push('/users/login');
 }
 
 </script>
 
 <template>
-  <NavbarDefault />
-  <Header style="margin-top: -80px">
+  <div class="position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <NavbarDefault :sticky="true" />
+      </div>
+    </div>
+  </div>
+
+  <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask opacity-6"></span>
       <div class="container custom-login-container my-auto position-relative">
