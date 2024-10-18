@@ -24,7 +24,7 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
-import RoomView from "@/views/Rooms/RoomView.vue";
+// import RoomView from "@/views/Rooms/RoomView.vue";
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
@@ -171,6 +171,8 @@ const router = createRouter({
       props: (route) => ({
         themeParkId: route.query.themeParkId || 1,
       }),
+    },
+    {
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,

@@ -1,29 +1,73 @@
 <script setup>
-import { onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
-//example components
+// example components
 import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
-//Vue Material Kit 2 components
+
+// Vue Material Kit 2 components
 
 // sections
 import PresentationExample from "./Sections/PresentationExample.vue";
 import data from "./Sections/Data/designBlocksData";
 
-//images
-import vueMkHeader from "@/assets/img/HanWhaResort.jpg";
+// images (6 images to cycle through)
+import image1 from "@/assets/img/main_images/Belvedere.jpg";
+import image2 from "@/assets/img/main_images/Sorano.jpg";
+import image3 from "@/assets/img/main_images/SanjungLake.jpeg";
+import image4 from "@/assets/img/main_images/Signiel.jpeg";
+import image5 from "@/assets/img/main_images/ThePlaza.jpeg";
+import image6 from "@/assets/img/main_images/ParadiseCity.jpeg";
 
-//hooks
+// image slider logic
+const images = [image1, image2, image3, image4, image5, image6];
+const currentImage = ref(images[0]); // starting image
+const isFading = ref(false); // controls the fade effect
+let imageIndex = 0;
+
 const body = document.getElementsByTagName("body")[0];
+let intervalId = null;
+
+// Helper function to change image with fade effect
+const changeImage = (newIndex) => {
+  isFading.value = true; // Start fading out
+  setTimeout(() => {
+    imageIndex = newIndex;
+    currentImage.value = images[imageIndex]; // Change image when faded out
+    isFading.value = false; // Fade back in
+  }, 500); // Time to wait for fade-out before changing image
+};
+
+// Move to the next image
+const nextImage = () => {
+  const nextIndex = (imageIndex + 1) % images.length;
+  changeImage(nextIndex);
+};
+
+// Move to the previous image
+const prevImage = () => {
+  const prevIndex = (imageIndex - 1 + images.length) % images.length;
+  changeImage(prevIndex);
+};
+
 onMounted(() => {
   body.classList.add("presentation-page");
   body.classList.add("bg-gray-200");
+
+  // Change the image every 5 seconds
+  intervalId = setInterval(nextImage, 5000); // 5 seconds
 });
+
 onUnmounted(() => {
   body.classList.remove("presentation-page");
   body.classList.remove("bg-gray-200");
+
+  // Clear the interval when the component is unmounted
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
 });
 </script>
 
@@ -35,8 +79,12 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
+
   <Header>
-    <div class="page-header min-vh-100" :style="`background-image: url(${vueMkHeader})`" loading="lazy">
+    <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
+      <!-- Transition effect for image change with fade -->
+      <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1};`">
+      </div>
       <div class="container">
         <div class="row">
           <div class="col-lg-7 text-center mx-auto position-relative">
@@ -49,6 +97,10 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Left and Right buttons for manual image change -->
+      <button class="btn-prev" @click="prevImage">‹</button>
+      <button class="btn-next" @click="nextImage">›</button>
     </div>
   </Header>
 
@@ -88,9 +140,58 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-    <!-- <PresentationCounter /> -->
+
     <PresentationExample :data="data" />
     <KakaoMap />
   </div>
+
   <DefaultFooter />
 </template>
+
+<style scoped>
+.background-image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 1s ease-in-out;
+  /* Smooth transition effect */
+  z-index: -1;
+}
+
+.page-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-prev,
+.btn-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1;
+  transition: background-color 0.3s ease;
+}
+
+.btn-prev:hover,
+.btn-next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.btn-prev {
+  left: 20px;
+}
+
+.btn-next {
+  right: 20px;
+}
+</style>

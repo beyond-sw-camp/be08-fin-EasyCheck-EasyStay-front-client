@@ -83,7 +83,7 @@ watch(
 <template>
     <nav class="navbar navbar-expand-lg top-0 py-3" :class="{
         'z-index-3 w-100 position-absolute my-3': props.transparent,
-        'z-index-3 py-2 py-2 start-0 end-0 position-absolute': props.sticky,
+        'z-index-3 py-2 start-0 end-0 position-absolute': props.sticky,
         'navbar-light bg-white py-3': !isScrolled && props.light,
         'navbar-dark bg-gradient-dark z-index-3 py-3': props.dark || isScrolled,
         'bg-transparent-black': isScrolled
