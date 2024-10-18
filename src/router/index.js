@@ -33,6 +33,10 @@ import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
 import MemberView from "@/views/LandingPages/SignIn/SignUp/MemberView.vue";
+import FindIdAuthenticationView from "@/views/LandingPages/SignIn/FindID/FindIdAuthenticationView.vue";
+import FindId from "@/views/LandingPages/SignIn/FindID/FindId.vue";
+import FindPwAuthentication from "@/views/LandingPages/SignIn/FindPW/FindPwAuthentication.vue";
+import FindPw from "@/views/LandingPages/SignIn/FindPW/FindPw.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -194,6 +198,26 @@ const router = createRouter({
       name: "JoinComplete",
       component: JoinCompleteView,
     },
+    {
+      path: "/users/findIdAuthentication",
+      name: "FindIdAuthentication",
+      component: FindIdAuthenticationView,
+    },
+    {
+      path: "/users/findId",
+      name: "FindId",
+      component: FindId,
+    },
+    {
+      path: "/users/FindPwAuthentication",
+      name: "FindPwAuthentication",
+      component: FindPwAuthentication
+    },
+    {
+      path: "/users/findPw",
+      name: "FindPw",
+      component: FindPw,
+    }
   ],
 });
 
