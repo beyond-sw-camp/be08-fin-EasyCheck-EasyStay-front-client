@@ -35,13 +35,16 @@
   </div>
 
   <div class="container-fluid d-flex justify-content-center my-5">
-    <MaterialButton color="danger" size="large" variant="gradient">
+    <MaterialButton color="danger" size="lg" variant="gradient">
       {{ themeParks[currentThemeParkIndex].name }} 이용권 구매하기
     </MaterialButton>
   </div>
 
   <div class="section-divider my-4"></div>
-  <NoticeInfo class="px-8" />
+  <NoticeInfo
+    class="px-8"
+    :themeParkName="themeParks[currentThemeParkIndex].name"
+  />
 </template>
 
 <script setup>
