@@ -27,8 +27,8 @@ function goToMain() {
   router.push('/');
 }
 
-function goToFindID() {
-  router.push('/users/findId');
+function goToFindPW() {
+  router.push('/users/findPw');
 }
 </script>
 
@@ -49,8 +49,8 @@ function goToFindID() {
         <div class="row">
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-start">
-              <h2 class="text-black mb-0">아이디 찾기</h2>
-              <h5 class="text-black fw-normal mt-4">아이디를 찾기 위해 휴대폰 본인 인증을 해주세요.</h5>
+              <h2 class="text-black mb-0">비밀번호 찾기</h2>
+              <h5 class="text-black fw-normal mt-4">비밀번호를 찾기 위해 휴대폰 본인 인증을 해주세요.</h5>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ function goToFindID() {
           <MaterialButton @click="goToMain" class="btn btn-secondary">
             취소
           </MaterialButton>
-          <MaterialButton @click="goToFindID" class="btn btn-primary ms-2">
+          <MaterialButton @click="goToFindPW" class="btn btn-primary ms-2">
             인증 요청
           </MaterialButton>
         </div>
@@ -106,7 +106,7 @@ function goToFindID() {
             </div>
           </div>
         </footer>
-
+        
       </div>
     </div>
   </Header>
