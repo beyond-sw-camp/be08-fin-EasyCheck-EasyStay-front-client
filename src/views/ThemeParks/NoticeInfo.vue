@@ -6,7 +6,9 @@
         <div class="contact-info-box">
           <table>
             <tr>
-              <span class="theme-park-name mx-2">{{ themeParkName }}</span>
+              <span class="theme-park-name mx-2">{{
+                props.themeParkName
+              }}</span>
               <span class="contact-number mx-2">041-939-1135</span>
             </tr>
             <tr>
