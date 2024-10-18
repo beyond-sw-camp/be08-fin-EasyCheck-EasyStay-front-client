@@ -34,9 +34,10 @@ import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
 import MemberView from "@/views/LandingPages/SignIn/SignUp/MemberView.vue";
 import FindIdAuthenticationView from "@/views/LandingPages/SignIn/FindID/FindIdAuthenticationView.vue";
-import FindId from "@/views/LandingPages/SignIn/FindID/FindId.vue";
-import FindPwAuthentication from "@/views/LandingPages/SignIn/FindPW/FindPwAuthentication.vue";
-import FindPw from "@/views/LandingPages/SignIn/FindPW/FindPw.vue";
+import FindIdView from "@/views/LandingPages/SignIn/FindID/FindIdView.vue";
+import FindPwAuthenticationView from "@/views/LandingPages/SignIn/FindPW/FindPwAuthenticationView.vue";
+import FindPwView from "@/views/LandingPages/SignIn/FindPW/FindPwView.vue";
+import PwComplete from "@/views/LandingPages/SignIn/FindPW/PwComplete.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -206,17 +207,22 @@ const router = createRouter({
     {
       path: "/users/findId",
       name: "FindId",
-      component: FindId,
+      component: FindIdView,
     },
     {
       path: "/users/FindPwAuthentication",
       name: "FindPwAuthentication",
-      component: FindPwAuthentication
+      component: FindPwAuthenticationView
     },
     {
       path: "/users/findPw",
       name: "FindPw",
-      component: FindPw,
+      component: FindPwView,
+    },
+    {
+      path: "/users/pwComplete",
+      name: "PwComplete",
+      component: PwComplete
     }
   ],
 });

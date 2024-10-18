@@ -8,14 +8,12 @@ import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
 //Vue Material Kit 2 components
-// import MaterialInput from "@/components/MaterialInput.vue";
+import MaterialInput from "@/components/MaterialInput.vue";
 // import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
-
-import Authentication from "../Sections/Authentication.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -27,8 +25,8 @@ function goToMain() {
   router.push('/');
 }
 
-function goToFindID() {
-  router.push('/users/findId');
+function goToPWComplete() {
+  router.push('/users/pwComplete');
 }
 </script>
 
@@ -42,35 +40,54 @@ function goToFindID() {
   </div>
 
   <Header>
-    <div class="page-header align-items-start min-vh-100" loading="lazy" style="margin-top: 70px;">
+    <div class="page-header align-items-start min-vh-80" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
 
       <div class="d-flex flex-column my-auto container custom-login-container position-relative">
         <div class="row">
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-start">
-              <h2 class="text-black mb-0">아이디 찾기</h2>
-              <h5 class="text-black fw-normal mt-4">아이디를 찾기 위해 휴대폰 본인 인증을 해주세요.</h5>
+              <h2 class="text-black mb-0">비밀번호 재설정</h2>
+              <h5 class="text-black fw-normal mt-4">비밀번호를 재설정 해주세요.</h5>
             </div>
           </div>
         </div>
 
         <hr class="my-2" style="border-top: 3px solid #000;" />
 
-        <Authentication />
+        <table class="table">
+          <tbody>
+            <tr>
+              <td class="text-statt align-middle fw-bold fs-8 col-2">비밀번호 입력</td>
+              <td class="align-middle ps-0">
+                <MaterialInput id="password1" class="text-start input-group-outline mb-0 w-25"
+                  :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              </td>
+            </tr>
+            <tr>
+              <td class="text-center align-middle fw-bold fs-8 pe-0 col-2">비밀번호 재입력</td> 
+              <td class="align-middle ps-0">
+                <MaterialInput id="password2" class="input-group-outline mb-0 w-25"
+                  :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr class="my-2" style="border-top: 3px solid #000;" />
 
         <!-- 버튼 -->
-        <div class="text-center mt-4 mb-5">
-          <MaterialButton @click="goToMain" class="btn btn-secondary">
-            취소
+        <div class="text-center mt-5">
+          <MaterialButton @click="goToMain" class="btn btn-light">
+            홈으로
           </MaterialButton>
-          <MaterialButton @click="goToFindID" class="btn btn-primary ms-2">
-            인증 요청
+          <MaterialButton @click="goToPWComplete" class="btn btn-dark ms-2">
+            설정완료
           </MaterialButton>
         </div>
 
         <!-- 푸터 -->
-        <footer class="footer position-absolute bottom-2 py-2 w-100">
+        <footer class="footer fixed-bottom py-2 w-100">
           <div class="container">
             <div class="row align-items-center justify-content-lg-between">
               <div class="col-12 col-md-6 my-auto">
@@ -90,8 +107,7 @@ function goToFindID() {
                   </li>
                   <li class="nav-item">
                     <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                      class="nav-link text-dark" target="_blank">About
-                      Us</a>
+                      class="nav-link text-dark" target="_blank">About Us</a>
                   </li>
                   <li class="nav-item">
                     <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"

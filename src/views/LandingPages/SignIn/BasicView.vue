@@ -67,7 +67,7 @@ onMounted(() => {
                     |
                     <RouterLink to="/users/findIdAuthentication" class="text-dark text-gradient font-weight-bold">아이디 찾기</RouterLink>
                     |
-                    <a href="#" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</a>
+                    <RouterLink to="/users/findPwAuthentication" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</RouterLink>
                   </p>
 
                 </form>
