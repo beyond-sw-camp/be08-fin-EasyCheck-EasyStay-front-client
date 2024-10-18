@@ -23,8 +23,15 @@ import ElDropdowns from "../layouts/sections/elements/dropdowns/DropdownsView.vu
 import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressBarsView.vue";
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
+
 import RoomView from "@/views/Rooms/RoomView.vue";
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
+import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+import SignUpView from "@/views/LandingPages/SignIn/SignUpView.vue";
+import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
+import JoinCompleteView from "@/views/LandingPages/SignIn/JoinCompleteView.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -49,8 +56,8 @@ const router = createRouter({
       component: AuthorView,
     },
     {
-      path: "/pages/landing-pages/basic",
-      name: "signin-basic",
+      path: "/users/login",
+      name: "login",
       component: SignInBasicView,
     },
     {
@@ -151,7 +158,7 @@ const router = createRouter({
     {
       path: "/accommodation",
       name: "Accommodation",
-      component: RoomView,
+      component: AccommodationView,
       props: (route) => ({
         // queryParam이 지정되지 않는다면 기본값으로 들어가게 설정
         accommodationId: route.query.accommodationId || 1,
@@ -164,6 +171,24 @@ const router = createRouter({
       props: (route) => ({
         themeParkId: route.query.themeParkId || 1,
       }),
+      path: "/room/:roomId",
+      name: "Room",
+      component: RoomDetailView,
+    },
+    {
+      path: "/users/signUp",
+      name: "SignUp",
+      component: SignUpView,
+    },
+    {
+      path: "/users/signUp/member",
+      name: "JoinMember",
+      component: MemberView,
+    },
+    {
+      path: "/joinComplete",
+      name: "JoinComplete",
+      component: JoinCompleteView,
     },
   ],
 });
