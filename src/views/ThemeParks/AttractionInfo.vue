@@ -1,12 +1,17 @@
 <template>
   <section class="my-3 py-3">
-    <h3 class="text-start text-black px-6 mb-5 mb-lg-7">시설 안내</h3>
-    <div class="container-fluid px-6">
-      <Splide :options="splideOptions">
+    <div class="d-flex justify-content-between align-items-center px-7 mb-5">
+      <h3 class="text-start text-black">시설 안내</h3>
+      <MaterialButton color="danger" @click="handleUsageGuide">
+        이용 안내
+      </MaterialButton>
+    </div>
+    <div class="container-fluid px-4">
+      <Splide :options="splideOptions" class="custom-splide mb-lg-5">
         <SplideSlide
           v-for="attraction in attractions"
           :key="attraction.id"
-          class="slider-item d-flex justify-content-center px-1"
+          class="slider-item d-flex justify-content-center px-3"
         >
           <div class="card attraction-card" @click="openModal(attraction)">
             <div class="attraction-image-wrapper">
@@ -39,7 +44,8 @@
 import { ref } from "vue";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import AttractionModal from "@/components/ThemePark/AttractionModal.vue";
-import "@splidejs/splide/dist/css/splide.min.css";
+import MaterialButton from "@/components/MaterialButton.vue";
+import "@splidejs/splide/css/sea-green";
 
 const attractions = [
   {
@@ -129,6 +135,10 @@ const formattedDescription = (description) => {
     : description;
 };
 
+const handleUsageGuide = () => {
+  alert("이용 안내를 참고해주세요.");
+};
+
 const splideOptions = {
   type: "slide",
   perPage: 3,
@@ -194,15 +204,19 @@ const splideOptions = {
   background-color: #007bff;
   color: #ffffff;
   border-radius: 50%;
-  padding: 0.5rem;
-  width: 50px;
-  height: 50px;
-  opacity: 0.8;
+  padding: 0.75rem;
+  width: 60px;
+  height: 60px;
+  opacity: 0.9;
   transition: background-color 0.3s, opacity 0.3s;
 }
 
 .splide__arrow:hover {
   background-color: #0056b3;
   opacity: 1;
+}
+
+.splide__track {
+  margin-bottom: 3rem !important;
 }
 </style>
