@@ -11,7 +11,7 @@
     </MaterialButton>
   </div>
   <div class="section-divider my-4"></div>
-  <InformationSection />
+  <InformationSection :themeParkName="themeParkName" />
 </template>
 
 <script setup>
