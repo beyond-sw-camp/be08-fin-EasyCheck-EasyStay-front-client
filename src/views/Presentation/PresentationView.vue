@@ -5,6 +5,7 @@ import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
+import Payment from "../../components/Payment/Payment.vue";
 import data from "./Sections/Data/designBlocksData";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
 
@@ -150,7 +151,7 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-
+    <Payment />
     <AccommodationList :data="data" />
     <KakaoMap />
   </div>
