@@ -5,8 +5,8 @@ import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
-import PresentationExample from "./Sections/PresentationExample.vue";
 import data from "./Sections/Data/designBlocksData";
+import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
 
 import image1 from "@/assets/img/main_images/Belvedere.jpg";
 import image2 from "@/assets/img/main_images/Sorano.jpg";
@@ -151,7 +151,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <PresentationExample :data="data" />
+    <AccommodationList :data="data" />
     <KakaoMap />
   </div>
 
