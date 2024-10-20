@@ -30,6 +30,8 @@ import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 
+import ReservationPage from "@/views/Payment/ReservationPage.vue";
+
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
 import MemberView from "@/views/LandingPages/SignIn/SignUp/MemberView.vue";
@@ -222,8 +224,13 @@ const router = createRouter({
     {
       path: "/users/pwComplete",
       name: "PwComplete",
-      component: PwComplete
-    }
+      component: PwComplete,
+    },
+    {
+      path: "/reservation",
+      name: "ReservationPage",
+      component: ReservationPage,
+    },
   ],
 });
 
