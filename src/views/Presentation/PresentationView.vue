@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import axios from "axios";
+import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
+import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
 import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
@@ -22,6 +25,31 @@ const isFading = ref(false);
 const isPlaying = ref(true);
 const imageIndex = ref(0);
 let intervalId = null;
+
+const accommodations = ref([]);
+const availableRooms = ref([]);
+
+const fetchAccommodations = async () => {
+  try {
+    const response = await axios.get("/api/v1/accommodations");
+    accommodations.value = response.data;
+  } catch (error) {
+    console.error("리조트 목록을 가져오는 중 오류가 발생했습니다.", error);
+  }
+};
+
+const onSearchRooms = async ({ resort, checkInDate, checkOutDate, roomCount }) => {
+  try {
+    const response = await axios.get("/api/v1/reservation-room/available", {
+      params: { accommodationId: resort, checkinDate: checkInDate, checkoutDate: checkOutDate, roomCount }
+    });
+    availableRooms.value = response.data;
+  } catch (error) {
+    console.error("객실 검색 중 오류가 발생했습니다.", error);
+  }
+};
+
+onMounted(fetchAccommodations);
 
 const changeImage = (newIndex) => {
   isFading.value = true;
@@ -116,39 +144,8 @@ onUnmounted(() => {
   <div class="card card-body mx-3 mx-md-7">
     <div class="row justify-content-center mb-5 pb-5">
       <div class="col-12 col-md-10">
-        <div class="card p-4">
-          <form class="row g-3 align-items-center">
-            <div class="col-md-4">
-              <label for="resortSelect" class="form-label">방문리조트 선택</label>
-              <select v-model="selectedResort" id="resortSelect" class="form-select">
-                <option value="" disabled>지점선택</option>
-                <option value="resort1">리조트 1</option>
-                <option value="resort2">리조트 2</option>
-              </select>
-            </div>
-
-            <div class="col-md-4">
-              <label for="checkIn" class="form-label">체크인</label>
-              <input type="date" v-model="checkInDate" id="checkIn" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-              <label for="checkOut" class="form-label">체크아웃</label>
-              <input type="date" v-model="checkOutDate" id="checkOut" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-              <label for="roomCount" class="form-label">객실 수</label>
-              <input type="number" v-model="roomCount" min="1" id="roomCount" class="form-control" />
-            </div>
-
-            <div class="col-md-4">
-              <button type="button" @click="searchRooms" class="btn btn-primary w-100">
-                객실 검색
-              </button>
-            </div>
-          </form>
-        </div>
+        <RoomSearchForm :accommodations="accommodations" @search="onSearchRooms" />
+        <RoomList :rooms="availableRooms" />
       </div>
     </div>
     <Payment />
