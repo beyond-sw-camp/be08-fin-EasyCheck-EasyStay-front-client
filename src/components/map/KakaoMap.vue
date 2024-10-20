@@ -1,54 +1,56 @@
 <template>
-    <div class="container-fluid mb-7">
-        <div class="row">
-            <div class="col-lg-3 col-md-4 col-12 p-4 bg-light">
-                <div class="section-title">
-                    <h5>리조트</h5>
-                </div>
-                <ul class="list-group mb-4">
-                    <li v-for="resort in resortAccommodations" :key="resort.id" class="list-group-item"
-                        @click="moveToLocation(resort)" style="cursor: pointer;">
-                        {{ resort.name }}
-                    </li>
-                </ul>
+    <section class="mb-5 pb-5">
+        <div class="container mt-sm-5 mt-3">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-12 p-4 bg-light">
+                    <div class="section-title">
+                        <h5>리조트</h5>
+                    </div>
+                    <ul class="list-group mb-4">
+                        <li v-for="resort in resortAccommodations" :key="resort.id" class="list-group-item"
+                            @click="moveToLocation(resort)" style="cursor: pointer;">
+                            {{ resort.name }}
+                        </li>
+                    </ul>
 
-                <div class="section-title">
-                    <h5>호텔</h5>
+                    <div class="section-title">
+                        <h5>호텔</h5>
+                    </div>
+                    <ul class="list-group">
+                        <li v-for="hotel in hotelAccommodations" :key="hotel.id" class="list-group-item"
+                            @click="moveToLocation(hotel)" style="cursor: pointer;">
+                            {{ hotel.name }}
+                        </li>
+                    </ul>
                 </div>
-                <ul class="list-group">
-                    <li v-for="hotel in hotelAccommodations" :key="hotel.id" class="list-group-item"
-                        @click="moveToLocation(hotel)" style="cursor: pointer;">
-                        {{ hotel.name }}
-                    </li>
-                </ul>
+
+                <div class="col-lg-9 col-md-8 col-12" style="height: 500px;">
+                    <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true"
+                        style="width: 100%; height: 100%;">
+                        <KakaoMapMarker :lat="centerCoordinate.lat" :lng="centerCoordinate.lng"></KakaoMapMarker>
+                    </KakaoMap>
+                </div>
             </div>
 
-            <div class="col-lg-9 col-md-8 col-12" style="height: 500px;">
-                <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true"
-                    style="width: 100%; height: 100%;">
-                    <KakaoMapMarker :lat="centerCoordinate.lat" :lng="centerCoordinate.lng"></KakaoMapMarker>
-                </KakaoMap>
+            <div class="row mt-5 location-info" v-if="currentLocation.name !== 'selectedAccommodation'">
+                <div class="col-12 text-left p-4">
+                    <h4 class="title">리조트 위치안내</h4>
+                    <div class="transportation mt-3">
+                        <i class="fas fa-car mr-2"></i>
+                        <span>자차 이용</span>
+                    </div>
+                    <div class="mt-3">
+                        <p class="address">주소: <span>{{ currentLocation.address }}</span></p>
+                        <p class="departure">출발지: 서울 (<span>{{ currentLocation.responseTime }}</span>)</p>
+                    </div>
+                    <div class="path-info mt-4 d-flex justify-content-center align-items-center">
+                        <img v-if="currentLocation.directionsUrl" :src="currentLocation.directionsUrl" alt="Directions"
+                            class="directions-img">
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="row mt-5 location-info" v-if="currentLocation.name !== 'selectedAccommodation'">
-            <div class="col-12 text-left p-4">
-                <h4 class="title">리조트 위치안내</h4>
-                <div class="transportation mt-3">
-                    <i class="fas fa-car mr-2"></i>
-                    <span>자차 이용</span>
-                </div>
-                <div class="mt-3">
-                    <p class="address">주소: <span>{{ currentLocation.address }}</span></p>
-                    <p class="departure">출발지: 서울 (<span>{{ currentLocation.responseTime }}</span>)</p>
-                </div>
-                <div class="path-info mt-4 d-flex justify-content-center align-items-center">
-                    <img v-if="currentLocation.directionsUrl" :src="currentLocation.directionsUrl" alt="Directions"
-                        class="directions-img">
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 </template>
 
 <script setup>

@@ -6,8 +6,8 @@ import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
 import Payment from "../../components/Payment/Payment.vue";
-import data from "./Sections/Data/designBlocksData";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
+import EventList from "./Sections/Event/EventList.vue";
 
 import image1 from "@/assets/img/main_images/Belvedere.jpg";
 import image2 from "@/assets/img/main_images/Sorano.jpg";
@@ -114,7 +114,7 @@ onUnmounted(() => {
   </Header>
 
   <div class="card card-body mx-3 mx-md-7">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mb-5 pb-5">
       <div class="col-12 col-md-10">
         <div class="card p-4">
           <form class="row g-3 align-items-center">
@@ -152,7 +152,8 @@ onUnmounted(() => {
       </div>
     </div>
     <Payment />
-    <AccommodationList :data="data" />
+    <EventList />
+    <AccommodationList />
     <KakaoMap />
   </div>
 
