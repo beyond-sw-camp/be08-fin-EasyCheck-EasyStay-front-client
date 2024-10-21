@@ -34,12 +34,14 @@ import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
-import MemberView from "@/views/LandingPages/SignIn/SignUp/MemberView.vue";
-import FindIdAuthenticationView from "@/views/LandingPages/SignIn/FindID/FindIdAuthenticationView.vue";
-import FindIdView from "@/views/LandingPages/SignIn/FindID/FindIdView.vue";
-import FindPwAuthenticationView from "@/views/LandingPages/SignIn/FindPW/FindPwAuthenticationView.vue";
-import FindPwView from "@/views/LandingPages/SignIn/FindPW/FindPwView.vue";
-import PwComplete from "@/views/LandingPages/SignIn/FindPW/PwComplete.vue";
+import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
+import MemberView from "@/views/LandingPages/SignIn/Member/MemberView.vue";
+import FindIdAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdAuthenticationView.vue";
+import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdView.vue";
+import FindPwAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwAuthenticationView.vue";
+import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwView.vue";
+import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
+import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -188,12 +190,17 @@ const router = createRouter({
     },
     {
       path: "/users/signUp",
-      name: "SignUp",
+      name: "MemberSignUp",
       component: SignUpView,
     },
     {
-      path: "/users/signUp/member",
-      name: "JoinMember",
+      path: "/users/memberAuthentication",
+      name: "MemberAuthentication",
+      component: MemberAuthView,
+    },
+    {
+      path: "/users/member/info",
+      name: "MemberView",
       component: MemberView,
     },
     {
@@ -227,6 +234,10 @@ const router = createRouter({
       component: PwComplete,
     },
     {
+      path: "/corporate/signUp",
+      name: "CorporateSignUp",
+      component: CorporateView,
+    }
       path: "/reservation",
       name: "ReservationPage",
       component: ReservationPage,
