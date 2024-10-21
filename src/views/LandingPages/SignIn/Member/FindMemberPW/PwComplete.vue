@@ -1,6 +1,7 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -8,24 +9,43 @@ import Header from "@/examples/Header.vue";
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
+
 onMounted(() => {
   setMaterialInput();
 });
+
+const router = useRouter();
+
+function goToMain() {
+  router.push('/');
+}
+
+function goToLogin() {
+  router.push('/users/login');
+}
+
 </script>
 
 <template>
-  <NavbarDefault />
-  <Header>
-    <div class="page-header align-items-start min-vh-100">
-      <span class="mask bg-white opacity-6"></span>
+  <div class="position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <NavbarDefault :sticky="true" />
+      </div>
+    </div>
+  </div>
 
+  <Header>
+    <div class="page-header align-items-start min-vh-100" loading="lazy">
+      <span class="mask opacity-6"></span>
       <div class="container custom-login-container my-auto position-relative">
         <div class="row">
           <div class="col-12">
             <div class="text-black shadow-succes py-3 mb-5 text-center line">
-              <h3 class="font-weight-bolder mb-0 mt-4">EASY STAY<br>회원가입</h3>
+              <span class="material-icons mb-2" style="font-size: 100px; color: steelblue">deck</span>
+              <h3 class="font-weight-bolder mb-0 mt-4">EASY STAY<br>비밀번호 변경 완료</h3>
               <div class="mt-3"></div>
-              <div class="row mt-3 justify-content-center">
+              <div class="row mt-3 justify-content-center mb-3">
                 EasyStay와 함께 편안한 휴식과 특별한 순간이 기다리고 있습니다. <br>
                 회원으로 다양한 혜택을 누려보세요!
               </div>
@@ -33,28 +53,19 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="row mb-4 justify-content-center">
-          <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
-            <div class="d-flex justify-content-center text-center">
-              <div class="col-auto d-flex flex-column align-items-center mx-5">
-                <router-link to="/join/member" class="text-decoration-none custom-router-link">
-                  <span class="material-icons" style="font-size: 200px;">person</span>
-                  <h4>일반 회원</h4>
-                </router-link>
-              </div>
-              <div class="col-auto d-flex flex-column align-items-center mx-5">
-                <router-link to="join/corporate" class="text-decoration-none custom-router-link">
-                  <span class="material-icons" style="font-size: 200px;">apartment</span>
-                  <h4>법인 회원</h4>
-                </router-link>
-              </div>
-            </div>
-          </div>
+        <!-- 버튼 -->
+        <div class="text-center mt-4">
+          <MaterialButton @click="goToMain" class="btn btn-light">
+            홈으로
+          </MaterialButton>
+          <MaterialButton @click="goToLogin" class="btn btn-dark ms-2">
+            로그인
+          </MaterialButton>
         </div>
       </div>
     </div>
 
-    <footer class="footer fixed-bottom py-2 w-100">
+    <footer class="footer position-absolute bottom-2 py-2 w-100">
       <div class="container">
         <div class="row align-items-center justify-content-lg-between">
           <div class="col-12 col-md-6 my-auto">
@@ -74,8 +85,7 @@ onMounted(() => {
               </li>
               <li class="nav-item">
                 <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                  class="nav-link text-dark" target="_blank">About
-                  Us</a>
+                  class="nav-link text-dark" target="_blank">About Us</a>
               </li>
               <li class="nav-item">
                 <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
@@ -92,14 +102,3 @@ onMounted(() => {
     </footer>
   </Header>
 </template>
-
-<style>
-.custom-router-link {
-  color: inherit;
-}
-
-.custom-router-link:hover {
-  color: inherit;
-  background-color: transparent;
-}
-</style>

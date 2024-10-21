@@ -24,13 +24,28 @@ import ElProgressBars from "../layouts/sections/elements/progress-bars/ProgressB
 import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
+import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
+
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 import ReservationView from "@/views/Reservation/ReservationView.vue";
 
-import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
-import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
-import JoinCompleteView from "@/views/LandingPages/SignIn/JoinCompleteView.vue";
+import ReservationPage from "@/views/Payment/ReservationPage.vue";
+
+import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
+import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
+import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
+import MemberView from "@/views/LandingPages/SignIn/Member/MemberView.vue";
+import FindIdAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdAuthenticationView.vue";
+import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdView.vue";
+import FindPwAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwAuthenticationView.vue";
+import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwView.vue";
+import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
+
+import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
+
+import MypageView from "@/views/Mypage/MypageView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -165,6 +180,19 @@ const router = createRouter({
       }),
     },
     {
+      path: "/themepark/:themeparkId",
+      name: "ThemePark",
+      component: ThemeParkView,
+      props: (route) => ({
+        themeParkId: route.query.themeParkId || 1,
+      }),
+    },
+    {
+      path: "/ticket-order/:themeParkId",
+      name: "TicketOrderView",
+      component: TicketOrderView,
+    },
+    {
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
@@ -175,13 +203,18 @@ const router = createRouter({
       component: ReservationView,
     },
     {
-      path: "/join",
-      name: "Join",
-      component: JoinView,
+      path: "/users/signUp",
+      name: "MemberSignUp",
+      component: SignUpView,
     },
     {
-      path: "/join/member",
-      name: "JoinMember",
+      path: "/users/memberAuthentication",
+      name: "MemberAuthentication",
+      component: MemberAuthView,
+    },
+    {
+      path: "/users/member/info",
+      name: "MemberView",
       component: MemberView,
     },
     {
@@ -189,7 +222,54 @@ const router = createRouter({
       name: "JoinComplete",
       component: JoinCompleteView,
     },
+    {
+      path: "/users/findIdAuthentication",
+      name: "FindIdAuthentication",
+      component: FindIdAuthenticationView,
+    },
+    {
+      path: "/users/findId",
+      name: "FindId",
+      component: FindIdView,
+    },
+    {
+      path: "/users/FindPwAuthentication",
+      name: "FindPwAuthentication",
+      component: FindPwAuthenticationView,
+    },
+    {
+      path: "/users/findPw",
+      name: "FindPw",
+      component: FindPwView,
+    },
+    {
+      path: "/users/pwComplete",
+      name: "PwComplete",
+      component: PwComplete,
+    },
+    {
+      path: "/corporate/signUp",
+      name: "CorporateSignUp",
+      component: CorporateView,
+    },
+    {
+      path: "/reservation",
+      name: "ReservationPage",
+      component: ReservationPage,
+    },
+    {
+      path: "/users/mypage",
+      name: "Mypage",
+      component: MypageView,
+    },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.name === "TicketOrderView") {
+    window.scrollTo(0, 0); // 해당 페이지로 이동할 때 스크롤을 맨 위로 이동
+  }
+  next();
 });
 
 export default router;
