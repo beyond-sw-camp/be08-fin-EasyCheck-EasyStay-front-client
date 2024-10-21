@@ -29,6 +29,7 @@ import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+import ReservationView from "@/views/Reservation/ReservationView.vue";
 
 import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
@@ -187,14 +188,19 @@ const router = createRouter({
       }),
     },
     {
-      path: '/ticket-order/:themeParkId',
-      name: 'TicketOrderView',
-      component: TicketOrderView
+      path: "/ticket-order/:themeParkId",
+      name: "TicketOrderView",
+      component: TicketOrderView,
     },
     {
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
+    },
+    {
+      path: "/reservation",
+      name: "Reservation",
+      component: ReservationView,
     },
     {
       path: "/users/signUp",
@@ -229,7 +235,7 @@ const router = createRouter({
     {
       path: "/users/FindPwAuthentication",
       name: "FindPwAuthentication",
-      component: FindPwAuthenticationView
+      component: FindPwAuthenticationView,
     },
     {
       path: "/users/findPw",
@@ -255,12 +261,12 @@ const router = createRouter({
       path: "/users/mypage",
       name: "Mypage",
       component: MypageView,
-    }
-    ],
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.name === 'TicketOrderView') { 
+  if (to.name === "TicketOrderView") {
     window.scrollTo(0, 0); // 해당 페이지로 이동할 때 스크롤을 맨 위로 이동
   }
   next();
