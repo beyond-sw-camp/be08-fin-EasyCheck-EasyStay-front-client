@@ -27,6 +27,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -64,9 +65,9 @@ onMounted(() => {
                   <p class="mt-4 text-sm text-center">
                     <RouterLink to="/users/signUp" class="text-dark text-gradient font-weight-bold">회원가입</RouterLink>
                     |
-                    <a href="#" class="text-dark text-gradient font-weight-bold">아이디 찾기</a>
+                    <RouterLink to="/users/findIdAuthentication" class="text-dark text-gradient font-weight-bold">아이디 찾기</RouterLink>
                     |
-                    <a href="#" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</a>
+                    <RouterLink to="/users/findPwAuthentication" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</RouterLink>
                   </p>
 
                 </form>

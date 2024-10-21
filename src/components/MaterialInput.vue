@@ -8,13 +8,20 @@ defineProps({
     type: String,
     default: "text",
   },
+  // label: {
+  //   type: [String, Object],
+  //   text: String,
+  //   class: String,
+  //   default: () => ({
+  //     class: "",
+  //   }),
+  // },
   label: {
-    type: [String, Object],
-    text: String,
-    class: String,
-    default: () => ({
-      class: "",
-    }),
+    default: () => ({}),
+  },
+  modelValue: {  // v-model을 위해 modelValue 사용
+    type: String,
+    default: "",
   },
   value: {
     type: String,
@@ -53,6 +60,14 @@ defineProps({
     default: "",
   },
 });
+
+// emit()을 사용하기 위해 defineEmits() 추가
+const emit = defineEmits(['update:modelValue']);
+
+const handleInput = (event) => {
+  emit('update:modelValue', event.target.value);
+};
+
 function getClasses(size, success, error) {
   let sizeValue, isValidValue;
 
@@ -82,10 +97,11 @@ function getClasses(size, success, error) {
       :type="type"
       class="form-control"
       :class="[getClasses(size, success, error), inputClass]"
-      :value="value"
+      :value="modelValue"
       :placeholder="placeholder"
-      :isRequired="isRequired"
+      :Required="isRequired"
       :disabled="isDisabled"
+      @input="handleInput" 
     />
   </div>
 </template>

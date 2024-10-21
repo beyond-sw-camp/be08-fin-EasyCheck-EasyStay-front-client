@@ -1,52 +1,56 @@
 <template>
-    <div class="container-fluid mb-7">
-        <div class="row">
-            <div class="col-lg-3 col-md-4 col-12 p-3 bg-light">
-                <h5>리조트</h5>
-                <ul class="list-group mb-4">
-                    <li v-for="resort in resortAccommodations" :key="resort.id" class="list-group-item"
-                        @click="moveToLocation(resort)" style="cursor: pointer;">
-                        {{ resort.name }}
-                    </li>
-                </ul>
+    <section class="mb-5 pb-5">
+        <div class="container mt-sm-5 mt-3">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-12 p-4 bg-light">
+                    <div class="section-title">
+                        <h5>리조트</h5>
+                    </div>
+                    <ul class="list-group mb-4">
+                        <li v-for="resort in resortAccommodations" :key="resort.id" class="list-group-item"
+                            @click="moveToLocation(resort)" style="cursor: pointer;">
+                            {{ resort.name }}
+                        </li>
+                    </ul>
 
-                <h5>호텔</h5>
-                <ul class="list-group">
-                    <li v-for="hotel in hotelAccommodations" :key="hotel.id" class="list-group-item"
-                        @click="moveToLocation(hotel)" style="cursor: pointer;">
-                        {{ hotel.name }}
-                    </li>
-                </ul>
-            </div>
-
-            <div class="col-lg-9 col-md-8 col-12" style="height: 500px;">
-                <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true"
-                    style="width: 100%; height: 100%;">
-                    <KakaoMapMarker :lat="centerCoordinate.lat" :lng="centerCoordinate.lng"></KakaoMapMarker>
-                </KakaoMap>
-            </div>
-        </div>
-
-        <!-- 경로 안내 메시지 및 위치 안내 섹션 -->
-        <div class="row mt-5" v-if="currentLocation.name !== 'selectedAccommodation'">
-            <div class="col-12 text-center">
-                <h4>리조트 위치안내</h4>
-                <div class="d-flex justify-content-center align-items-center mt-3">
-                    <i class="fas fa-car mr-2"></i>
-                    <span>자차 이용</span>
+                    <div class="section-title">
+                        <h5>호텔</h5>
+                    </div>
+                    <ul class="list-group">
+                        <li v-for="hotel in hotelAccommodations" :key="hotel.id" class="list-group-item"
+                            @click="moveToLocation(hotel)" style="cursor: pointer;">
+                            {{ hotel.name }}
+                        </li>
+                    </ul>
                 </div>
-                <div class="mt-2">
-                    <p>주소: <span>{{ currentLocation.address }}</span></p>
-                    <p>출발지: 서울 (<span>{{ currentLocation.responseTime }}</span>)</p>
-                    <div class="path-info d-flex justify-content-center align-items-center">
-                        <!-- AWS S3에 저장된 directionsUrl 이미지를 표시 -->
+
+                <div class="col-lg-9 col-md-8 col-12" style="height: 500px;">
+                    <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true"
+                        style="width: 100%; height: 100%;">
+                        <KakaoMapMarker :lat="centerCoordinate.lat" :lng="centerCoordinate.lng"></KakaoMapMarker>
+                    </KakaoMap>
+                </div>
+            </div>
+
+            <div class="row mt-5 location-info" v-if="currentLocation.name !== 'selectedAccommodation'">
+                <div class="col-12 text-left p-4">
+                    <h4 class="title">리조트 위치안내</h4>
+                    <div class="transportation mt-3">
+                        <i class="fas fa-car mr-2"></i>
+                        <span>자차 이용</span>
+                    </div>
+                    <div class="mt-3">
+                        <p class="address">주소: <span>{{ currentLocation.address }}</span></p>
+                        <p class="departure">출발지: 서울 (<span>{{ currentLocation.responseTime }}</span>)</p>
+                    </div>
+                    <div class="path-info mt-4 d-flex justify-content-center align-items-center">
                         <img v-if="currentLocation.directionsUrl" :src="currentLocation.directionsUrl" alt="Directions"
-                            style="max-width: 100%; height: auto;">
+                            class="directions-img">
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script setup>
@@ -59,34 +63,80 @@ const centerCoordinate = ref({
     lng: 126.927607128836
 });
 
-// 현재 선택된 리조트 또는 호텔 위치를 저장할 변수
 const currentLocation = ref({ name: 'selectedAccommodation' });
-
-// Pinia store 사용
 const accommodationStore = useAccommodationStore();
-
-// 리조트와 호텔을 필터링하여 나눔
 const resortAccommodations = computed(() => accommodationStore.accommodations.filter(acc => acc.accommodationType === 'RESORT'));
 const hotelAccommodations = computed(() => accommodationStore.accommodations.filter(acc => acc.accommodationType === 'HOTEL'));
 
-// API에서 리조트와 호텔 목록을 가져오는 함수
 onMounted(() => {
     accommodationStore.fetchAccommodations();
 });
 
-// 지도 중심을 이동하고 경로 안내를 업데이트하는 함수
 const moveToLocation = (location) => {
     centerCoordinate.value = {
         lat: location.latitude,
         lng: location.longitude
     };
 
-    // 선택된 리조트 또는 호텔의 정보를 업데이트
     currentLocation.value = location;
 };
 </script>
 
 <style scoped>
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+.location-info {
+    height: 500px;
+    padding: 20px;
+}
+
+.title {
+    font-family: 'Pretendard-Regular';
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.transportation {
+    font-family: 'Pretendard-Regular';
+    font-size: 1rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+}
+
+.address,
+.departure {
+    font-family: 'Pretendard-Regular';
+    font-size: 1rem;
+    color: #495057;
+}
+
+.directions-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.list-group-item:hover {
+    background-color: #e9ecef;
+}
+
 @media (max-width: 768px) {
 
     .col-lg-3,
@@ -96,6 +146,10 @@ const moveToLocation = (location) => {
 
     .col-lg-9 {
         padding: 0 !important;
+    }
+
+    .list-group-item {
+        font-size: 0.9rem;
     }
 }
 
