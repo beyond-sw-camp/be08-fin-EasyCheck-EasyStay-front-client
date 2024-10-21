@@ -32,18 +32,32 @@
 <script setup>
 import { ref } from "vue";
 
-const themePark = ref({
-  id: 1,
-  name: "설악 워터피아",
-  description:
-    "눈 앞에서 시원하게 펼쳐지는 설악산의 풍광과 뜨끈뜨끈한 천연온천을 즐기며 진정한 힐링과 치유의 시간을 즐겨보세요~",
-  location: "속초 리조트",
-  imageUrls: [
-    "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
-    "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-    "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
-  ],
-});
+const themePark = ref(
+  {
+    id: 1,
+    name: "설악 워터피아",
+    description:
+      "눈 앞에서 시원하게 펼쳐지는 설악산의 풍광과 뜨끈뜨끈한 천연온천을 즐기며 진정한 힐링과 치유의 시간을 즐겨보세요~",
+    location: "속초 리조트",
+    imageUrls: [
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
+    ],
+  },
+  {
+    id: 2,
+    name: "인피니티 풀",
+    description:
+      "하늘의 끝 바다의 너머로 헤엄쳐가는 환상적인 느낌, 마치 동해의 수평선 너머로 헤엄쳐가는 듯한 멋진 경험을 선사합니다.",
+    location: "속초 리조트",
+    imageUrls: [
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation5.jpg",
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation1.jpg",
+      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
+    ],
+  }
+);
 
 const activeIndex = ref(0);
 
@@ -58,7 +72,6 @@ const prevSlide = () => {
     themePark.value.imageUrls.length;
 };
 </script>
-
 
 <style scoped lang="scss">
 .carousel {
@@ -93,7 +106,7 @@ img {
 
 .carousel-caption {
   position: absolute;
-  top: 50%; 
+  top: 50%;
   left: 10%;
   transform: translateY(-50%);
   color: white;
@@ -107,15 +120,15 @@ img {
   font-size: 3rem;
   font-weight: bold;
   margin: 0;
-  color: #fff; 
+  color: #fff;
 }
 
 .carousel-description {
   font-size: 1rem;
   margin: 2rem 0 0 0;
-  color: #fff; 
-  max-width: 500px; 
-  word-wrap: break-word; 
+  color: #fff;
+  max-width: 500px;
+  word-wrap: break-word;
 }
 
 .carousel-control-prev,
