@@ -36,11 +36,18 @@ onUnmounted(() => {
     </div>
   </div>
   <Header>
-    <div class="page-header min-vh-100" :style="`background-image: url(${vueMkHeader})`" loading="lazy">
+    <div
+      class="page-header min-vh-100"
+      :style="`background-image: url(${vueMkHeader})`"
+      loading="lazy"
+    >
       <div class="container">
         <div class="row">
           <div class="col-lg-7 text-center mx-auto position-relative">
-            <h1 class="text-white pt-3 mt-n5 me-2" :style="{ display: 'inline-block ' }">
+            <h1
+              class="text-white pt-3 mt-n5 me-2"
+              :style="{ display: 'inline-block ' }"
+            >
               EasyStay
             </h1>
             <p class="lead text-white px-5 mt-3" :style="{ fontWeight: '500' }">
@@ -58,8 +65,14 @@ onUnmounted(() => {
         <div class="card p-4">
           <form class="row g-3 align-items-center">
             <div class="col-md-4">
-              <label for="resortSelect" class="form-label">방문리조트 선택</label>
-              <select v-model="selectedResort" id="resortSelect" class="form-select">
+              <label for="resortSelect" class="form-label"
+                >방문리조트 선택</label
+              >
+              <select
+                v-model="selectedResort"
+                id="resortSelect"
+                class="form-select"
+              >
                 <option value="" disabled>지점선택</option>
                 <option value="resort1">리조트 1</option>
                 <option value="resort2">리조트 2</option>
@@ -68,21 +81,43 @@ onUnmounted(() => {
 
             <div class="col-md-4">
               <label for="checkIn" class="form-label">체크인</label>
-              <input type="date" v-model="checkInDate" id="checkIn" class="form-control" />
+              <input
+                type="date"
+                v-model="checkInDate"
+                id="checkIn"
+                class="form-control"
+              />
             </div>
 
             <div class="col-md-4">
               <label for="checkOut" class="form-label">체크아웃</label>
-              <input type="date" v-model="checkOutDate" id="checkOut" class="form-control" />
+              <input
+                type="date"
+                v-model="checkOutDate"
+                id="checkOut"
+                class="form-control"
+              />
             </div>
 
             <div class="col-md-4">
               <label for="roomCount" class="form-label">객실 수</label>
-              <input type="number" v-model="roomCount" min="1" id="roomCount" class="form-control" />
+              <input
+                type="number"
+                v-model="roomCount"
+                min="1"
+                id="roomCount"
+                class="form-control"
+              />
             </div>
 
             <div class="col-md-4">
-              <button type="button" @click="searchRooms" class="btn btn-primary w-100">객실 검색</button>
+              <button
+                type="button"
+                @click="searchRooms"
+                class="btn btn-primary w-100"
+              >
+                객실 검색
+              </button>
             </div>
           </form>
         </div>
