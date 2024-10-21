@@ -49,6 +49,8 @@ import MypageView from "@/views/Mypage/MypageView.vue";
 import InfoUpdateView from "@/views/Mypage/InfoUpdate/InfoUpdateView.vue";
 import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
+import ResignView from "@/views/Mypage/Resign/ResignView.vue";
+import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -279,7 +281,17 @@ const router = createRouter({
       path: "/users/pwUpdate",
       name: "PwUpdate",
       component: PwUpdateView,
-    }
+    },
+    {
+      path: "/users/resign",
+      name: "Resign",
+      component: ResignView,
+    },
+    {
+      path: "/users/resignComplete",
+      name: "ResignComplete",
+      component: ResignCompleteView,
+    },
     ],
 });
 
