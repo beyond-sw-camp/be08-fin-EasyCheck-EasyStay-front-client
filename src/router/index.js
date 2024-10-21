@@ -48,6 +48,7 @@ import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.v
 import MypageView from "@/views/Mypage/MypageView.vue";
 import InfoUpdateView from "@/views/Mypage/InfoUpdate/InfoUpdateView.vue";
 import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
+import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -273,6 +274,11 @@ const router = createRouter({
       path: "/users/updateComplete",
       name: "InfoUpdateComplete",
       component: InfoCompleteView,
+    },
+    {
+      path: "/users/pwUpdate",
+      name: "PwUpdate",
+      component: PwUpdateView,
     }
     ],
 });
