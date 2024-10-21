@@ -41,6 +41,7 @@ import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdVi
 import FindPwAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwAuthenticationView.vue";
 import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwView.vue";
 import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
+
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
 
 const router = createRouter({
@@ -237,12 +238,13 @@ const router = createRouter({
       path: "/corporate/signUp",
       name: "CorporateSignUp",
       component: CorporateView,
-    }
+    },
+    {
       path: "/reservation",
       name: "ReservationPage",
       component: ReservationPage,
-    },
-  ],
+    }
+    ],
 });
 
 export default router;
