@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@popperjs/core": "2.11.5",
+    "@portone/browser-sdk": "^0.0.10",
     "@splidejs/vue-splide": "^0.6.12",
     "axios": "^1.7.7",
     "bootstrap": "5.1.3",
