@@ -44,6 +44,8 @@ import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComple
 
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
 
+import MypageView from "@/views/Mypage/MypageView.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -243,6 +245,11 @@ const router = createRouter({
       path: "/reservation",
       name: "ReservationPage",
       component: ReservationPage,
+    },
+    {
+      path: "/users/mypage",
+      name: "Mypage",
+      component: MypageView,
     }
     ],
 });
