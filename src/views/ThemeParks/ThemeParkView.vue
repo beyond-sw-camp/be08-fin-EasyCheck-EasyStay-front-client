@@ -34,8 +34,16 @@
     <AttractionInfo :themeParkId="themeParks[currentThemeParkIndex].id" />
   </div>
 
-  <div class="container-fluid d-flex justify-content-center my-5">
-    <MaterialButton color="danger" size="lg" variant="gradient">
+  <div
+    class="container-fluid d-flex justify-content-center my-5"
+    v-if="themeParks[currentThemeParkIndex].ticketAvailable"
+  >
+    <MaterialButton
+      color="danger"
+      size="lg"
+      variant="gradient"
+      @click="goToTicketOrderView"
+    >
       {{ themeParks[currentThemeParkIndex].name }} 이용권 구매하기
     </MaterialButton>
   </div>
@@ -49,6 +57,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
@@ -56,16 +65,30 @@ import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
 const themeParks = ref([
-  { id: 1, name: "설악 워터피아" },
-  { id: 2, name: "인피니티 풀" },
-  { id: 3, name: "라라키즈 어드벤처" },
-  { id: 4, name: "미니 골프 포렌드" },
+  { id: 1, name: "설악 워터피아", ticketAvailable: true },
+  { id: 2, name: "인피니티 풀", ticketAvailable: false },
+  { id: 3, name: "라라키즈 어드벤처", ticketAvailable: false },
+  { id: 4, name: "미니 골프 포렌드", ticketAvailable: false },
 ]);
 
 const currentThemeParkIndex = ref(0);
 
 const changeThemePark = (index) => {
   currentThemeParkIndex.value = index;
+};
+
+const router = useRouter();
+
+const goToTicketOrderView = () => {
+  const themePark = themeParks.value[currentThemeParkIndex.value];
+  if (themePark) {
+    router.push({
+      name: "TicketOrderView",
+      params: { themeParkId: themePark.id },
+    });
+  } else {
+    console.error("Invalid theme park index or theme park data not available.");
+  }
 };
 </script>
 

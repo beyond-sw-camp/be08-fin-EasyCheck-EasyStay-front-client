@@ -25,7 +25,7 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
-
+import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
@@ -179,12 +179,17 @@ const router = createRouter({
       }),
     },
     {
-      path: "/themepark",
+      path: "/themepark/:themeparkId",
       name: "ThemePark",
       component: ThemeParkView,
       props: (route) => ({
         themeParkId: route.query.themeParkId || 1,
       }),
+    },
+    {
+      path: '/ticket-order/:themeParkId',
+      name: 'TicketOrderView',
+      component: TicketOrderView
     },
     {
       path: "/room/:roomId",
@@ -252,6 +257,13 @@ const router = createRouter({
       component: MypageView,
     }
     ],
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.name === 'TicketOrderView') { 
+    window.scrollTo(0, 0); // 해당 페이지로 이동할 때 스크롤을 맨 위로 이동
+  }
+  next();
 });
 
 export default router;
