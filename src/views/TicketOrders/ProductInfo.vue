@@ -34,11 +34,12 @@
                     <span>-</span>
                   </button>
                   <input
-                    type="text"
+                    type="number"
                     id="adultCount"
                     class="input-control"
                     v-model="adultCount"
-                    readonly
+                    @input="validateAdultCount"
+                    min="0"
                   />
                   <button
                     type="button"
@@ -64,11 +65,12 @@
                     <span>-</span>
                   </button>
                   <input
-                    type="text"
+                    type="number"
                     id="childCount"
                     class="input-control"
                     v-model="childCount"
-                    readonly
+                    @input="validateChildCount"
+                    min="0"
                   />
                   <button
                     type="button"
@@ -109,6 +111,15 @@ const incrementChild = () => {
 };
 const decrementChild = () => {
   if (childCount.value > 0) childCount.value--;
+};
+
+const validateAdultCount = (event) => {
+  const value = parseInt(event.target.value);
+  adultCount.value = isNaN(value) || value < 0 ? 0 : value;
+};
+const validateChildCount = (event) => {
+  const value = parseInt(event.target.value);
+  childCount.value = isNaN(value) || value < 0 ? 0 : value;
 };
 
 const getTotalPrice = () => adultCount.value * 30000 + childCount.value * 24000;
@@ -165,6 +176,11 @@ const formattedTotalPrice = computed(
   padding: 0.5rem 0;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .price-info {
   margin-top: 0.5rem;
   font-size: 12px;
