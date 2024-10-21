@@ -275,7 +275,6 @@ const router = createRouter({
       component: InfoCompleteView,
     }
     ],
-  ],
 });
 
 router.beforeEach((to, from, next) => {
