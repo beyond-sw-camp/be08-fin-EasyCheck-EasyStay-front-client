@@ -9,7 +9,6 @@ import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
-import Payment from "../../components/Payment/Payment.vue";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
 import EventList from "./Sections/Event/EventList.vue";
 
@@ -153,23 +152,13 @@ onUnmounted(() => {
   </div>
 
   <Header>
-    <div
-      class="page-header min-vh-100 position-relative"
-      style="overflow: hidden"
-    >
-      <div
-        class="background-image"
-        :style="`background-image: url(${currentImage}); opacity: ${
-          isFading ? 0 : 1
-        };`"
-      ></div>
+    <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
+      <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
+        };`"></div>
       <div class="container">
         <div class="row">
           <div class="col-lg-7 text-center mx-auto position-relative">
-            <h1
-              class="text-white pt-3 mt-n5 me-2"
-              :style="{ display: 'inline-block ' }"
-            >
+            <h1 class="text-white pt-3 mt-n5 me-2" :style="{ display: 'inline-block ' }">
               EasyStay
             </h1>
             <p class="lead text-white px-5 mt-3" :style="{ fontWeight: '500' }">
@@ -183,13 +172,8 @@ onUnmounted(() => {
       <button class="btn-next" @click="nextImage"></button>
 
       <div class="dots-container">
-        <span
-          v-for="(image, index) in images"
-          :key="index"
-          class="dot"
-          :class="{ active: index === imageIndex }"
-          @click="goToImage(index)"
-        ></span>
+        <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
+          @click="goToImage(index)"></span>
         <button @click="togglePlayPause" class="play-pause-btn">
           {{ isPlaying ? "||" : "▶" }}
         </button>
@@ -200,13 +184,9 @@ onUnmounted(() => {
   <div class="card card-body">
     <section class="row justify-content-center mb-5 pb-5 mx-3 mx-md-7">
       <div class="col-12 col-md-10">
-        <RoomSearchForm
-          :accommodations="accommodations"
-          @search="onSearchRooms"
-        />
+        <RoomSearchForm :accommodations="accommodations" @search="onSearchRooms" />
         <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
       </div>
-      <Payment />
       <EventList />
       <AccommodationList />
       <KakaoMap />
