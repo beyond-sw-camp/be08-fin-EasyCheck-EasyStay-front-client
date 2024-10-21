@@ -26,6 +26,7 @@ import ElTypography from "../layouts/sections/elements/typography/TypographyView
 
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+import ReservationView from "@/views/Reservation/ReservationView.vue";
 
 import JoinView from "@/views/LandingPages/SignIn/JoinView.vue";
 import MemberView from "@/views/LandingPages/SignIn/MemberView.vue";
@@ -167,6 +168,11 @@ const router = createRouter({
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
+    },
+    {
+      path: "/reservation",
+      name: "Reservation",
+      component: ReservationView,
     },
     {
       path: "/join",
