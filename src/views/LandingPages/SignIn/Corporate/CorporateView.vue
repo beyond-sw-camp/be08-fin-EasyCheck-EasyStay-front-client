@@ -13,7 +13,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
-import Authentication from "../Sections/Authentication.vue";
+import CorporateInfo from "../Sections/CorporateInfo.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -49,14 +49,12 @@ function requestVerification() {
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-start">
               <h2 class="text-black mb-0">회원가입</h2>
-              <h5 class="text-black fw-normal mt-4">회원가입을 위해 휴대폰 본인 인증을 해주세요.</h5>
+              <h5 class="text-black fw-normal mt-4">회원가입을 위해 정보를 입력해주세요.</h5>
             </div>
           </div>
         </div>
 
-        <hr class="my-2" style="border-top: 3px solid #000;" />
-
-        <Authentication />
+        <CorporateInfo />
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
@@ -64,7 +62,7 @@ function requestVerification() {
             취소
           </MaterialButton>
           <MaterialButton @click="requestVerification" class="btn btn-primary ms-2">
-            인증 요청
+            가입 완료
           </MaterialButton>
         </div>
 
@@ -116,7 +114,6 @@ function requestVerification() {
 
 .footer {
   position: relative;
-  /* footer 위치 조정 */
   bottom: 0;
 }
 </style>

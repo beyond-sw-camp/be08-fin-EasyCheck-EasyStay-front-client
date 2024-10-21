@@ -45,13 +45,13 @@ onMounted(() => {
           <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="d-flex justify-content-center text-center">
               <div class="col-auto d-flex flex-column align-items-center mx-5">
-                <RouterLink to="/users/signUp/member" class="text-decoration-none custom-router-link">
+                <RouterLink to="/users/memberAuthentication" class="text-decoration-none custom-router-link">
                   <span class="material-icons" style="font-size: 200px;">person</span>
                   <h4>일반 회원</h4>
                 </RouterLink>
               </div>
               <div class="col-auto d-flex flex-column align-items-center mx-5">
-                <RouterLink to="join/signUp/corporate" class="text-decoration-none custom-router-link">
+                <RouterLink to="/corporate/signUp" class="text-decoration-none custom-router-link">
                   <span class="material-icons" style="font-size: 200px;">apartment</span>
                   <h4>법인 회원</h4>
                 </RouterLink>

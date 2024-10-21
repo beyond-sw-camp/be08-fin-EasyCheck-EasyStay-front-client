@@ -1,19 +1,17 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router';
 
 // example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
-//Vue Material Kit 2 components
-// import MaterialInput from "@/components/MaterialInput.vue";
-// import MaterialSwitch from "@/components/MaterialSwitch.vue";
+// Vue Material Kit 2 components
 import MaterialButton from "@/components/MaterialButton.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
 import Authentication from "../Sections/Authentication.vue";
 
@@ -21,15 +19,17 @@ onMounted(() => {
   setMaterialInput();
 });
 
+// 라우터
 const router = useRouter();
 
 function goToMain() {
   router.push('/');
 }
 
-function goToFindPW() {
-  router.push('/users/findPw');
+function requestVerification() {
+  router.push('/users/member/info');
 }
+
 </script>
 
 <template>
@@ -41,16 +41,15 @@ function goToFindPW() {
     </div>
   </div>
 
-  <Header>
-    <div class="page-header align-items-start min-vh-100" loading="lazy" style="margin-top: 70px;">
+  <Header style="margin-top: 80px;">
+    <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
-
-      <div class="d-flex flex-column my-auto container custom-login-container position-relative">
+      <div class="container custom-login-container my-auto position-relative">
         <div class="row">
           <div class="col-12">
             <div class="bg-white shadow-succes py-3 mb-5 text-start">
-              <h2 class="text-black mb-0">비밀번호 찾기</h2>
-              <h5 class="text-black fw-normal mt-4">비밀번호를 찾기 위해 휴대폰 본인 인증을 해주세요.</h5>
+              <h2 class="text-black mb-0">회원가입</h2>
+              <h5 class="text-black fw-normal mt-4">회원가입을 위해 휴대폰 본인 인증을 해주세요.</h5>
             </div>
           </div>
         </div>
@@ -64,13 +63,13 @@ function goToFindPW() {
           <MaterialButton @click="goToMain" class="btn btn-secondary">
             취소
           </MaterialButton>
-          <MaterialButton @click="goToFindPW" class="btn btn-primary ms-2">
+          <MaterialButton @click="requestVerification" class="btn btn-primary ms-2">
             인증 요청
           </MaterialButton>
         </div>
 
         <!-- 푸터 -->
-        <footer class="footer position-absolute bottom-2 py-2 w-100">
+        <footer class="footer position-absolute bottom-0 py-2 w-100">
           <div class="container">
             <div class="row align-items-center justify-content-lg-between">
               <div class="col-12 col-md-6 my-auto">
@@ -90,8 +89,7 @@ function goToFindPW() {
                   </li>
                   <li class="nav-item">
                     <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                      class="nav-link text-dark" target="_blank">About
-                      Us</a>
+                      class="nav-link text-dark" target="_blank">About Us</a>
                   </li>
                   <li class="nav-item">
                     <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
@@ -106,8 +104,19 @@ function goToFindPW() {
             </div>
           </div>
         </footer>
-        
       </div>
     </div>
   </Header>
 </template>
+
+<style>
+.custom-checkbox {
+  transform: scale(0.8);
+}
+
+.footer {
+  position: relative;
+  /* footer 위치 조정 */
+  bottom: 0;
+}
+</style>
