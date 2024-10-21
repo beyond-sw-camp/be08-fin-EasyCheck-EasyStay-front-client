@@ -100,7 +100,7 @@ defineProps({
         ],
       },
       {
-        name: "ABOUT US",
+        name: "DEVELOPER",
         items: [
           {
             name: "Yongun Gye",
