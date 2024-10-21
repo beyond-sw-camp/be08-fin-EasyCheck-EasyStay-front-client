@@ -23,11 +23,9 @@ export const useAccommodationStore = defineStore("accommodationStore", {
     },
 
     // 모든 시설 조회 API 호출
-    async fetchAccommodations(page = 0, size = 10) {
+    async fetchAccommodations() {
       try {
-        const response = await apiClient.get(`/accommodations`, {
-          params: { page, size },
-        });
+        const response = await apiClient.get(`/accommodations`);
         this.accommodations = response.data;
       } catch (error) {
         console.error("Failed to fetch accommodations:", error);
