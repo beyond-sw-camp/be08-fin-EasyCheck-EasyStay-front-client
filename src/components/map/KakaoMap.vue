@@ -55,7 +55,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useAccommodationStore } from '@/stores/accommodationStore';
+import { useAccommodationStore } from '@/stores/accommodationStore.js';
 import { KakaoMap, KakaoMapMarker } from 'vue3-kakao-maps';
 
 const centerCoordinate = ref({

@@ -197,8 +197,8 @@ onUnmounted(() => {
     </div>
   </Header>
 
-  <div class="card card-body mx-3 mx-md-7">
-    <div class="row justify-content-center mb-5 pb-5">
+  <div class="card card-body">
+    <section class="row justify-content-center mb-5 pb-5 mx-3 mx-md-7">
       <div class="col-12 col-md-10">
         <RoomSearchForm
           :accommodations="accommodations"
@@ -206,11 +206,12 @@ onUnmounted(() => {
         />
         <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
       </div>
-    </div>
-    <Payment />
-    <EventList />
-    <AccommodationList />
-    <KakaoMap />
+      <Payment />
+      <EventList />
+      <AccommodationList />
+      <KakaoMap />
+    </section>
+
   </div>
 
   <DefaultFooter />
