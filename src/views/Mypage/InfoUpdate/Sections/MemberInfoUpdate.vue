@@ -86,7 +86,8 @@ const searchZipCode = () => {
   }).open();
 };
 
-const fileName = ref(''); // 선택된 파일 이름을 저장할 변수
+// 파일 첨부
+const fileName = ref(''); 
 
 const updateFileName = (event) => {
   if (event.target.files.length > 0) {
