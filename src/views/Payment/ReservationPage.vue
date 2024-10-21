@@ -14,7 +14,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios"; // axios import
+import apiClient from "axios"; // axios import
 
 const route = useRoute(); // 현재 라우트 정보 가져오기
 
@@ -28,7 +28,7 @@ const roomCount = ref(route.query.roomCount);
 // 예약 처리 함수
 const processReservation = async () => {
     try {
-        const response = await axios.post("http://localhost:8080/api/v1/reservation-room", {
+        const response = await apiClient.post("http://localhost:8080/api/v1/reservation-room", {
             roomId: roomId.value,
             reservationDate: new Date().toISOString(),
             checkinDate: checkInDate.value,
