@@ -20,6 +20,7 @@
       :buyerPhone="buyerPhone"
       :buyerEmail="buyerEmail"
       :buyerEmailDomain="buyerEmailDomain"
+      :isLoggedIn="isLoggedIn"
       v-model:buyerName="buyerName"
       v-model:buyerPhone="buyerPhone"
       v-model:buyerEmail="buyerEmail"
@@ -50,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 import ProductInfo from "@/views/TicketOrders/ProductInfo.vue";
 import BuyerInfo from "@/views/TicketOrders/BuyerInfo.vue";
 import UsageInfo from "@/views/TicketOrders/UsageInfo.vue";
@@ -66,7 +67,16 @@ const termsChecked1 = ref(false);
 const termsChecked2 = ref(false);
 const isModalVisible = ref(false);
 const modalType = ref("");
-const isLoggedIn = ref(true); // 로그인 상태 확인용 변수 (현재는 기본값 true로 설정)
+const isLoggedIn = ref(true);
+
+watchEffect(() => {
+  if (isLoggedIn.value) {
+    buyerName.value = "홍길동";
+    buyerPhone.value = "01012345678";
+    buyerEmail.value = "dummy";
+    buyerEmailDomain.value = "example.com";
+  }
+});
 
 const incrementAdult = () => {
   adultCount.value++;
