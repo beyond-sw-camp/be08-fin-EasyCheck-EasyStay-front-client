@@ -30,6 +30,8 @@ import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 
+import ReservationPage from "@/views/Payment/ReservationPage.vue";
+
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
 import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
@@ -39,7 +41,6 @@ import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdVi
 import FindPwAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwAuthenticationView.vue";
 import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwView.vue";
 import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
-
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
 
 const router = createRouter({
@@ -237,6 +238,10 @@ const router = createRouter({
       name: "CorporateSignUp",
       component: CorporateView,
     }
+      path: "/reservation",
+      name: "ReservationPage",
+      component: ReservationPage,
+    },
   ],
 });
 
