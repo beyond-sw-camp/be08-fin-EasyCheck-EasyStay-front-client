@@ -1,38 +1,32 @@
 <template>
-  <div class="modal" tabindex="-1" style="display: block">
-    <div class="modal-dialog modal-dialog-centered mt-0">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ attraction.name }}</h5>
-          <button
-            type="button"
-            class="btn-close"
-            aria-label="Close"
-            @click="$emit('close')"
-          ><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-          <img
-            :src="attraction.imageUrl"
-            alt="Attraction Image"
-            class="img-fluid mb-2"
-          />
-          <h6>시설 정보</h6>
-          <p>{{ attraction.details }}</p>
-          <h6>이용 기준</h6>
-          <ul>
-            <li v-for="rule in attraction.guidelines" :key="rule">
-              {{ rule }}
-            </li>
-          </ul>
-        </div>
-      </div>
+  <div class="modal-overlay" @click.self="handleClose">
+    <div class="modal-content">
+      <button class="close-button" @click="handleClose">X</button>
+      <h2>{{ attraction.name }}</h2>
+      <img
+        v-if="attraction.imageUrls && attraction.imageUrls.length > 0"
+        :src="attraction.imageUrls[0]"
+        alt="Attraction Image"
+        class="modal-image"
+      />
+      <p class="modal-description">{{ attraction.introduction }}</p>
+      <h3>이용 기준</h3>
+      <ul class="standard-use-list">
+        <li
+          v-for="(item, index) in formattedStandardUse"
+          :key="index"
+        >
+          {{ item }}
+        </li>
+      </ul>
+      <h3>추가 정보</h3>
+      <p>{{ attraction.information }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 
 const props = defineProps({
   attraction: {
@@ -40,48 +34,70 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["close"]);
+
+const handleClose = () => {
+  emit("close");
+};
+
+const formattedStandardUse = computed(() => {
+  if (!props.attraction.standardUse) {
+    return [];
+  }
+  return props.attraction.standardUse
+    .split(";")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+});
 </script>
 
 <style scoped>
-.modal {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  z-index: 1000;
 }
-.modal-dialog {
-  max-width: 600px;
+
+.modal-content {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  position: relative;
+  max-width: 500px;
   width: 100%;
 }
-.modal-content {
-  overflow-y: auto;
-  padding: 1rem;
-  position: relative;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #dee2e6;
-}
-.modal-body {
-  font-size: 0.9rem;
-}
-.btn-close {
-  background: none;
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #000;
 }
-.btn-close:hover {
-  color: #555;
+
+.modal-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.modal-description {
+  margin-bottom: 1rem;
+}
+
+.standard-use-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
 }
 </style>

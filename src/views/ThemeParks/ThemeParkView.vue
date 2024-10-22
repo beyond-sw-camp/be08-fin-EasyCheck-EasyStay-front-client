@@ -1,8 +1,8 @@
 <template>
   <NavbarDefault :sticky="true" />
-  <MainImage :themeParkName="themeParks[currentThemeParkIndex].name" />
+  <MainImage v-if="currentThemePark" :themePark="currentThemePark" />
 
-  <section class="px-8 py-4">
+  <section class="px-8 py-4" v-if="themeParks.length">
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -10,13 +10,13 @@
             <ul class="nav nav-tabs p-1 justify-content-center" role="tablist">
               <li
                 class="nav-item"
-                v-for="(themePark, index) in themeParks"
-                :key="index"
+                v-for="themePark in themeParks"
+                :key="themePark.id"
               >
                 <button
                   class="nav-link px-4 py-2"
-                  :class="{ active: currentThemeParkIndex === index }"
-                  @click="changeThemePark(index)"
+                  :class="{ active: currentThemeParkId === themePark.id }"
+                  @click="changeThemePark(themePark.id)"
                   role="tab"
                 >
                   {{ themePark.name }}
@@ -31,12 +31,15 @@
 
   <div class="container-fluid px-8">
     <div class="section-divider"></div>
-    <AttractionInfo :themeParkId="themeParks[currentThemeParkIndex].id" />
+    <AttractionInfo
+      v-if="currentThemePark"
+      :themeParkId="currentThemePark.id"
+    />
   </div>
 
   <div
     class="container-fluid d-flex justify-content-center my-5"
-    v-if="themeParks[currentThemeParkIndex].ticketAvailable"
+    v-if="currentThemePark?.ticketAvailable"
   >
     <MaterialButton
       color="danger"
@@ -44,50 +47,75 @@
       variant="gradient"
       @click="goToTicketOrderView"
     >
-      {{ themeParks[currentThemeParkIndex].name }} 이용권 구매하기
+      {{ currentThemePark.name }} 이용권 구매하기
     </MaterialButton>
   </div>
 
   <div class="section-divider my-4"></div>
   <NoticeInfo
+    v-if="currentThemePark"
     class="px-8"
-    :themeParkName="themeParks[currentThemeParkIndex].name"
+    :themeParkName="currentThemePark.name"
   />
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useThemeParkStore } from "@/stores/themeparkStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
-const themeParks = ref([
-  { id: 1, name: "설악 워터피아", ticketAvailable: true },
-  { id: 2, name: "인피니티 풀", ticketAvailable: false },
-  { id: 3, name: "라라키즈 어드벤처", ticketAvailable: false },
-  { id: 4, name: "미니 골프 포렌드", ticketAvailable: false },
-]);
-
-const currentThemeParkIndex = ref(0);
-
-const changeThemePark = (index) => {
-  currentThemeParkIndex.value = index;
-};
-
+const themeParkStore = useThemeParkStore();
 const router = useRouter();
+const route = useRoute();
 
-const goToTicketOrderView = () => {
-  const themePark = themeParks.value[currentThemeParkIndex.value];
-  if (themePark) {
+const accommodationId = 1;
+const currentThemeParkId = ref(parseInt(route.params.themeParkId, 10) || null);
+
+onMounted(async () => {
+  await themeParkStore.fetchThemeParks(accommodationId);
+  if (Array.isArray(themeParks.value) && themeParks.value.length > 0) {
+    if (!currentThemeParkId.value) {
+      currentThemeParkId.value = themeParks.value[0].id;
+    }
+  }
+});
+
+const themeParks = computed(() =>
+  Array.isArray(themeParkStore.themeParks) ? themeParkStore.themeParks : []
+);
+
+const currentThemePark = computed(() => {
+  return (
+    themeParks.value.find((park) => park.id === currentThemeParkId.value) ||
+    null
+  );
+});
+
+const changeThemePark = (themeParkId) => {
+  if (themeParks.value.some((park) => park.id === themeParkId)) {
+    currentThemeParkId.value = themeParkId;
     router.push({
-      name: "TicketOrderView",
-      params: { themeParkId: themePark.id },
+      name: "ThemeParkView",
+      params: { themeParkId: themeParkId },
     });
   } else {
-    console.error("Invalid theme park index or theme park data not available.");
+    console.error("Invalid theme park id");
+  }
+};
+
+const goToTicketOrderView = () => {
+  if (currentThemePark.value) {
+    router.push({
+      name: "TicketOrderView",
+      params: { themeParkId: currentThemePark.value.id },
+    });
+  } else {
+    console.error("Invalid theme park data not available.");
   }
 };
 </script>

@@ -16,14 +16,16 @@
           <div class="card attraction-card" @click="openModal(attraction)">
             <div class="attraction-image-wrapper">
               <img
-                :src="attraction.imageUrl"
+                v-for="(url, index) in attraction.imageUrls"
+                :key="index"
+                :src="url"
                 class="card-img-top attraction-image"
                 alt="Attraction Image"
               />
               <div class="overlay">
                 <h5 class="card-title">{{ attraction.name }}</h5>
                 <p class="card-text">
-                  {{ formattedDescription(attraction.description) }}
+                  {{ formattedIntroduction(attraction.introduction) }}
                 </p>
               </div>
             </div>
@@ -41,98 +43,56 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed, defineProps, watch } from "vue";
+import { useAttractionStore } from "@/stores/attractionStore";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import AttractionModal from "@/components/ThemePark/AttractionModal.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import "@splidejs/splide/css/sea-green";
 
-const attractions = [
-  {
-    id: 1,
-    name: "파도풀",
-    description:
-      "속초 바다를 닮은 최고높이 1.8M의 시원한 파도를 이곳에서 느껴보세요",
-    imageUrl:
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation1.jpg",
-    details: "수심 300m, 온도 27-29°C",
-    guidelines: [
-      "신장 90cm 이하 어린이는 보호자 동반 입장",
-      "3세 이하 유아는 방수 기저귀 착용 필수",
-      "음식물 반입 금지",
-    ],
+const props = defineProps({
+  themeParkId: {
+    type: Number,
+    required: true,
   },
-  {
-    id: 2,
-    name: "멀티풀",
-    description: "다양한 놀이시설을 함께 갖춘 멀티풀이 준비되어 있습니다.",
-    imageUrl:
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-    details: "수심 200m, 온도 25-28°C",
-    guidelines: [
-      "신장 100cm 이하 어린이는 보호자 동반 입장",
-      "수영모 착용 필수",
-      "음식물 반입 금지",
-    ],
-  },
-  {
-    id: 3,
-    name: "키즈풀",
-    description:
-      "어린 아이들만의 특별한 놀이공간으로 다양한 시설에서 재미있는 시간을 가져보세요",
-    imageUrl:
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
-    details: "수심 30cm, 온도 27-29°C",
-    guidelines: [
-      "신장 90cm 이하 어린이는 보호자 동반 입장",
-      "3세 이하 유아는 방수 기저귀 착용 필수",
-      "음식물 반입 금지",
-    ],
-  },
-  {
-    id: 4,
-    name: "아쿠아풀",
-    description: "속초 바다에서 시원한 파도와 함께 즐거움을 느껴보세요",
-    imageUrl:
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
-    details: "수심 150m, 온도 26-28°C",
-    guidelines: [
-      "신장 100cm 이하 어린이는 보호자 동반 입장",
-      "구명조끼 착용 필수",
-      "음식물 반입 금지",
-    ],
-  },
-  {
-    id: 5,
-    name: "인피니티 풀",
-    description:
-      "끝없이 펼쳐지는 속초의 푸른 바다를 파노라마로 즐길 수 있는 최고의 전망과 함께 여유를 즐기세요",
-    imageUrl:
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation5.jpg",
-    details: "수심 100m, 온도 27-30°C",
-    guidelines: [
-      "신장 120cm 이상만 이용 가능",
-      "음료 반입 금지",
-      "수영모 착용 필수",
-    ],
-  },
-];
+});
 
+const attractionStore = useAttractionStore();
 const selectedAttraction = ref(null);
 const showModal = ref(false);
+
+onMounted(() => {
+  fetchAttractions();
+});
+
+watch(
+  () => props.themeParkId,
+  () => {
+    fetchAttractions();
+  }
+);
+
+const fetchAttractions = () => {
+  if (props.themeParkId) {
+    attractionStore.fetchAttractions(props.themeParkId);
+  }
+};
+
+const attractions = computed(() => attractionStore.attractions);
 
 const openModal = (attraction) => {
   selectedAttraction.value = attraction;
   showModal.value = true;
 };
+
 const closeModal = () => {
   showModal.value = false;
 };
 
-const formattedDescription = (description) => {
-  return description.length > 50
-    ? description.slice(0, 50) + "..."
-    : description;
+const formattedIntroduction = (introduction) => {
+  return introduction.length > 50
+    ? introduction.slice(0, 50) + "..."
+    : introduction;
 };
 
 const handleUsageGuide = () => {
