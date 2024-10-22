@@ -26,8 +26,10 @@ import ElTypography from "../layouts/sections/elements/typography/TypographyView
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
-import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
+import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+
+import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 
@@ -263,6 +265,12 @@ const router = createRouter({
       path: "/users/mypage",
       name: "Mypage",
       component: MypageView,
+    },
+    {
+      path: "/usageguide/:guidePageName",
+      name: "UsageGuide",
+      component: UsageGuideWrapper,
+      props: true,
     },
   ],
 });
