@@ -9,5 +9,11 @@ export const useAppStore = defineStore("storeId", {
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
 import { useAttractionStore } from "@/stores/attractionStore";
+import { useTicketStore } from "@/stores/ticketStore";
 
-export { useThemeParkStore, useAccommodationStore, useAttractionStore };
+export {
+  useThemeParkStore,
+  useAccommodationStore,
+  useAttractionStore,
+  useTicketStore,
+};
