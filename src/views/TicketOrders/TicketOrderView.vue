@@ -1,4 +1,5 @@
 <template>
+  <NavbarDefault :sticky="true" />
   <div class="container my-5">
     <h2 class="text-left mb-4">입장권 구매</h2>
     <p class="text-left text-muted pb-4">
@@ -52,6 +53,7 @@
 
 <script setup>
 import { ref, computed, watchEffect } from "vue";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import ProductInfo from "@/views/TicketOrders/ProductInfo.vue";
 import BuyerInfo from "@/views/TicketOrders/BuyerInfo.vue";
 import UsageInfo from "@/views/TicketOrders/UsageInfo.vue";
