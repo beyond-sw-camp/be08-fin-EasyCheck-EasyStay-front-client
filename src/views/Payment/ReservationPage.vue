@@ -14,6 +14,9 @@
         <!-- 결제하기 버튼 -->
         <button @click="processReservationAndPayment" :disabled="loading">결제하기</button>
 
+        <!-- 결제 내역 조회하기 버튼 -->
+        <button @click="goToPaymentPage">결제 내역 조회하기</button>
+
         <!-- 로딩 상태 표시 -->
         <p v-if="loading">처리 중...</p>
         <p v-if="error" class="error">{{ error }}</p>
@@ -22,12 +25,13 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api";
 import { processPayment } from "@/components/Payment/Payment.vue"; // processPayment 함수 가져오기
 
 // Route 정보 가져오기
 const route = useRoute();
+const router = useRouter();
 
 // 쿼리로 전달된 정보 사용
 const roomId = ref(route.query.roomId);
@@ -42,6 +46,7 @@ const isReservationComplete = ref(false);
 // totalPrice 입력
 const totalPrice = ref(0);
 
+// 결제 처리 함수
 const processReservationAndPayment = async () => {
     try {
         // 예약 처리
@@ -73,6 +78,11 @@ const processReservationAndPayment = async () => {
         console.error("예약 또는 결제 처리 실패:", err);
         alert("예약 또는 결제 처리 중 오류가 발생했습니다.");
     }
+};
+
+// 결제 내역 조회 페이지로 이동
+const goToPaymentPage = () => {
+    router.push({ name: 'PaymentPage' });
 };
 </script>
 
