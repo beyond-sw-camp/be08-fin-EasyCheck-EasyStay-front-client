@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import vClickOutside from 'v-click-outside';
+import vClickOutside from "v-click-outside";
 
 // Nucleo Icons
 import "./assets/css/nucleo-icons.css";
