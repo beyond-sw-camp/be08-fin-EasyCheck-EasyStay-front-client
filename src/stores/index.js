@@ -5,3 +5,9 @@ export const useAppStore = defineStore("storeId", {
     bootstrap,
   }),
 });
+
+import { useThemeParkStore } from "@/stores/themeparkStore";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useAttractionStore } from "@/stores/attractionStore";
+
+export { useThemeParkStore, useAccommodationStore, useAttractionStore };
