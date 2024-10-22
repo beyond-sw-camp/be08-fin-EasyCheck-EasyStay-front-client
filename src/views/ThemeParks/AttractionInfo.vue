@@ -44,6 +44,7 @@
 
 <script setup>
 import { ref, onMounted, computed, defineProps, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useAttractionStore } from "@/stores/attractionStore";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import AttractionModal from "@/components/ThemePark/AttractionModal.vue";
@@ -55,9 +56,14 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  currentThemePark: {
+    type: Object,
+    required: true,
+  },
 });
 
 const attractionStore = useAttractionStore();
+const router = useRouter();
 const selectedAttraction = ref(null);
 const showModal = ref(false);
 
@@ -96,7 +102,22 @@ const formattedIntroduction = (introduction) => {
 };
 
 const handleUsageGuide = () => {
-  alert("이용 안내를 참고해주세요.");
+  if (props.currentThemePark && props.currentThemePark.guidePageName) {
+    console.log("Navigating to guide:", props.currentThemePark.guidePageName);
+    router
+      .push({
+        name: "UsageGuide",
+        params: { guidePageName: props.currentThemePark.guidePageName },
+      })
+      .then(() => {
+        console.log("Navigation successful!");
+      })
+      .catch((error) => {
+        console.error("Navigation error:", error);
+      });
+  } else {
+    console.error("guidePageName is not available for this theme park.");
+  }
 };
 
 const splideOptions = {

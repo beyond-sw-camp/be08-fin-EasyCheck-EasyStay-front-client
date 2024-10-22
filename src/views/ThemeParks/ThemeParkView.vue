@@ -34,6 +34,7 @@
     <AttractionInfo
       v-if="currentThemePark"
       :themeParkId="currentThemePark.id"
+      :currentThemePark="currentThemePark"
     />
   </div>
 
@@ -46,6 +47,7 @@
       size="lg"
       variant="gradient"
       @click="goToTicketSelectionView"
+      class="mx-3"
     >
       {{ currentThemePark.name }} 이용권 구매하기
     </MaterialButton>
@@ -91,8 +93,7 @@ const themeParks = computed(() =>
 
 const currentThemePark = computed(() => {
   return (
-    themeParks.value.find((park) => park.id === currentThemeParkId.value) ||
-    null
+    themeParks.value.find((park) => park.id === currentThemeParkId.value) || null
   );
 });
 
