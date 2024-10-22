@@ -1,5 +1,4 @@
 <template>
-  <!-- Payment.vue에는 별도의 UI가 없으므로 template는 비어있습니다. -->
   <div></div>
 </template>
 
@@ -47,18 +46,44 @@ export function processPayment(reservationId, totalPrice) {
         alert("결제 실패: " + rsp.error_msg);
         console.log("결제 실패:", rsp);
 
-        // 결제 실패 시 예약 상태를 CANCELED로 업데이트
+        // 결제가 실패한 경우 예약 상태를 CANCELED로 업데이트
         try {
           await apiClient.put(`/reservation-room/${reservationId}`, {
-            reservationStatus: "CANCELED",
+            reservationStatus: "CANCELED", // 예약 상태를 CANCELED로 변경
           });
-          alert("예약이 취소되었습니다.");
+          alert("예약 상태가 CANCELED로 업데이트되었습니다.");
         } catch (error) {
-          console.error("예약 취소 실패:", error);
-          alert("예약을 취소하는 중 오류가 발생했습니다.");
+          console.error("예약 상태 업데이트 실패:", error);
+          alert("예약 상태를 업데이트하는 중 오류가 발생했습니다.");
         }
       }
     }
   );
+}
+
+export async function refundPayment(paymentId, impUid) {
+
+  if (!impUid) {
+    alert("impUid가 누락되었습니다. 결제 정보를 확인해주세요.");
+    return;
+  }
+
+  try {
+    // 서버에 환불 요청
+    const response = await apiClient.put(`/payment/${paymentId}`, {
+      impUid: impUid, // I'mport 결제 ID (필수)
+      reason: "고객 요청으로 인한 환불", // 환불 사유
+    });
+
+    if (response.status === 200 || response.status === 204) {
+      alert("환불이 완료되었습니다.");
+      console.log("환불 성공:", response);
+    } else {
+      throw new Error(response.data.error_msg || "환불 실패");
+    }
+  } catch (error) {
+    alert(`환불 처리 중 오류가 발생했습니다: ${error.message}`);
+    console.error("환불 실패:", error);
+  }
 }
 </script>

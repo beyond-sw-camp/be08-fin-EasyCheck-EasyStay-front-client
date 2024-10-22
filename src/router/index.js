@@ -51,6 +51,7 @@ import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
+import PaymentPage from "@/views/Payment/PaymentPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -292,7 +293,12 @@ const router = createRouter({
       name: "ResignComplete",
       component: ResignCompleteView,
     },
-    ],
+    {
+      path: "/payment",
+      name: "PaymentPage",
+      component: PaymentPage,
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {
