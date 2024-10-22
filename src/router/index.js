@@ -30,6 +30,7 @@ import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 import ReservationView from "@/views/Reservation/ReservationView.vue";
+import ReservationResultView from "@/views/Reservation/ReservationResultView.vue";
 
 import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
@@ -261,6 +262,11 @@ const router = createRouter({
       component: ReservationPage,
     },
     {
+      path: "/reservation/result",
+      name: "ReservationResult",
+      component: ReservationResultView,
+    },
+    {
       path: "/users/mypage",
       name: "Mypage",
       component: MypageView,
@@ -279,8 +285,8 @@ const router = createRouter({
       path: "/users/pwUpdate",
       name: "PwUpdate",
       component: PwUpdateView,
-    }
-    ],
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {
