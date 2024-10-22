@@ -34,7 +34,7 @@
     />
 
     <div class="d-flex justify-content-center mt-5">
-      <button class="btn btn-danger mx-2">취소</button>
+      <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>
       <button class="btn btn-primary mx-2" :disabled="!isFormValid">
         구매하기
       </button>
@@ -112,5 +112,14 @@ const agreeModal = () => {
     termsChecked2.value = true;
   }
   closeModal();
+};
+
+const handleCancel = () => {
+  const userConfirmed = window.confirm(
+    "구매를 취소하시겠습니까?\n입력된 구매정보가 초기화됩니다."
+  );
+  if (userConfirmed) {
+    window.history.back();
+  }
 };
 </script>
