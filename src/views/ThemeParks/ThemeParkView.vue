@@ -45,7 +45,7 @@
       color="danger"
       size="lg"
       variant="gradient"
-      @click="goToTicketOrderView"
+      @click="goToTicketSelectionView"
     >
       {{ currentThemePark.name }} 이용권 구매하기
     </MaterialButton>
@@ -100,7 +100,7 @@ const changeThemePark = (themeParkId) => {
   if (themeParks.value.some((park) => park.id === themeParkId)) {
     currentThemeParkId.value = themeParkId;
     router.push({
-      name: "ThemeParkView",
+      name: "ThemePark",
       params: { themeParkId: themeParkId },
     });
   } else {
@@ -108,10 +108,10 @@ const changeThemePark = (themeParkId) => {
   }
 };
 
-const goToTicketOrderView = () => {
+const goToTicketSelectionView = () => {
   if (currentThemePark.value) {
     router.push({
-      name: "TicketOrderView",
+      name: "TicketSelection",
       params: { themeParkId: currentThemePark.value.id },
     });
   } else {
