@@ -11,11 +11,8 @@
         <label for="totalPrice">Total Price: </label>
         <input type="number" v-model="totalPrice" id="totalPrice" />
 
-        <!-- 예약하기 버튼 -->
-        <button @click="processReservation" :disabled="loading">예약하기</button>
-
-        <!-- 예약이 완료되면 결제하기 버튼 표시 -->
-        <button v-if="isReservationComplete" @click="onPaymentClick" :disabled="loading">결제하기</button>
+        <!-- 결제하기 버튼 -->
+        <button @click="processReservationAndPayment" :disabled="loading">결제하기</button>
 
         <!-- 로딩 상태 표시 -->
         <p v-if="loading">처리 중...</p>
@@ -45,10 +42,10 @@ const isReservationComplete = ref(false);
 // totalPrice 입력
 const totalPrice = ref(0);
 
-// 예약 처리 함수
-const processReservation = async () => {
+const processReservationAndPayment = async () => {
     try {
-        await apiClient.post("/reservation-room", {
+        // 예약 처리
+        const reservationResponse = await apiClient.post("/reservation-room", {
             roomId: roomId.value,
             reservationDate: new Date().toISOString(),
             checkinDate: checkInDate.value,
@@ -57,17 +54,25 @@ const processReservation = async () => {
             totalPrice: totalPrice.value,
             paymentStatus: "UNPAID",
         });
-        isReservationComplete.value = true; // 예약 완료 상태로 변경
-        alert("예약이 완료되었습니다!");
-    } catch (err) {
-        console.error("예약 실패:", err);
-        alert("예약 처리 중 오류가 발생했습니다.");
-    }
-};
 
-// 결제 처리 함수
-const onPaymentClick = () => {
-    processPayment(roomId.value, totalPrice.value); // 결제 로직 호출
+        console.log("예약 응답:", reservationResponse); // 응답 로그 확인
+
+        // 서버 응답에서 reservationId 확인
+        const reservationId = reservationResponse?.data?.id || reservationResponse?.data?.reservationId;
+        console.log("예약 ID:", reservationId); // 예약 ID 로그 확인
+
+        if (!reservationId) {
+            throw new Error("예약 ID를 가져오지 못했습니다.");
+        }
+
+        isReservationComplete.value = true; // 예약 완료 상태로 변경
+
+        // 결제 처리
+        processPayment(reservationId, totalPrice.value); // 결제 로직 호출
+    } catch (err) {
+        console.error("예약 또는 결제 처리 실패:", err);
+        alert("예약 또는 결제 처리 중 오류가 발생했습니다.");
+    }
 };
 </script>
 
