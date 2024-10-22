@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "@/api";
 import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
 import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
@@ -36,7 +36,7 @@ const router = useRouter(); // useRouter 호출
 
 const fetchAccommodations = async () => {
   try {
-    const response = await axios.get("/api/v1/accommodations");
+    const response = await apiClient.get("/accommodations");
     accommodations.value = response.data;
   } catch (error) {
     console.error("리조트 목록을 가져오는 중 오류가 발생했습니다.", error);
@@ -55,7 +55,7 @@ const onSearchRooms = async ({
   roomCount = count; // 객실 수 저장
 
   try {
-    const response = await axios.get("/api/v1/reservation-room/available", {
+    const response = await apiClient.get("/reservation-room/available", {
       params: {
         accommodationId: resort,
         checkinDate: inDate,
