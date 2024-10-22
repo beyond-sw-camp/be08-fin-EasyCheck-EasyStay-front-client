@@ -46,6 +46,17 @@ export function processPayment(reservationId, totalPrice) {
       } else {
         alert("결제 실패: " + rsp.error_msg);
         console.log("결제 실패:", rsp);
+
+        // 결제 실패 시 예약 상태를 CANCELED로 업데이트
+        try {
+          await apiClient.put(`/reservation-room/${reservationId}`, {
+            reservationStatus: "CANCELED",
+          });
+          alert("예약이 취소되었습니다.");
+        } catch (error) {
+          console.error("예약 취소 실패:", error);
+          alert("예약을 취소하는 중 오류가 발생했습니다.");
+        }
       }
     }
   );
