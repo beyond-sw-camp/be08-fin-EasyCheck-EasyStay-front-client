@@ -1,7 +1,9 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
+import { userLoginStore } from '@/stores/loginStore';
+import axios from "axios";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -13,7 +15,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
-import MemberInfo from "../Sections/MemberInfo.vue";
+import MemberInfo from "@/views/LandingPages/SignIn/Sections/MemberInfo.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -26,9 +28,32 @@ function goToMain() {
   router.push('/');
 }
 
-function requestVerification() {
-  router.push('/joinComplete');
+const formData = ref({
+  email: "",
+  password: "",
+  name: "",
+  phone: "",
+  addr: "",
+  addrDetail: "",
+  marketingConsent: false,
+});
+
+async function registerUser() {
+  try {
+    const response = await axios.post("/users/member/info", formData.value);
+
+    if (response.status === 201) {
+      // 회원가입 성공 후 리다이렉트
+      router.push('/joinComplete');
+    }
+  } catch (error) {
+    console.error("회원가입 실패:", error);
+    // 에러 처리 (예: 사용자에게 에러 메시지 표시)
+  }
 }
+
+const loginStore = userLoginStore();
+const signUpData = loginStore.signUpformData;
 
 </script>
 
@@ -54,15 +79,15 @@ function requestVerification() {
           </div>
         </div>
 
-        <MemberInfo />
+        <MemberInfo v-model="signUpformData"/>
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
           <MaterialButton @click="goToMain" class="btn btn-secondary">
             취소
           </MaterialButton>
-          <MaterialButton @click="requestVerification" class="btn btn-primary ms-2">
-            가입 완료
+          <MaterialButton @click="registerUser" class="btn btn-primary ms-2">
+            회원가입
           </MaterialButton>
         </div>
 
