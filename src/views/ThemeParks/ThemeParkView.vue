@@ -2,12 +2,49 @@
   <NavbarDefault :sticky="true" />
   <MainImage v-if="currentThemePark" :themePark="currentThemePark" />
 
-  <section class="px-8 py-4" v-if="themeParks.length">
+  <!-- 사업장 탭 -->
+  <section class="accommodation-tabs px-8 py-4" v-if="accommodations.length">
     <div class="container">
       <div class="row">
         <div class="col-12">
           <div class="nav-wrapper position-relative end-0">
-            <ul class="nav nav-tabs p-1 justify-content-center" role="tablist">
+            <ul
+              class="nav nav-tabs p-1 justify-content-center accommodation-nav-tabs"
+              role="tablist"
+            >
+              <li
+                class="nav-item"
+                v-for="accommodation in accommodations"
+                :key="accommodation.id"
+              >
+                <button
+                  class="nav-link px-4 py-2"
+                  :class="{
+                    active: currentAccommodationId === accommodation.id,
+                  }"
+                  @click="changeAccommodation(accommodation.id)"
+                  role="tab"
+                >
+                  {{ accommodation.name }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 테마파크 탭 -->
+  <section class="themepark-tabs px-8 py-4" v-if="themeParks.length">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="nav-wrapper position-relative end-0">
+            <ul
+              class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs"
+              role="tablist"
+            >
               <li
                 class="nav-item"
                 v-for="themePark in themeParks"
@@ -29,6 +66,7 @@
     </div>
   </section>
 
+  <!-- 시설 안내 -->
   <div class="container-fluid px-8">
     <div class="section-divider"></div>
     <AttractionInfo
@@ -65,37 +103,60 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeparkStore";
+import { useAccommodationStore } from "@/stores/accommodationStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
+defineProps({
+  themeParkId: {
+    type: Number,
+    required: true,
+  },
+});
+
+const accommodations = ref([]);
+const themeParks = ref([]);
+
 const themeParkStore = useThemeParkStore();
+const accommodationStore = useAccommodationStore();
 const router = useRouter();
 const route = useRoute();
 
-const accommodationId = 1;
+const currentAccommodationId = ref(1);
 const currentThemeParkId = ref(parseInt(route.params.themeParkId, 10) || null);
 
 onMounted(async () => {
-  await themeParkStore.fetchThemeParks(accommodationId);
-  if (Array.isArray(themeParks.value) && themeParks.value.length > 0) {
+  await accommodationStore.fetchResortAccommodations();
+  accommodations.value = accommodationStore.accommodations || [];
+
+  await themeParkStore.fetchThemeParks(currentAccommodationId.value);
+  themeParks.value = themeParkStore.themeParks || [];
+
+  if (themeParks.value.length > 0) {
     if (!currentThemeParkId.value) {
       currentThemeParkId.value = themeParks.value[0].id;
     }
   }
 });
 
-const themeParks = computed(() =>
-  Array.isArray(themeParkStore.themeParks) ? themeParkStore.themeParks : []
-);
-
 const currentThemePark = computed(() => {
   return (
-    themeParks.value.find((park) => park.id === currentThemeParkId.value) || null
+    themeParks.value.find((park) => park.id === currentThemeParkId.value) ||
+    null
   );
 });
+
+const changeAccommodation = async (accommodationId) => {
+  currentAccommodationId.value = accommodationId;
+  await themeParkStore.fetchThemeParks(accommodationId);
+  themeParks.value = themeParkStore.themeParks || [];
+  if (themeParks.value.length > 0) {
+    currentThemeParkId.value = themeParks.value[0].id;
+  }
+};
 
 const changeThemePark = (themeParkId) => {
   if (themeParks.value.some((park) => park.id === themeParkId)) {
@@ -122,6 +183,50 @@ const goToTicketSelectionView = () => {
 </script>
 
 <style scoped>
+.accommodation-nav-tabs {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.accommodation-nav-tabs .nav-link {
+  color: #495057;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.accommodation-nav-tabs .nav-link.active {
+  background-color: #ffffff;
+  color: #007bff;
+  border-bottom: 3px solid #ff0000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.themepark-nav-tabs {
+  background-color: #ffffff;
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 20px;
+}
+
+.themepark-nav-tabs .nav-link {
+  color: #333333;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.themepark-nav-tabs .nav-link.active {
+  background-color: #ffebcd;
+  color: #333333;
+  border-bottom: 2px solid #007bff;
+  box-shadow: none;
+}
+
 .section-divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #ccc, transparent);
@@ -149,28 +254,14 @@ const goToTicketSelectionView = () => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  background-color: #f8f9fa;
-  border-radius: 10px;
   justify-content: center;
 }
 
 .nav-item {
-  flex: 1 1 auto;
-  min-width: 120px;
-  max-width: calc(100% / 3);
   text-align: center;
 }
 
 .nav-link {
-  color: #343a40;
-  font-weight: bold;
   transition: background-color 0.3s ease, color 0.3s ease;
-  width: 100%;
-}
-
-.nav-link.active {
-  background-color: #007bff;
-  color: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 </style>
