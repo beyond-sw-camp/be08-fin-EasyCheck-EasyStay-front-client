@@ -16,9 +16,7 @@
           <div class="card attraction-card" @click="openModal(attraction)">
             <div class="attraction-image-wrapper">
               <img
-                v-for="(url, index) in attraction.imageUrls"
-                :key="index"
-                :src="url"
+                :src="attraction.imageUrl"
                 class="card-img-top attraction-image"
                 alt="Attraction Image"
               />
