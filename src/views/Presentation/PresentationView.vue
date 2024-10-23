@@ -191,10 +191,7 @@ onUnmounted(() => {
       <AccommodationList />
       <KakaoMap />
     </section>
-
   </div>
-
-  <DefaultFooter />
 </template>
 
 <style scoped>
