@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "@/api";
 import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
 import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
@@ -9,7 +9,6 @@ import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
-import Payment from "../../components/Payment/Payment.vue";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
 import EventList from "./Sections/Event/EventList.vue";
 
@@ -35,25 +34,34 @@ let checkOutDate = null; // 체크아웃 날짜를 문자열로 저장
 let roomCount = null;
 const router = useRouter(); // useRouter 호출
 
-
 const fetchAccommodations = async () => {
   try {
-    const response = await axios.get("/api/v1/accommodations");
+    const response = await apiClient.get("/accommodations");
     accommodations.value = response.data;
   } catch (error) {
     console.error("리조트 목록을 가져오는 중 오류가 발생했습니다.", error);
   }
 };
 
-const onSearchRooms = async ({ resort, checkInDate: inDate, checkOutDate: outDate, roomCount: count }) => {
-  selectedResort.value = resort;  // 선택한 리조트 저장
-  checkInDate = inDate;  // 체크인 날짜 저장
-  checkOutDate = outDate;  // 체크아웃 날짜 저장
-  roomCount = count;  // 객실 수 저장
+const onSearchRooms = async ({
+  resort,
+  checkInDate: inDate,
+  checkOutDate: outDate,
+  roomCount: count,
+}) => {
+  selectedResort.value = resort; // 선택한 리조트 저장
+  checkInDate = inDate; // 체크인 날짜 저장
+  checkOutDate = outDate; // 체크아웃 날짜 저장
+  roomCount = count; // 객실 수 저장
 
   try {
-    const response = await axios.get("/api/v1/reservation-room/available", {
-      params: { accommodationId: resort, checkinDate: inDate, checkoutDate: outDate, roomCount: count }
+    const response = await apiClient.get("/reservation-room/available", {
+      params: {
+        accommodationId: resort,
+        checkinDate: inDate,
+        checkoutDate: outDate,
+        roomCount: count,
+      },
     });
     availableRooms.value = response.data;
   } catch (error) {
@@ -63,19 +71,21 @@ const onSearchRooms = async ({ resort, checkInDate: inDate, checkOutDate: outDat
 
 const onRoomSelected = (room) => {
   if (!selectedResort.value || !checkInDate || !checkOutDate || !roomCount) {
-    console.error("리조트, 체크인 날짜, 체크아웃 날짜, 객실 수 정보가 누락되었습니다.");
+    console.error(
+      "리조트, 체크인 날짜, 체크아웃 날짜, 객실 수 정보가 누락되었습니다."
+    );
     return;
   }
 
   router.push({
-    name: 'ReservationPage',
+    name: "ReservationPage",
     query: {
       roomId: room.roomId,
       accommodationId: selectedResort.value, // 선택한 리조트 ID
-      checkInDate: checkInDate,  // 선택한 체크인 날짜
-      checkOutDate: checkOutDate,  // 선택한 체크아웃 날짜
-      roomCount: roomCount  // 선택한 객실 수
-    }
+      checkInDate: checkInDate, // 선택한 체크인 날짜
+      checkOutDate: checkOutDate, // 선택한 체크아웃 날짜
+      roomCount: roomCount, // 선택한 객실 수
+    },
   });
 };
 
@@ -171,17 +181,17 @@ onUnmounted(() => {
     </div>
   </Header>
 
-  <div class="card card-body mx-3 mx-md-7">
-    <div class="row justify-content-center mb-5 pb-5">
+  <div class="card card-body">
+    <section class="row justify-content-center mb-5 pb-5 mx-3 mx-md-7">
       <div class="col-12 col-md-10">
         <RoomSearchForm :accommodations="accommodations" @search="onSearchRooms" />
         <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
       </div>
-    </div>
-    <Payment />
-    <EventList />
-    <AccommodationList />
-    <KakaoMap />
+      <EventList />
+      <AccommodationList />
+      <KakaoMap />
+    </section>
+
   </div>
 
   <DefaultFooter />

@@ -7,20 +7,17 @@ import { onMounted } from "vue";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
-//Vue Material Kit 2 components
-import MaterialInput from "@/components/MaterialInput.vue";
-import MaterialSwitch from "@/components/MaterialSwitch.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
-
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
 onMounted(() => {
   setMaterialInput();
 });
+
+import easystayImage from '@/assets/img/easystay.png';
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
+  <div class="position-sticky z-index-sticky top-0 w-100">
     <div class="row">
       <div class="col-12">
         <NavbarDefault :sticky="true" />
@@ -29,64 +26,62 @@ onMounted(() => {
   </div>
 
   <Header>
-    <div class="page-header align-items-start min-vh-90" loading="lazy">
+    <div class="page-header align-items-start min-vh-90" loading="lazy" style="padding-top: 80px;">
       <span class="mask bg-white opacity-6"></span>
       <div class="container custom-login-container my-auto position-relative">
+
         <div class="row">
           <div class="col-12">
-            <div class="bg-white shadow-succes py-3 mb-3 text-center line">
-              <h3 class="text-black font-weight-bolder mb-0 mt-4">마이페이지</h3>
-              <div class="row mt-3 text-black justify-content-center fs-4">
-                안녕하세요. ooo님은 EASY STAY의 회원입니다.
-              </div>
 
-              <div class="row mt-3 justify-content-center">
-                <div class="d-flex justify-content-center w-50">
-                  <RouterLink to="/users/infoUpdate" class="mx-3">회원 정보 수정 ></RouterLink>
-                  <RouterLink to="/users/pwUpdate" class="mx-3">비밀번호 변경 > </RouterLink>
-                  <RouterLink to="/users/delete" class="mx-3">회원 탈퇴 ></RouterLink>
-                </div>
+            <div class="bg-image" :style="{ backgroundImage: 'url(' + easystayImage + ')' }"
+              style="background-size: cover; background-position: center; height: 230px; display: flex; align-items: center; justify-content: center; z-index: 1;">
+              <div class="py-3 mb-3 text-center" style="background-color: rgba(255, 255, 255, 0.3); width: 100%;">
+                <h3 class="text-black font-weight-bolder mb-0 mt-4">마이페이지</h3>
+                <div class="row mt-3 text-black justify-content-center fs-4">
               </div>
-            </div>
-          </div>
-
-          <div class="col-12">
-            <div class="bg-white p-4 min-vh-15 mb-5">
-              <div class="d-flex justify-content-center">
-                <div class="text-center mx-4">
-                  <RouterLink to="users/roomReservations">
-                    <span class="material-icons" style="font-size: 70px;">description</span>
-                    <div class="mt-2">객실 예약 내역</div>
-                  </RouterLink>
-                </div>
-                <div class="text-center mx-4">
-                  <RouterLink to="users/attractionReservations">
-                    <span class="material-icons" style="font-size: 70px;">attractions</span>
-                    <div class="mt-2">테마파크 예약 내역</div>
-                  </RouterLink>
-                </div>
-                <div class="text-center mx-4">
-                  <RouterLink to="users/point">
-                    <span class="material-icons" style="font-size: 70px;">loyalty</span>
-                    <div class="mt-2">포인트</div>
-                  </RouterLink>
+                <div class="row mt-3 justify-content-center">
+                  <div class="d-flex justify-content-center w-50">
+                    <RouterLink to="/users/infoUpdate" class="mx-3">회원 정보 수정 ></RouterLink>
+                    <RouterLink to="/users/pwUpdate" class="mx-3">비밀번호 변경 > </RouterLink>
+                    <RouterLink to="/users/resign" class="mx-3">회원 탈퇴 ></RouterLink>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-
-          <div class="row justify-content-center text-black fs-6">
-            <div class="text-center">
-              <!-- <img src="../../assets/img/easystay2.png" alt="설명 텍스트" class="img-fluid mb-1">  -->
-            </div>
-            <div class="justify-content-center text-center">
-              EASY STAY의 멤버십은 특별한 가치를 선사합니다.
+        <div class="col-12">
+          <div class="bg-white p-4 min-vh-15 mt-3">
+            <div class="d-flex justify-content-center">
+              <div class="text-center mx-5">
+                <RouterLink to="users/roomReservations">
+                  <span class="material-icons" style="font-size: 70px;">description</span>
+                  <div class="mt-2">객실 예약 내역</div>
+                </RouterLink>
+              </div>
+              <div class="text-center mx-5">
+                <RouterLink to="users/attractionReservations">
+                  <span class="material-icons" style="font-size: 70px;">attractions</span>
+                  <div class="mt-2">테마파크 예약 내역</div>
+                </RouterLink>
+              </div>
+              <div class="text-center mx-5">
+                <RouterLink to="users/point">
+                  <span class="material-icons" style="font-size: 70px;">loyalty</span>
+                  <div class="mt-2">포인트</div>
+                </RouterLink>
+              </div>
             </div>
           </div>
+        </div>
 
-
-
+        <div style="border-top: 1px solid #000; width: 25%; margin: 10px auto;"></div>
+    
+        <div class="row justify-content-center text-black fs-6 mb-4">
+          <div class="text-center mt-3">
+            <h5 class="custom-font">EASY STAY's membership offers special value.</h5>
+          </div>
         </div>
 
       </div>
@@ -142,5 +137,9 @@ onMounted(() => {
   /* 전체 너비 */
   background-color: white;
   /* 필요에 따라 배경색 추가 */
+}
+
+.custom-font {
+  font-family: 'Caveat', cursive;
 }
 </style>

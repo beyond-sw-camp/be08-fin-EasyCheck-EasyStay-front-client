@@ -32,6 +32,7 @@ import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
+import ReservationView from "@/views/Reservation/ReservationView.vue";
 
 import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
@@ -48,6 +49,12 @@ import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComple
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
 
 import MypageView from "@/views/Mypage/MypageView.vue";
+import InfoUpdateView from "@/views/Mypage/InfoUpdate/InfoUpdateView.vue";
+import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
+import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
+import ResignView from "@/views/Mypage/Resign/ResignView.vue";
+import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
+import PaymentPage from "@/views/Payment/PaymentPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -202,9 +209,20 @@ const router = createRouter({
       props: true,
     },
     {
+      path: "/usageguide/:guidePageName",
+      name: "UsageGuide",
+      component: UsageGuideWrapper,
+      props: true,
+    },
+    {
       path: "/room/:roomId",
       name: "Room",
       component: RoomDetailView,
+    },
+    {
+      path: "/reservation",
+      name: "Reservation",
+      component: ReservationView,
     },
     {
       path: "/users/signUp",
@@ -267,10 +285,34 @@ const router = createRouter({
       component: MypageView,
     },
     {
-      path: "/usageguide/:guidePageName",
-      name: "UsageGuide",
-      component: UsageGuideWrapper,
-      props: true,
+      path: "/users/infoUpdate",
+      name: "InfoUpdate",
+      component: InfoUpdateView,
+    },
+    {
+      path: "/users/updateComplete",
+      name: "InfoUpdateComplete",
+      component: InfoCompleteView,
+    },
+    {
+      path: "/users/pwUpdate",
+      name: "PwUpdate",
+      component: PwUpdateView,
+    },
+    {
+      path: "/users/resign",
+      name: "Resign",
+      component: ResignView,
+    },
+    {
+      path: "/users/resignComplete",
+      name: "ResignComplete",
+      component: ResignCompleteView,
+    },
+    {
+      path: "/payment",
+      name: "PaymentPage",
+      component: PaymentPage,
     },
   ],
 });
