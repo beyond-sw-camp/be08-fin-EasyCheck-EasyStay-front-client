@@ -99,7 +99,7 @@ function getClasses(size, success, error) {
       :class="[getClasses(size, success, error), inputClass]"
       :value="modelValue"
       :placeholder="placeholder"
-      :Required="isRequired"
+      :required="isRequired"
       :disabled="isDisabled"
       @input="handleInput" 
     />

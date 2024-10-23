@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import apiClient from "@/api";
 import ExampleCard from "../../Components/ExampleCard.vue";
 
 const events = ref([]);
 
 const fetchEvents = async () => {
     try {
-        const response = await axios.get('/api/v1/events');
+        const response = await apiClient.get('/events');
         events.value = response.data;
     } catch (error) {
         console.error("Failed to fetch events:", error);

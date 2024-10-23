@@ -1,7 +1,9 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
 import { RouterLink } from "vue-router";
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
+import { userLoginStore } from "@/stores/loginStore";
+import { useRouter } from "vue-router";
 
 // example components
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -17,6 +19,37 @@ import setMaterialInput from "@/assets/js/material-input";
 onMounted(() => {
   setMaterialInput();
 });
+
+// 회원 로그인
+const router = useRouter();
+const userLogin = userLoginStore();
+
+const email = ref('');
+const password = ref('');
+const status = ref('');
+const role = ref('');
+
+async function login() {
+  const formData = {
+    email: email.value,
+    password: password.value,
+    status: status.value,
+    role: role.value
+  };
+
+  try {
+    const response = await userLogin.login(formData);
+    console.log("응답 데이터:", response);
+    
+    if (response) {
+      router.push('/'); // 로그인 성공 후 메인 페이지로 이동
+      console.log("Success Login");
+    }
+  } catch (error) {
+    console.log("Login Fail: ", error);
+  }
+}
+
 </script>
 
 <template>
@@ -27,7 +60,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  
+
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -53,21 +86,24 @@ onMounted(() => {
                 <form role="form" class="text-start">
 
                   <MaterialInput id="email1" class="input-group-outline my-3"
-                    :label="{ text: '아이디', class: 'form-label' }" type="email" />
+                    :label="{ text: '아이디', class: 'form-label' }" type="email" v-model="email" />
                   <MaterialInput id="password1" class="input-group-outline mb-3"
-                    :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+                    :label="{ text: '비밀번호', class: 'form-label' }" type="password" v-model="password" />
                   <MaterialSwitch class="d-flex align-items-center mb-3" id="rememberMe1" labelClass="mb-0 ms-3"
                     checked>아이디 저장</MaterialSwitch>
                   <div class="text-center">
-                    <MaterialButton class="my-4 mb-2" variant="gradient" color="dark" fullWidth>Sign in
+                    <MaterialButton type="button" @click="login" class="my-4 mb-2" variant="gradient" color="dark"
+                      fullWidth>Sign in
                     </MaterialButton>
                   </div>
                   <p class="mt-4 text-sm text-center">
                     <RouterLink to="/users/signUp" class="text-dark text-gradient font-weight-bold">회원가입</RouterLink>
                     |
-                    <RouterLink to="/users/findIdAuthentication" class="text-dark text-gradient font-weight-bold">아이디 찾기</RouterLink>
+                    <RouterLink to="/users/findIdAuthentication" class="text-dark text-gradient font-weight-bold">아이디 찾기
+                    </RouterLink>
                     |
-                    <RouterLink to="/users/findPwAuthentication" class="text-dark text-gradient font-weight-bold">비밀번호 찾기</RouterLink>
+                    <RouterLink to="/users/findPwAuthentication" class="text-dark text-gradient font-weight-bold">비밀번호
+                      찾기</RouterLink>
                   </p>
 
                 </form>
@@ -225,6 +261,7 @@ onMounted(() => {
 }
 
 .card {
-  margin: 0 auto; /* 카드 중앙 정렬 */
+  margin: 0 auto;
+  /* 카드 중앙 정렬 */
 }
 </style>
