@@ -36,7 +36,6 @@ import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
-import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
 import MemberView from "@/views/LandingPages/SignIn/Member/MemberView.vue";
 import FindIdAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdAuthenticationView.vue";
 import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdView.vue";
@@ -213,11 +212,6 @@ const router = createRouter({
       path: "/users/signUp",
       name: "MemberSignUp",
       component: SignUpView,
-    },
-    {
-      path: "/users/memberAuthentication",
-      name: "MemberAuthentication",
-      component: MemberAuthView,
     },
     {
       path: "/users/member/info",

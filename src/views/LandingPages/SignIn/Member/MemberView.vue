@@ -77,43 +77,6 @@ const registerUser = async () => {
             회원가입
           </MaterialButton>
         </div>
-
-        <!-- 푸터 -->
-        <footer class="footer position-absolute bottom-0 py-2 w-100">
-          <div class="container">
-            <div class="row align-items-center justify-content-lg-between">
-              <div class="col-12 col-md-6 my-auto">
-                <div class="copyright text-center text-sm text-dark text-lg-start">
-                  © {{ new Date().getFullYear() }}, made with
-                  <i class="fa fa-heart" aria-hidden="true"></i> by
-                  <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                    class="font-weight-bold text-dark" target="_blank">EASY CHECK</a>
-                  for a better web.
-                </div>
-              </div>
-              <div class="col-12 col-md-6">
-                <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                      class="nav-link text-dark" target="_blank">EASY CHECK</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                      class="nav-link text-dark" target="_blank">About Us</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
-                      class="nav-link text-dark" target="_blank">GitHub</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-dark"
-                      target="_blank">License</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   </Header>
@@ -122,11 +85,5 @@ const registerUser = async () => {
 <style scoped>
 .custom-checkbox {
   transform: scale(0.8);
-}
-
-.footer {
-  position: relative;
-  /* footer 위치 조정 */
-  bottom: 0;
 }
 </style>
