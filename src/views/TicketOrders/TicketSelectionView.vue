@@ -46,7 +46,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router"; // useRoute를 import
 import { useTicketStore } from "@/stores/ticketStore";
 import dayjs from "dayjs";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -54,11 +54,12 @@ import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 const tickets = ref([]);
 const groupedTickets = ref([]);
 const router = useRouter();
+const route = useRoute(); // route 사용 선언
 const ticketStore = useTicketStore();
 const isLoggedIn = ref(false);
 
 onMounted(async () => {
-  const themeParkId = 1;
+  const themeParkId = route.params.themeParkId; // route params에서 themeParkId를 가져옴
   await ticketStore.fetchTickets(themeParkId);
   if (ticketStore.tickets.data && Array.isArray(ticketStore.tickets.data)) {
     tickets.value = ticketStore.tickets.data;
