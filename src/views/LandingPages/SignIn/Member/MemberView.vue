@@ -1,7 +1,9 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
+import { userLoginStore } from '@/stores/loginStore';
+import apiClient from "@/api";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -13,11 +15,13 @@ import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
-import MemberInfo from "../Sections/MemberInfo.vue";
+import MemberInfo from "@/views/LandingPages/SignIn/Sections/MemberInfo.vue";
 
 onMounted(() => {
   setMaterialInput();
 });
+
+const loginStore = userLoginStore();
 
 // 라우터
 const router = useRouter();
@@ -26,9 +30,17 @@ function goToMain() {
   router.push('/');
 }
 
-function requestVerification() {
-  router.push('/joinComplete');
-}
+// 회원가입
+const registerUser = async () => {
+  try {
+    const success = await loginStore.registerUser();
+    if (success) {
+      router.push('/joinComplete');
+    }
+  } catch (error) {
+    console.error("회원가입 처리 중 오류 발생:", error.message);
+  }
+};
 
 </script>
 
@@ -54,15 +66,15 @@ function requestVerification() {
           </div>
         </div>
 
-        <MemberInfo />
+        <MemberInfo v-model="signUpformData" />
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
           <MaterialButton @click="goToMain" class="btn btn-secondary">
             취소
           </MaterialButton>
-          <MaterialButton @click="requestVerification" class="btn btn-primary ms-2">
-            가입 완료
+          <MaterialButton @click="registerUser" class="btn btn-primary ms-2">
+            회원가입
           </MaterialButton>
         </div>
 
@@ -107,7 +119,7 @@ function requestVerification() {
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-checkbox {
   transform: scale(0.8);
 }
