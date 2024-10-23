@@ -42,7 +42,8 @@ async function login() {
     console.log("응답 데이터:", response);
     
     if (response) {
-      router.push('/'); // 로그인 성공 후 메인 페이지로 이동
+      // router.push('/'); // 로그인 성공 후 메인 페이지로 이동
+      router.go(-1);
       console.log("Success Login");
     }
   } catch (error) {

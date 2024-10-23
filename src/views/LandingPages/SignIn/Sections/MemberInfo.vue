@@ -116,32 +116,13 @@ const searchZipCode = () => {
   new daum.Postcode({
     oncomplete: function (data) {
       postcode.value = data.zonecode; // 올바른 키 사용
-      roadAddress.value = data.roadAddress; // 도로명 주소
-      jibunAddress.value = data.jibunAddress; // 지번 주소
-      detailAddress.value = ''; // 상세주소
-      extraAddress.value = ''; // 참고항목
+      loginStore.roadAddress = data.roadAddress; // 도로명 주소
+      loginStore.jibunAddress = data.jibunAddress; // 지번 주소
+      loginStore.detailAddress = ''; // 상세주소 초기화
     },
   }).open();
 };
 
-
-
-// 회원가입
-const email = ref('');
-const password = ref('');
-const name = ref('');
-
-async function registerUser() {
-  try {
-    const success = await userStore.registerUser();
-    if (success) {
-      router.push('/joinComplete'); // 회원가입 성공 후 리다이렉트
-    }
-  } catch (error) {
-    console.error("회원가입 실패:", error);
-    // 에러 처리 (예: 사용자에게 에러 메시지 표시)
-  }
-}
 </script>
 
 <template>
@@ -161,8 +142,8 @@ async function registerUser() {
           <td class="fw-bold fs-8">아이디</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.email" required class="input-group-outline mb-0" id="email"
-                :label="{ text: '아이디', class: 'form-label' }" type="text" />
+              <MaterialInput v-model="loginStore.signUpformData.email" required class="input-group-outline mb-0"
+                id="email" :label="{ text: '아이디', class: 'form-label' }" type="text" />
             </div>
           </td>
         </tr>
@@ -173,8 +154,8 @@ async function registerUser() {
           <td class="fw-bold fs-8">비밀번호</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0"
+                id="password" :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
             </div>
           </td>
         </tr>
@@ -248,12 +229,33 @@ async function registerUser() {
               <button type="button" class="btn btn-outline-primary mb-0" @click="searchZipCode">주소 검색</button>
             </div>
             <div class="mt-2 col-5">
-              <MaterialInput v-model="roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
-              <MaterialInput v-model="jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
-              <MaterialInput v-model="detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
+              <MaterialInput v-model="loginStore.roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
+              <MaterialInput v-model="loginStore.jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
+              <MaterialInput v-model="loginStore.detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
             </div>
           </td>
         </tr>
+
+        <tr>
+          <td class="fw-bold fs-8">마케팅 수신 동의 여부</td>
+          <td>
+            <div class="d-flex align-items-stretch col-4">
+              <label class="me-2">
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="Y"
+                  class="form-check-input" />
+                예
+              </label>
+              <label>
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="N"
+                  class="form-check-input" />
+                아니요
+              </label>
+            </div>
+          </td>
+        </tr>
+
+
+
       </tbody>
     </table>
   </div>
