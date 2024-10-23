@@ -1,57 +1,48 @@
-import { defineStore } from 'pinia';
-import apiClient from '@/api';
-import router from '@/router';
-import axios from 'axios';
-
+import { defineStore } from "pinia";
+import apiClient from "@/api";
+import router from "@/router";
 export const userLoginStore = defineStore("userStore", {
   state: () => ({
     id: null,
     password: null,
     message: null,
-    selectedPhonePrefix: '',
-    phoneMiddle: '',
-    phoneSuffix: '',
-    verificationCode: '',
+    selectedPhonePrefix: "",
+    phoneMiddle: "",
+    phoneSuffix: "",
+    verificationCode: "",
+    roadAddress: "",
+    jibunAddress: "",
+    detailAddress: "",
 
     signUpformData: {
-      email: '',
-      password: '',
-      name: '',
-      selectedPhonePrefix: '',
-      phoneMiddle: '',
-      phoneSuffix: '',
-      verificationCode: '',
-      roadAddress: '',
-      jibunAddress: '',
-      detailAddress: '',
-      marketingConsent: '',
+      email: "",
+      password: "",
+      name: "",
+      verificationCode: "",
+      marketingConsent: "N",
     },
-
   }),
 
   getters: {
     inUserLogin(state) {
-      return state.id != null;  
+      return state.id != null;
     },
   },
 
   actions: {
-    generateVerificationCode() {
-      const code = Math.floor(10000000 + Math.random() * 90000000);
-      return code.toString();
-    },
-
     // 일반회원 - 로그인
     async login(formData) {
       try {
         const response = await apiClient.post("/users/login", formData);
-        
+
         if (response && response.data) {
-          localStorage.setItem('jwt', response.data.accessToken);
+          localStorage.setItem("jwt", response.data.accessToken);
           console.log("로그인 성공");
           return response.data;
         } else {
-          throw new Error("Unexpected response format: " + JSON.stringify(response));
+          throw new Error(
+            "Unexpected response format: " + JSON.stringify(response)
+          );
         }
       } catch (error) {
         console.error("로그인 실패:", error);
@@ -65,95 +56,83 @@ export const userLoginStore = defineStore("userStore", {
       this.phoneSuffix = suffix;
     },
 
-    // 인증번호 요청
-    async requestVerificationCode() {
-      const phoneNumber = `${this.selectedPhonePrefix}${this.phoneMiddle}${this.phoneSuffix}`;
-      
-      console.log('Sending phone number:', phoneNumber);
-    
-      try {
-        const response = await fetch('http://localhost:8080/api/v1/sms/code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            receivingPhoneNumber: phoneNumber,
-          }),
-        });
-    
-        console.log('Response status:', response.status);
-        const text = await response.text();
-        console.log('Response body:', text);
-    
-        if (response.ok) {
-          if (text) {
-            const data = JSON.parse(text);
-            return data.message;
-          } else {
-            throw new Error('빈 응답입니다.');
-          }
-        } else {
-          console.error('Response status:', response.status);
-          throw new Error('인증 코드 요청에 실패했습니다.');
-        }
-      } catch (error) {
-        console.error('Error in requestVerificationCode:', error.message);
-        throw error;
-      }  
+    // 인증번호 생성
+    generateVerificationCode() {
+      const code = Math.floor(10000000 + Math.random() * 90000000);
+      return code.toString();
     },
-    
+
+    async requestVerificationCode() {
+      const phone = `${this.selectedPhonePrefix}${this.phoneMiddle}${this.phoneSuffix}`;
+      console.log("Sending phone number:", phone);
+
+      try {
+        await apiClient.post("/sms/code", {
+          receivingPhoneNumber: phone,
+        });
+      } catch (error) {
+        console.error("Error in requestVerificationCode:", error.message);
+        throw error;
+      }
+    },
+
     async handlePhoneAuthentication() {
       try {
         const message = await this.requestVerificationCode();
         console.log(message); // 성공 메시지 출력
       } catch (error) {
-        console.error('Error during phone authentication:', error.message);
+        console.error("Error during phone authentication:", error.message);
       }
     },
-    
+
+    // 인증번호 인증
     async verifyCode(phone, verificationCode) {
-      const payload = {
-        phone: phone,  // "phone" 키 사용
-        code: verificationCode,  // "code" 키 사용
-      };
-    
-      console.log('Phone Number:', phone); // 전화번호 로그
-      console.log('Entered verification code:', verificationCode); // 인증 코드 로그
-    
+      console.log("Phone Number:", phone);
+      console.log("Entered verification code:", verificationCode);
+
       try {
-        const response = await fetch('http://localhost:8080/api/v1/sms/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+        await apiClient.post("/sms/verify", {
+          phone,
+          code: verificationCode,
         });
-    
-        if (response.ok) {
-          const data = await response.json(); // JSON 응답 파싱
-          console.log('인증 성공:', data.message);
-          return data.message;
-        } else {
-          const errorData = await response.json();
-          console.error('인증 실패:', errorData.errors ? errorData.errors[0].errorMessage : '인증 코드 검증에 실패했습니다.');
-          throw new Error(errorData.errors ? errorData.errors[0].errorMessage : '인증 코드 검증에 실패했습니다.');
-        }
       } catch (error) {
-        console.error('Error in verifyCode:', error.message);
-        throw error;
+        console.log(error);
+
+        console.error("Error in verifyCode:", error.message);
       }
     },
 
     // 일반회원 - 회원가입
     async registerUser() {
+      const addr = `${this.roadAddress} ${this.detailAddress}`;
+      const addrDetail = this.jibunAddress;
+
+      // 전화번호 구성
+      const phonePrefix = this.selectedPhonePrefix;
+      const phoneMiddle = this.phoneMiddle;
+      const phoneSuffix = this.phoneSuffix;
+
+      const requestData = {
+        email: this.signUpformData.email,
+        password: this.signUpformData.password,
+        name: this.signUpformData.name,
+        phone: `${phonePrefix}${phoneMiddle}${phoneSuffix}`,
+        addr,
+        addrDetail,
+        marketingConsent: this.signUpformData.marketingConsent,
+      };
+
+      console.log(requestData);
+
       try {
-        const response = await axios.post("/users/member/info", this.signUpformData); // 수정된 부분
-        return response.status === 201;
+        const response = await apiClient.post("/users", requestData);
+        if (response.status === 201) {
+          router.push("/joinComplete");
+        }
       } catch (error) {
         console.error("회원가입 실패:", error);
-        throw error;
+        throw error; // 에러를 상위로 던지기
       }
     },
-  }
+  },
 });

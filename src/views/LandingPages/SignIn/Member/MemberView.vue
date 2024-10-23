@@ -3,7 +3,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
-import axios from "axios";
+import apiClient from "@/api";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -21,6 +21,8 @@ onMounted(() => {
   setMaterialInput();
 });
 
+const loginStore = userLoginStore();
+
 // 라우터
 const router = useRouter();
 
@@ -28,32 +30,17 @@ function goToMain() {
   router.push('/');
 }
 
-const formData = ref({
-  email: "",
-  password: "",
-  name: "",
-  phone: "",
-  addr: "",
-  addrDetail: "",
-  marketingConsent: false,
-});
-
-async function registerUser() {
+// 회원가입
+const registerUser = async () => {
   try {
-    const response = await axios.post("/users/member/info", formData.value);
-
-    if (response.status === 201) {
-      // 회원가입 성공 후 리다이렉트
+    const success = await loginStore.registerUser();
+    if (success) {
       router.push('/joinComplete');
     }
   } catch (error) {
-    console.error("회원가입 실패:", error);
-    // 에러 처리 (예: 사용자에게 에러 메시지 표시)
+    console.error("회원가입 처리 중 오류 발생:", error.message);
   }
-}
-
-const loginStore = userLoginStore();
-const signUpData = loginStore.signUpformData;
+};
 
 </script>
 
@@ -79,7 +66,7 @@ const signUpData = loginStore.signUpformData;
           </div>
         </div>
 
-        <MemberInfo v-model="signUpformData"/>
+        <MemberInfo v-model="signUpformData" />
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
@@ -132,7 +119,7 @@ const signUpData = loginStore.signUpformData;
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-checkbox {
   transform: scale(0.8);
 }
