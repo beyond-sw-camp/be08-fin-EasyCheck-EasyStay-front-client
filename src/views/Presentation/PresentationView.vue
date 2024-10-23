@@ -143,61 +143,91 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
-  <Header>
-    <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
-      <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
-        };`"></div>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-7 text-center mx-auto position-relative">
-            <h1 class="text-white pt-3 mt-n5 me-2" :style="{ display: 'inline-block ' }">
-              EasyStay
-            </h1>
-            <p class="lead text-white px-5 mt-3" :style="{ fontWeight: '500' }">
-              You can stay here through EasyCheck.
-            </p>
-          </div>
+  <div>
+    <div class="position-sticky z-index-sticky top-0">
+      <div class="row">
+        <div class="col-12">
+          <NavbarDefault :sticky="true" />
         </div>
       </div>
+    </div>
 
-      <button class="btn-prev" @click="prevImage"></button>
-      <button class="btn-next" @click="nextImage"></button>
+    <Header>
+      <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
+        <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
+          };`"></div>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-7 text-center mx-auto position-relative">
+              <h1 class="text-white pt-3 mt-n5 me-2" :style="{ display: 'inline-block ' }">
+                EasyStay
+              </h1>
+              <p class="lead text-white px-5 mt-3" :style="{ fontWeight: '500' }">
+                You can stay here through EasyCheck.
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <div class="dots-container">
-        <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
-          @click="goToImage(index)"></span>
-        <button @click="togglePlayPause" class="play-pause-btn">
-          {{ isPlaying ? "||" : "▶" }}
-        </button>
+        <button class="btn-prev" @click="prevImage"></button>
+        <button class="btn-next" @click="nextImage"></button>
+
+        <div class="dots-container">
+          <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
+            @click="goToImage(index)"></span>
+          <button @click="togglePlayPause" class="play-pause-btn">
+            {{ isPlaying ? "||" : "▶" }}
+          </button>
+        </div>
+      </div>
+      <div class="roomSearchForm-container">
+        <div class="container p-0">
+          <RoomSearchForm class="m-auto" :accommodations="accommodations" @search="onSearchRooms" />
+        </div>
+      </div>
+    </Header>
+
+    <div style="background-color: white;">
+      <div class="container card card-body">
+        <section class="row justify-content-center mb-5 pb-5">
+          <EventList />
+          <AccommodationList />
+          <KakaoMap />
+        </section>
+
       </div>
     </div>
-  </Header>
-
-  <div class="card card-body">
-    <section class="row justify-content-center mb-5 pb-5 mx-3 mx-md-7">
-      <div class="col-12 col-md-10">
-        <RoomSearchForm :accommodations="accommodations" @search="onSearchRooms" />
-        <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
-      </div>
-      <EventList />
-      <AccommodationList />
-      <KakaoMap />
-    </section>
-
+    <!-- <DefaultFooter /> -->
   </div>
 
-  <DefaultFooter />
 </template>
 
 <style scoped>
+@media (min-width: 1400px) {
+
+  .container-xxl,
+  .container-xl,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container {
+    max-width: 1320px;
+  }
+}
+
+@media (max-width: 1399px) {
+  .roomSearchForm-container {
+    display: none;
+  }
+}
+
+.roomSearchForm-container {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  border-bottom: 1px solid #ebebeb;
+}
+
 .background-image {
   width: 100%;
   height: 100%;
@@ -211,13 +241,14 @@ onUnmounted(() => {
 }
 
 .page-header {
+
   position: relative;
   overflow: hidden;
 }
 
 .dots-container {
   position: absolute;
-  bottom: 20px;
+  bottom: 200px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
