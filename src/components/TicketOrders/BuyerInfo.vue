@@ -32,7 +32,7 @@
           </div>
 
           <div class="form-group email-group">
-            <label for="buyerEmail">이메일 (선택)</label>
+            <label for="buyerEmail">이메일</label>
             <div class="input-group input-lg d-flex align-items-center">
               <MaterialInput
                 class="input-group-outline"
