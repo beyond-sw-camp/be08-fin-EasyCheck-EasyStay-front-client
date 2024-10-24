@@ -17,6 +17,7 @@ import image3 from "@/assets/img/main_images/SanjungLake.jpeg";
 import image4 from "@/assets/img/main_images/Signiel.jpeg";
 import image5 from "@/assets/img/main_images/ThePlaza.jpeg";
 import image6 from "@/assets/img/main_images/ParadiseCity.jpeg";
+import { userLoginStore } from "@/stores/loginStore";
 
 const images = [image1, image2, image3, image4, image5, image6];
 const currentImage = ref(images[0]);
@@ -32,6 +33,15 @@ let checkInDate = null; // 체크인 날짜를 문자열로 저장
 let checkOutDate = null; // 체크아웃 날짜를 문자열로 저장
 let roomCount = null;
 const router = useRouter(); // useRouter 호출
+
+// 테스트용 추가 버튼 연결하고 주석 지우겠음
+const userStore = userLoginStore();
+const logout = () => {
+  userStore.logout();
+  alert("로그아웃 되었습니다.");
+  router.push("/");
+};
+// 여기까지 
 
 const fetchAccommodations = async () => {
   try {

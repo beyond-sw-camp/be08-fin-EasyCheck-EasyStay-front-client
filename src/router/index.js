@@ -26,6 +26,9 @@ import ElTypography from "../layouts/sections/elements/typography/TypographyView
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
+import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
+import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
@@ -54,6 +57,7 @@ import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
+import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -196,9 +200,22 @@ const router = createRouter({
       }),
     },
     {
-      path: "/ticket-order/:themeParkId",
+      path: "/themepark/:themeParkId/tickets",
+      name: "TicketSelection",
+      component: TicketSelectionView,
+      props: true,
+    },
+    {
+      path: "/ticketorder",
       name: "TicketOrderView",
       component: TicketOrderView,
+      props: true,
+    },
+    {
+      path: "/usageguide/:guidePageName",
+      name: "UsageGuide",
+      component: UsageGuideWrapper,
+      props: true,
     },
     {
       path: "/room/:roomId",
@@ -301,6 +318,20 @@ const router = createRouter({
       component: PaymentPage,
     },
     {
+      path: "/users/mypage",
+      component: MypageView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem("accessToken");
+        console.log("token:", token);
+        if (token) {
+          next();
+        } else {
+          alert("로그인이 필요합니다.");
+          next({ path: "/users/login" });
+        }
+      }
+    },
+    {
       path: "/noticesListView",
       name: "noticesListView",
       component: NoticesListView,
@@ -309,6 +340,11 @@ const router = createRouter({
       path: "/suggestionsListView",
       name: "SuggestionsListView",
       component: SuggestionsListView,
+    },
+    {
+      path: "/noticesListView/noticeDetail",
+      name: "NoticeDetail",
+      component: NoticeDetail,
     },
   ],
 });
