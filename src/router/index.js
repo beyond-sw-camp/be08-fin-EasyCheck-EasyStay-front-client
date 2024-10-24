@@ -177,7 +177,7 @@ const router = createRouter({
       component: ElTypography,
     },
     {
-      path: "/accommodation",
+      path: "/accommodation/:accommodationId",
       name: "Accommodation",
       component: AccommodationView,
       props: (route) => ({
