@@ -2,7 +2,6 @@
   <NavbarDefault :sticky="true" />
   <MainImage v-if="currentThemePark" :themePark="currentThemePark" />
 
-  <!-- 사업장 탭 -->
   <section class="accommodation-tabs px-8 py-4" v-if="accommodations.length">
     <div class="container">
       <div class="row">
@@ -35,7 +34,6 @@
     </div>
   </section>
 
-  <!-- 테마파크 탭 -->
   <section class="themepark-tabs px-8 py-4" v-if="themeParks.length">
     <div class="container">
       <div class="row">
@@ -66,12 +64,11 @@
     </div>
   </section>
 
-  <!-- 시설 안내 -->
   <div class="container-fluid px-8">
     <div class="section-divider"></div>
     <AttractionInfo
       v-if="currentThemePark"
-      :themeParkId="currentThemePark.id"
+      :themeParkId="Number(currentThemePark.id)"
       :currentThemePark="currentThemePark"
     />
   </div>
@@ -100,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch, defineProps } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
@@ -110,11 +107,12 @@ import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
-defineProps({
+// props에서 themeParkId를 받아오기
+const props = defineProps({
   themeParkId: {
-    type: Number,
+    type: [String, Number],
     required: true,
-  },
+  }
 });
 
 const accommodations = ref([]);
@@ -126,21 +124,29 @@ const router = useRouter();
 const route = useRoute();
 
 const currentAccommodationId = ref(1);
-const currentThemeParkId = ref(parseInt(route.params.themeParkId, 10) || null);
+const currentThemeParkId = ref(Number(props.themeParkId) || parseInt(route.params.themeParkId, 10) || null);
 
 onMounted(async () => {
   await accommodationStore.fetchResortAccommodations();
   accommodations.value = accommodationStore.accommodations || [];
+  fetchThemeParksData();
+});
 
+watch(
+  () => route.params.themeParkId,
+  (newId) => {
+    currentThemeParkId.value = parseInt(newId, 10);
+    fetchThemeParksData();
+  }
+);
+
+const fetchThemeParksData = async () => {
   await themeParkStore.fetchThemeParks(currentAccommodationId.value);
   themeParks.value = themeParkStore.themeParks || [];
-
-  if (themeParks.value.length > 0) {
-    if (!currentThemeParkId.value) {
-      currentThemeParkId.value = themeParks.value[0].id;
-    }
+  if (themeParks.value.length > 0 && !currentThemeParkId.value) {
+    currentThemeParkId.value = themeParks.value[0].id;
   }
-});
+};
 
 const currentThemePark = computed(() => {
   return (
@@ -151,11 +157,7 @@ const currentThemePark = computed(() => {
 
 const changeAccommodation = async (accommodationId) => {
   currentAccommodationId.value = accommodationId;
-  await themeParkStore.fetchThemeParks(accommodationId);
-  themeParks.value = themeParkStore.themeParks || [];
-  if (themeParks.value.length > 0) {
-    currentThemeParkId.value = themeParks.value[0].id;
-  }
+  fetchThemeParksData();
 };
 
 const changeThemePark = (themeParkId) => {
@@ -174,7 +176,10 @@ const goToTicketSelectionView = () => {
   if (currentThemePark.value) {
     router.push({
       name: "TicketSelection",
-      params: { themeParkId: currentThemePark.value.id },
+      params: {
+        themeParkId: Number(currentThemePark.value.id),
+        themeParkName: currentThemePark.value.name,
+      },
     });
   } else {
     console.error("Invalid theme park data not available.");
@@ -232,18 +237,18 @@ const goToTicketSelectionView = () => {
   background: linear-gradient(to right, transparent, #ccc, transparent);
   margin: 3rem 0;
   position: relative;
+}
 
-  &::before {
-    content: "●";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    color: #ccc;
-    padding: 0 10px;
-    font-size: 0.8rem;
-  }
+.section-divider::before {
+  content: "●";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  color: #ccc;
+  padding: 0 10px;
+  font-size: 0.8rem;
 }
 
 .nav-wrapper {

@@ -1,97 +1,112 @@
 <template>
-  <NavbarDefault :sticky="true" />
-  <div class="order-summary container my-5">
-    <h2 class="mb-4">이용권 주문</h2>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">{{ ticket.name }} 이용권</h5>
-        <p class="card-text">
-          유효기간: {{ ticket.validFrom }} ~ {{ ticket.validTo }}
-        </p>
-        <div class="form-group mb-3">
-          <label for="adultCount">대인 수량</label>
-          <div class="input-group">
-            <button class="btn btn-outline-secondary" @click="decrementAdult">
-              -
-            </button>
-            <input
-              type="number"
-              id="adultCount"
-              class="form-control"
-              v-model="adultCount"
-              min="0"
-            />
-            <button class="btn btn-outline-secondary" @click="incrementAdult">
-              +
-            </button>
-          </div>
-          <small class="text-muted">대인 가격: {{ ticket.adultPrice }}원</small>
-        </div>
+  <div class="card p-4 mb-5">
+    <h4 class="mb-3">{{ themeParkName }} 구매상품 정보</h4>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td class="label-cell">지점</td>
+            <td class="content-cell">
+              <span>{{ themeParkName }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">유효기간</td>
+            <td class="content-cell">
+              <span
+                >{{ formatDate(adultTicket.validFromDate) }} ~
+                {{ formatDate(adultTicket.validToDate) }}</span
+              >
+              <br />
+              <small class="text-muted"
+                >* 유효기간 중 언제든지 사용 가능한 상품입니다.</small
+              >
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">구매 수량</td>
+            <td class="content-cell">
+              <div class="quantity-row">
+                <div class="quantity-group">
+                  <label class="quantity-label">대인</label>
+                  <div class="input-group">
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="decrementAdult"
+                    >
+                      <i class="ni ni-fat-delete"></i>
+                    </button>
+                    <input
+                      type="number"
+                      id="adultCount"
+                      class="form-control quantity-input"
+                      v-model="adultCount"
+                      min="0"
+                    />
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="incrementAdult"
+                    >
+                      <i class="ni ni-fat-add"></i>
+                    </button>
+                  </div>
+                  <small class="text-muted price-info"
+                    >대인 / 온라인회원가 {{ adultTicket.price }}원</small
+                  >
+                </div>
 
-        <div class="form-group mb-3">
-          <label for="childCount">소인 수량</label>
-          <div class="input-group">
-            <button class="btn btn-outline-secondary" @click="decrementChild">
-              -
-            </button>
-            <input
-              type="number"
-              id="childCount"
-              class="form-control"
-              v-model="childCount"
-              min="0"
-            />
-            <button class="btn btn-outline-secondary" @click="incrementChild">
-              +
-            </button>
-          </div>
-          <small class="text-muted">소인 가격: {{ ticket.childPrice }}원</small>
-        </div>
-
-        <p class="card-text">
-          총 금액: {{ formattedTotalPrice }}
-        </p>
-
-        <form @submit.prevent="placeOrder">
-          <div class="form-group">
-            <label for="buyerName">구매자 이름</label>
-            <input
-              type="text"
-              id="buyerName"
-              v-model="buyerName"
-              class="form-control"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="buyerEmail">이메일</label>
-            <input
-              type="email"
-              id="buyerEmail"
-              v-model="buyerEmail"
-              class="form-control"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-primary mt-3 w-100">
-            주문하기
-          </button>
-        </form>
-      </div>
+                <div class="quantity-group">
+                  <label class="quantity-label">소인</label>
+                  <div class="input-group">
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="decrementChild"
+                    >
+                      <i class="ni ni-fat-delete"></i>
+                    </button>
+                    <input
+                      type="number"
+                      id="childCount"
+                      class="form-control quantity-input"
+                      v-model="childCount"
+                      min="0"
+                    />
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="incrementChild"
+                    >
+                      <i class="ni ni-fat-add"></i>
+                    </button>
+                  </div>
+                  <small class="text-muted price-info"
+                    >소인 / 온라인회원가 {{ childTicket.price }}원</small
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">총 금액 (VAT 포함)</td>
+            <td class="content-cell total-price">
+              <strong class="total-amount">{{ formattedTotalPrice }}</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
+import { ref, computed, defineProps } from "vue";
+import dayjs from "dayjs";
 
-// route에서 ticket 정보를 받음
-const route = useRoute();
-const ticket = route.state?.ticket || {};
+const props = defineProps({
+  adultTicket: Object,
+  childTicket: Object,
+  themeParkName: String,
+});
 
-// 수량 조정
 const adultCount = ref(0);
 const childCount = ref(0);
 
@@ -105,45 +120,102 @@ const decrementChild = () => {
   if (childCount.value > 0) childCount.value--;
 };
 
-// 총 가격 계산
 const formattedTotalPrice = computed(() => {
-  const total =
-    adultCount.value * ticket.adultPrice + childCount.value * ticket.childPrice;
-  return `₩ ${total.toLocaleString()}`;
+  const adultTotal = adultCount.value * (props.adultTicket?.price || 0);
+  const childTotal = childCount.value * (props.childTicket?.price || 0);
+  return `₩ ${(adultTotal + childTotal).toLocaleString()}`;
 });
 
-// 구매자 정보
-const buyerName = ref("");
-const buyerEmail = ref("");
-
-// 주문 처리 함수
-const placeOrder = () => {
-  console.log("Order placed:", {
-    ticket,
-    adultCount: adultCount.value,
-    childCount: childCount.value,
-    buyerName: buyerName.value,
-    buyerEmail: buyerEmail.value,
-  });
+const formatDate = (date) => {
+  return dayjs(date).format("YYYY-MM-DD");
 };
 </script>
 
 <style scoped>
-.order-summary {
-  background-color: #f9f9f9;
-  padding: 2rem;
-  border-radius: 10px;
-}
-
 .card {
+  background-color: #ffffff;
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card-title {
+.table-bordered td {
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.label-cell {
+  width: 20%;
+  font-weight: bold;
+  text-align: left;
+}
+
+.content-cell {
+  text-align: left;
+}
+
+.quantity-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.quantity-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.quantity-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bi {
+  font-size: 24px;
+}
+
+.quantity-input {
+  text-align: center;
+  width: 60px;
+  height: 40px;
+  font-size: 1.2rem;
+}
+
+.price-info {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.total-price {
+  text-align: left;
+}
+
+.total-amount {
+  color: red;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 </style>

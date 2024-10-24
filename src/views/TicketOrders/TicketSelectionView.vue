@@ -1,7 +1,7 @@
 <template>
   <NavbarDefault :sticky="true" />
   <div class="ticket-selection container my-5">
-    <h2 class="mb-4">이용권 선택</h2>
+    <h2 class="mb-4">{{ themeParkName }} 이용권 선택</h2>
     <div class="ticket-list row">
       <div
         v-for="ticketGroup in groupedTickets"
@@ -11,29 +11,35 @@
         <div class="card ticket-card h-100">
           <div class="card-body">
             <h5 class="card-title">{{ ticketGroup.name }}</h5>
-            <p class="card-text">
-              {{ ticketGroup.description }}
-            </p>
+            <p class="card-text">{{ ticketGroup.description }}</p>
             <div class="card-prices">
               <p class="card-price">
                 대인:
-                <span class="normal-price">{{ ticketGroup.adultPrice }}원</span>
-                <span class="final-price"
-                  >{{ getDiscountedPrice(ticketGroup.adultPrice) }}원</span
+                <span class="normal-price"
+                  >{{ ticketGroup.adultTicket.price }}원</span
                 >
+                <span v-if="isLoggedIn" class="final-price">
+                  {{ getDiscountedPrice(ticketGroup.adultTicket.price) }}원
+                  (회원가)
+                </span>
               </p>
               <p class="card-price">
                 소인:
-                <span class="normal-price">{{ ticketGroup.childPrice }}원</span>
-                <span class="final-price"
-                  >{{ getDiscountedPrice(ticketGroup.childPrice) }}원</span
+                <span class="normal-price"
+                  >{{ ticketGroup.childTicket.price }}원</span
                 >
+                <span v-if="isLoggedIn" class="final-price">
+                  {{ getDiscountedPrice(ticketGroup.childTicket.price) }}원
+                  (회원가)
+                </span>
               </p>
-              <span class="login-hint" v-if="!isLoggedIn"> 로그인 시 </span>
+              <span class="login-hint" v-if="!isLoggedIn">
+                로그인 시 회원가로 할인 적용됩니다.
+              </span>
             </div>
             <button
               class="btn btn-primary mt-3 w-100"
-              @click="goToOrderPage(ticketGroup.id)"
+              @click="handlePurchase(ticketGroup)"
             >
               구매하기
             </button>
@@ -45,67 +51,77 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router"; // useRoute를 import
+import { ref, onMounted, defineProps } from "vue";
+import { useRouter } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
-import dayjs from "dayjs";
+import { useThemeParkStore } from "@/stores/themeParkStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
+import dayjs from "dayjs";
 
-const tickets = ref([]);
+const props = defineProps({
+  themeParkId: {
+    type: [String, Number],
+    required: true,
+  },
+  themeParkName: {
+    type: String,
+    required: true,
+  },
+});
+
 const groupedTickets = ref([]);
 const router = useRouter();
-const route = useRoute(); // route 사용 선언
 const ticketStore = useTicketStore();
+const themeParkStore = useThemeParkStore();
 const isLoggedIn = ref(false);
 
 onMounted(async () => {
-  const themeParkId = route.params.themeParkId; // route params에서 themeParkId를 가져옴
+  const themeParkId = Number(props.themeParkId);
   await ticketStore.fetchTickets(themeParkId);
-  if (ticketStore.tickets.data && Array.isArray(ticketStore.tickets.data)) {
-    tickets.value = ticketStore.tickets.data;
+
+  if (ticketStore.tickets && ticketStore.tickets.data) {
+    const today = dayjs();
+    const validTickets = ticketStore.tickets.data.filter((ticket) => {
+      const saleStart = dayjs(ticket.saleStartDate);
+      const saleEnd = dayjs(ticket.saleEndDate);
+      return today.isAfter(saleStart) && today.isBefore(saleEnd);
+    });
+
+    console.log("Valid Tickets:", validTickets);
+
+    groupedTickets.value = ticketStore.groupTicketsByType(validTickets);
   } else {
-    console.error("Invalid tickets data:", ticketStore.tickets);
-    tickets.value = [];
+    console.error("Tickets data is missing or invalid.");
   }
-  filterAndGroupTickets();
+
   checkLoginStatus();
 });
-
-const filterAndGroupTickets = () => {
-  const today = dayjs();
-  const validTickets = tickets.value.filter(
-    (ticket) =>
-      dayjs(ticket.saleStartDate).isBefore(today) &&
-      dayjs(ticket.saleEndDate).isAfter(today)
-  );
-
-  const grouped = {};
-  validTickets.forEach((ticket) => {
-    const key = ticket.ticketName.replace(/ \(대인\)| \(소인\)/g, "");
-    if (!grouped[key]) {
-      grouped[key] = {
-        id: ticket.id,
-        name: key,
-        adultPrice: null,
-        childPrice: null,
-      };
-    }
-    if (ticket.ticketName.includes("대인")) {
-      grouped[key].adultPrice = ticket.price;
-    } else if (ticket.ticketName.includes("소인")) {
-      grouped[key].childPrice = ticket.price;
-    }
-  });
-  groupedTickets.value = Object.values(grouped);
-};
 
 const getDiscountedPrice = (price) => {
   const discountRate = 0.8;
   return Math.floor(price * discountRate);
 };
 
-const goToOrderPage = (ticketId) => {
-  router.push({ name: "TicketOrderView", params: { ticketId } });
+const handlePurchase = (ticketGroup) => {
+  const themeParkId = Number(ticketGroup.themeParkId);
+
+  console.log("Attempting to set theme park with ID:", themeParkId);
+
+  themeParkStore.setCurrentThemeParkById(themeParkId);
+
+  if (!isLoggedIn.value) {
+    router.push({ path: "/users/login" });
+  } else {
+    router.push({
+      name: "TicketOrderView",
+      params: {
+        adultTicket: JSON.stringify(ticketGroup.adultTicket),
+        childTicket: JSON.stringify(ticketGroup.childTicket),
+        themeParkId: themeParkId,
+        themeParkName: props.themeParkName,
+      },
+    });
+  }
 };
 
 const checkLoginStatus = () => {
