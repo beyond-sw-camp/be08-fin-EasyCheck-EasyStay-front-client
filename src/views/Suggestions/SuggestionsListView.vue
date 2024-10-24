@@ -115,6 +115,8 @@
 
 <script setup>
 import { ref } from "vue";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
+import Header from "@/examples/Header.vue";
 
 const topics = ref([
   { label: "객실", value: "객실" },
