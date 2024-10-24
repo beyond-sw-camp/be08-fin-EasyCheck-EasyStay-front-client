@@ -2,7 +2,7 @@
   <div class="carousel slide p-2">
     <div class="carousel-inner">
       <div
-        v-for="(url, index) in imgUrls"
+        v-for="(url, index) in thumbnailUrls"
         :key="url"
         class="w-100"
         :class="['carousel-item', { active: index === activeIndex }]"
@@ -27,23 +27,23 @@
 
 <script setup>
 import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useAccommodationStore } from "@/stores/accommodationStore.js";
 
-const imgUrls = [
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation1.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation5.jpg",
-];
+const store = useAccommodationStore();
+
+const { thumbnailUrls } = storeToRefs(store);
 
 const activeIndex = ref(0);
 
 const nextSlide = () => {
-  activeIndex.value = (activeIndex.value + 1) % imgUrls.length;
+  activeIndex.value = (activeIndex.value + 1) % thumbnailUrls.value.length;
 };
 
 const prevSlide = () => {
-  activeIndex.value = (activeIndex.value - 1 + imgUrls.length) % imgUrls.length;
+  activeIndex.value =
+    (activeIndex.value - 1 + thumbnailUrls.value.length) %
+    thumbnailUrls.value.length;
 };
 </script>
 
