@@ -11,6 +11,12 @@
         <label for="totalPrice">Total Price: </label>
         <input type="number" v-model="totalPrice" id="totalPrice" />
 
+        <label for="payment-method">결제 방법을 선택하세요:</label>
+        <select v-model="selectedPaymentMethod" id="payment-method">
+            <option value="card">신용카드</option>
+            <option value="vbank">가상계좌</option>
+        </select>
+
         <!-- 결제하기 버튼 -->
         <button @click="processReservationAndPayment" :disabled="loading">결제하기</button>
 
@@ -46,6 +52,12 @@ const isReservationComplete = ref(false);
 // totalPrice 입력
 const totalPrice = ref(0);
 
+// 결제 방법 선택
+const selectedPaymentMethod = ref("card"); // 기본 결제 방법은 신용카드
+
+// 로딩 상태
+const loading = ref(false);
+
 // 결제 처리 함수
 const processReservationAndPayment = async () => {
     try {
@@ -73,10 +85,12 @@ const processReservationAndPayment = async () => {
         isReservationComplete.value = true; // 예약 완료 상태로 변경
 
         // 결제 처리
-        processPayment(reservationId, totalPrice.value); // 결제 로직 호출
+        await processPayment(reservationId, totalPrice.value, selectedPaymentMethod.value); // 결제 로직 호출
     } catch (err) {
         console.error("예약 또는 결제 처리 실패:", err);
         alert("예약 또는 결제 처리 중 오류가 발생했습니다.");
+    } finally {
+        loading.value = false;
     }
 };
 
