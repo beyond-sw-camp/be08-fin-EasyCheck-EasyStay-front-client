@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
-import { useOrderStore } from "./orderStore";
+import { useTicketOrderStore } from "@/stores/ticketOrderStore";
 
-export const usePaymentStore = defineStore("paymentStore", {
+export const useTicketPaymentStore = defineStore("paymentStore", {
   state: () => ({
     currentPayment: null,
+    paymentHistory: [],
     loading: false,
     error: null,
   }),
@@ -42,7 +43,7 @@ export const usePaymentStore = defineStore("paymentStore", {
 
               this.currentPayment = response.data;
 
-              const orderStore = useOrderStore();
+              const orderStore = useTicketOrderStore();
               await orderStore.completeOrder(orderId);
 
               alert("결제 성공!");
@@ -61,6 +62,19 @@ export const usePaymentStore = defineStore("paymentStore", {
           }
         }
       );
+    },
+
+    async fetchUserPaymentHistory() {
+      this.loading = true;
+      try {
+        const response = await apiClient.get("/api/v1/tickets/payment/history");
+        this.paymentHistory = response.data;
+        this.loading = false;
+      } catch (error) {
+        this.loading = false;
+        this.error = error;
+        console.error("결제 내역 조회 실패:", error);
+      }
     },
   },
 });
