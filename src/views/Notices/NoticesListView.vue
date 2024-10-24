@@ -20,7 +20,7 @@
           class="form-select"
         >
           <option
-            v-for="branch in branches"
+            v-for="branch in accommodations"
             :key="branch.id"
             :value="branch.id"
           >
@@ -59,7 +59,9 @@
         >
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
-          <small class="text-muted">{{ formatDate(notice.date) }}</small>
+          <small class="text-muted">{{
+            formatDate(notice.created_date)
+          }}</small>
         </div>
       </div>
       <div v-else>
@@ -72,64 +74,37 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useNoticeStore } from "@/stores/notice";
 
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+// import { useAccommodationStore } from "@/stores/accommodationStore";
+// const accommodationStore = useAccommodationStore(); // Store 가져오기
 
 const router = useRouter();
+const noticeStore = useNoticeStore();
 
 const goToNoticeDetail = (id) => {
   router.push({ name: "NoticeDetail", params: { id } });
 };
 
-const branches = ref([
-  { id: 1, name: "Seoul 리조트" },
-  { id: 2, name: "Busan 리조트" },
-  { id: 3, name: "Jeju 리조트" },
-]);
-
-const selectedBranch = ref(branches.value[0].id);
-const notices = ref([]);
+const selectedBranch = ref(null);
 const filteredNotices = ref([]);
 const searchQuery = ref("");
+const accommodations = ref([]);
 
 const fetchNotices = async () => {
-  const exampleNotices = {
-    1: [
-      {
-        id: 1,
-        title: "서울리조트 휴관 안내",
-        content:
-          "서울리조트가 2024년 10월 23일부터 11월 23일까지 내부 사정상 휴관함을 알려드립니다. 그동안의 예약은 불가하며.....",
-        date: "2024-10-20",
-      },
-      {
-        id: 2,
-        title: "서울리조트 편의시설 리모델링 안내",
-        content:
-          "서울리조트 CU가 리모델링함을 안내해드립니다. 2024/10/30부터 3일간 리모델링으로 인한 휴점을 안내해드립니다.",
-        date: "2024-10-21",
-      },
-    ],
-    2: [
-      {
-        id: 3,
-        title: "부산 해운대",
-        content:
-          "부산 리조트를 사용하시는 고객분들께 안내해드립니다. 리조트 앞 해운대 바로국밥을 꼭 드셔보시길 바랍니다.",
-        date: "2024-10-18",
-      },
-    ],
-    3: [],
-  };
-
-  notices.value = exampleNotices[selectedBranch.value] || [];
-  filterNotices();
+  if (!selectedBranch.value) {
+    return; // selectedBranch가 null인 경우 함수 종료
+  }
+  await noticeStore.fetchNotices(selectedBranch.value); // 리조트 ID를 이용해 공지사항을 가져옴
+  filteredNotices.value = noticeStore.notices;
+  console.log("필터 정보 : ", filteredNotices.value); // 가져온 공지사항을 필터 리스트에 저장
 };
 
 const filterNotices = () => {
   const query = searchQuery.value.toLowerCase();
-  filteredNotices.value = notices.value.filter(
+  filteredNotices.value = noticeStore.notices.filter(
     (notice) =>
       notice.title.toLowerCase().includes(query) ||
       notice.content.toLowerCase().includes(query)
@@ -141,7 +116,14 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString(undefined, options);
 };
 
-onMounted(fetchNotices);
+onMounted(async () => {
+  await noticeStore.fetchAccommodations(); // 지점 목록 API 호출
+  accommodations.value = noticeStore.accommodations; // API 응답 데이터를 accommodations에 저장
+  if (accommodations.value.length > 0) {
+    selectedBranch.value = accommodations.value[1].id; // 두 번째 지점의 ID를 기본 선택
+    await fetchNotices(); // 초기 공지사항 로드
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -169,7 +151,6 @@ onMounted(fetchNotices);
 
 .search-btn {
   background-color: #007bff; /* 파란색 버튼 */
-  //   border: 2px solid #007bff;
   border-radius: 0 4px 4px 0; /* 우측 모서리 둥글게 */
   color: white;
   padding: 10px 20px;
