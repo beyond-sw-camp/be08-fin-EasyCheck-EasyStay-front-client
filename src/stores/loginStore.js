@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
 import router from "@/router";
+
 export const userLoginStore = defineStore("userStore", {
   state: () => ({
     id: null,
@@ -13,6 +14,8 @@ export const userLoginStore = defineStore("userStore", {
     roadAddress: "",
     jibunAddress: "",
     detailAddress: "",
+
+    userData: "",
 
     signUpformData: {
       emailPrefix: "",
@@ -29,7 +32,7 @@ export const userLoginStore = defineStore("userStore", {
       return state.id != null;
     },
     isAllChecked(state) {
-      // 모든 체크박스가 체크되어 있는지 확인
+      // 약관동의의 필수 체크박스가 체크되었는지 확인
       return (
         state.consentItems.every((item) => item.checked) &&
         state.consentItems2.every((item) => item.checked)
@@ -44,8 +47,10 @@ export const userLoginStore = defineStore("userStore", {
         const response = await apiClient.post("/users/login", formData);
 
         if (response && response.data) {
-          localStorage.setItem("jwt", response.data.accessToken);
-          console.log("로그인 성공");
+          localStorage.setItem("accessToken", response.data.accessToken);
+          console.log("로그인 성공, 저장된 토큰:", response.data.accessToken);
+          router.push("/");
+
           return response.data;
         } else {
           throw new Error(
@@ -76,7 +81,8 @@ export const userLoginStore = defineStore("userStore", {
         return;
       }
 
-      this.authenticatePhone(); // 약관이 모두 체크된 경우 인증 요청
+      // 약관이 모두 체크된 경우 인증 요청
+      this.authenticatePhone();
     },
 
     // 인증번호 요청
@@ -97,7 +103,7 @@ export const userLoginStore = defineStore("userStore", {
     async handlePhoneAuthentication() {
       try {
         const message = await this.requestVerificationCode();
-        console.log(message); // 성공 메시지 출력
+        console.log(message);
       } catch (error) {
         console.error("Error during phone authentication:", error.message);
       }
@@ -113,15 +119,11 @@ export const userLoginStore = defineStore("userStore", {
           phone,
           code: verificationCode,
         });
-
-        // 인증 성공 시
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
         }
       } catch (error) {
         console.error("Error in verifyCode:", error.message);
-
-        // 인증 실패 시
         alert("인증에 실패했습니다. 확인 후 다시 시도해주세요.");
       }
     },
@@ -174,8 +176,30 @@ export const userLoginStore = defineStore("userStore", {
           return false; // 중복됨
         }
         console.error("이메일 중복 체크 오류:", error);
-        throw error; // 다른 에러는 상위로 던지기
+        throw error;
       }
+    },
+
+    // 사용자 정보 가져오기
+    async getUserData() {
+      try {
+        const response = await apiClient.get("/users/info");
+        this.userData = response.data;
+      } catch (error) {
+        this.error =
+          error.response?.data?.message ||
+          "사용자 정보를 가져오는 데 실패했습니다.";
+        console.error("사용자 정보 요청 오류:", this.error);
+        throw error;
+      }
+    },
+
+    // 로그아웃
+    logout() {
+      // 토큰 삭제
+      localStorage.removeItem("accessToken");
+      this.$reset();
+      router.push("/");
     },
   },
 });
