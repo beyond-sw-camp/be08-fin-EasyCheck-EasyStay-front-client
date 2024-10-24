@@ -45,7 +45,7 @@ onMounted(() => {
           <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
             <div class="d-flex justify-content-center text-center">
               <div class="col-auto d-flex flex-column align-items-center mx-5">
-                <RouterLink to="/users/memberAuthentication" class="text-decoration-none custom-router-link">
+                <RouterLink to="/users/member/info" class="text-decoration-none custom-router-link">
                   <span class="material-icons" style="font-size: 200px;">person</span>
                   <h4>일반 회원</h4>
                 </RouterLink>
@@ -61,43 +61,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
-    <footer class="footer fixed-bottom py-2 w-100">
-      <div class="container">
-        <div class="row align-items-center justify-content-lg-between">
-          <div class="col-12 col-md-6 my-auto">
-            <div class="copyright text-center text-sm text-dark text-lg-start">
-              © {{ new Date().getFullYear() }}, made with
-              <i class="fa fa-heart" aria-hidden="true"></i> by
-              <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                class="font-weight-bold text-dark" target="_blank">EASY CHECK</a>
-              for a better web.
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                  class="nav-link text-dark" target="_blank">EASY CHECK</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                  class="nav-link text-dark" target="_blank">About
-                  Us</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
-                  class="nav-link text-dark" target="_blank">GitHub</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-dark"
-                  target="_blank">License</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
   </Header>
 </template>
 

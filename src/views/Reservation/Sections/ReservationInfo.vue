@@ -65,7 +65,7 @@
     <div class="action-buttons">
       <button class="cancel-btn">취소</button>
       <button class="reserve-btn" :disabled="!allAgreementsChecked">
-        예약하기
+        결제하기
       </button>
     </div>
   </div>

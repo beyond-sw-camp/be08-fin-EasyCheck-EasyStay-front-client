@@ -33,12 +33,12 @@ import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 import ReservationView from "@/views/Reservation/ReservationView.vue";
+import ReservationResultView from "@/views/Reservation/ReservationResultView.vue";
 
 import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
-import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
 import MemberView from "@/views/LandingPages/SignIn/Member/MemberView.vue";
 import FindIdAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdAuthenticationView.vue";
 import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdView.vue";
@@ -55,6 +55,8 @@ import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
+import NoticesListView from "@/views/Notices/NoticesListView.vue";
+import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -230,11 +232,6 @@ const router = createRouter({
       component: SignUpView,
     },
     {
-      path: "/users/memberAuthentication",
-      name: "MemberAuthentication",
-      component: MemberAuthView,
-    },
-    {
       path: "/users/member/info",
       name: "MemberView",
       component: MemberView,
@@ -280,6 +277,11 @@ const router = createRouter({
       component: ReservationPage,
     },
     {
+      path: "/reservation/result",
+      name: "ReservationResult",
+      component: ReservationResultView,
+    },
+    {
       path: "/users/mypage",
       name: "Mypage",
       component: MypageView,
@@ -313,6 +315,30 @@ const router = createRouter({
       path: "/payment",
       name: "PaymentPage",
       component: PaymentPage,
+    },
+    {
+      path: "/users/mypage",
+      component: MypageView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem("accessToken");
+        console.log("token:", token);
+        if (token) {
+          next();
+        } else {
+          alert("로그인이 필요합니다.");
+          next({ path: "/users/login" });
+        }
+      }
+    },
+    {
+      path: "/noticesListView",
+      name: "noticesListView",
+      component: NoticesListView,
+    },
+    {
+      path: "/suggestionsListView",
+      name: "SuggestionsListView",
+      component: SuggestionsListView,
     },
   ],
 });

@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
+import { userLoginStore } from "@/stores/loginStore";
+import apiClient from "@/api";
 
 // Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
@@ -8,9 +10,20 @@ import MaterialInput from "@/components/MaterialInput.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import MaterialButton from "@/components/MaterialButton.vue";
 
+const store = userLoginStore();
+const userInfo = ref({});
+const error = ref(null);
+
 // Initialize MaterialInput on mount
-onMounted(() => {
+onMounted(async () => {
   setMaterialInput();
+
+  try {
+    const response = await apiClient.get("/users/info");
+    userInfo.value = response.data; // 사용자 정보 저장
+  } catch (error) {
+    console.error("사용자 정보 로드 오류:", error.response?.data?.message || "정보를 가져오는 데 실패했습니다.");
+  }
 });
 
 // 약관 동의
@@ -86,18 +99,9 @@ const searchZipCode = () => {
   }).open();
 };
 
-// 파일 첨부
-const fileName = ref(''); 
-
-const updateFileName = (event) => {
-  if (event.target.files.length > 0) {
-    fileName.value = event.target.files[0].name; // 선택된 파일 이름 저장
-  } else {
-    fileName.value = ''; // 파일이 선택되지 않았을 때 초기화
-  }
-};
-
 const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보여줄지 여부
+
+
 </script>
 
 
@@ -118,9 +122,8 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
         <tr>
           <td class="fw-bold fs-8">아이디</td>
           <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="username"
-                :label="{ text: '아이디', class: 'form-label' }" type="text" />
+            <div class="d-flex align-items-ceneter col-5">
+              <span>{{ userInfo.email }}</span>
             </div>
           </td>
         </tr>
@@ -157,9 +160,8 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
         <tr>
           <td class="fw-bold fs-8">성함</td>
           <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="name" :label="{ text: '성함', class: 'form-label' }"
-                type="text" />
+            <div class="d-flex align-items-ceneter col-5">
+              <span>{{ userInfo.name }}</span>
             </div>
           </td>
         </tr>
@@ -242,7 +244,6 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
 
 .input-group-outline {
   /* 두 개의 입력박스가 같은 너비를 차지하도록 */
-  flex: 1; 
+  flex: 1;
 }
-
 </style>

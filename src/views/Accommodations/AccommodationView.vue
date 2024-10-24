@@ -1,5 +1,4 @@
 <template>
-  <navbar-default />
   <accomodation-image />
   <div class="container w-75">
     <accommodation-info />
@@ -15,7 +14,6 @@ import AccommodationInfo from "./Sections/AccommodationInfo.vue";
 import AccomodationImage from "./Sections/AccomodationImage.vue";
 import RoomInfo from "./Sections/RoomInfo.vue";
 import EventInfo from "./Sections/EventInfo.vue";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 </script>
 
 <style lang="scss" scoped>

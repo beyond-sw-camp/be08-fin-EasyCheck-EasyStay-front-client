@@ -3,7 +3,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
-import axios from "axios";
+import apiClient from "@/api";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -21,6 +21,8 @@ onMounted(() => {
   setMaterialInput();
 });
 
+const loginStore = userLoginStore();
+
 // 라우터
 const router = useRouter();
 
@@ -28,32 +30,17 @@ function goToMain() {
   router.push('/');
 }
 
-const formData = ref({
-  email: "",
-  password: "",
-  name: "",
-  phone: "",
-  addr: "",
-  addrDetail: "",
-  marketingConsent: false,
-});
-
-async function registerUser() {
+// 회원가입
+const registerUser = async () => {
   try {
-    const response = await axios.post("/users/member/info", formData.value);
-
-    if (response.status === 201) {
-      // 회원가입 성공 후 리다이렉트
+    const success = await loginStore.registerUser();
+    if (success) {
       router.push('/joinComplete');
     }
   } catch (error) {
-    console.error("회원가입 실패:", error);
-    // 에러 처리 (예: 사용자에게 에러 메시지 표시)
+    console.error("회원가입 처리 중 오류 발생:", error.message);
   }
-}
-
-const loginStore = userLoginStore();
-const signUpData = loginStore.signUpformData;
+};
 
 </script>
 
@@ -79,7 +66,7 @@ const signUpData = loginStore.signUpformData;
           </div>
         </div>
 
-        <MemberInfo v-model="signUpformData"/>
+        <MemberInfo v-model="signUpformData" />
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
@@ -90,56 +77,13 @@ const signUpData = loginStore.signUpformData;
             회원가입
           </MaterialButton>
         </div>
-
-        <!-- 푸터 -->
-        <footer class="footer position-absolute bottom-0 py-2 w-100">
-          <div class="container">
-            <div class="row align-items-center justify-content-lg-between">
-              <div class="col-12 col-md-6 my-auto">
-                <div class="copyright text-center text-sm text-dark text-lg-start">
-                  © {{ new Date().getFullYear() }}, made with
-                  <i class="fa fa-heart" aria-hidden="true"></i> by
-                  <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                    class="font-weight-bold text-dark" target="_blank">EASY CHECK</a>
-                  for a better web.
-                </div>
-              </div>
-              <div class="col-12 col-md-6">
-                <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                      class="nav-link text-dark" target="_blank">EASY CHECK</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                      class="nav-link text-dark" target="_blank">About Us</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
-                      class="nav-link text-dark" target="_blank">GitHub</a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-dark"
-                      target="_blank">License</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-checkbox {
   transform: scale(0.8);
-}
-
-.footer {
-  position: relative;
-  /* footer 위치 조정 */
-  bottom: 0;
 }
 </style>

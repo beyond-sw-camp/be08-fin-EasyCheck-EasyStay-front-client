@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { userLoginStore } from '@/stores/loginStore';
 
 // Vue Material Kit 2 components
@@ -26,15 +26,22 @@ const consentItems2 = ref([
   { label: '통신사 이용약관 동의 (필수)', checked: false },
 ]);
 
-function toggleAll() {
+const toggleAll = () => {
+  const isCheckedValue = isChecked.value;
   consentItems.value.forEach(item => {
-    item.checked = isChecked.value;
+    item.checked = isCheckedValue;
   });
 
   consentItems2.value.forEach(item => {
-    item.checked = isChecked.value;
+    item.checked = isCheckedValue;
   });
-}
+};
+
+// 전체 약관 동의 여부 확인
+const isAllChecked = computed(() => {
+  return consentItems.value.every(item => item.checked) &&
+    consentItems2.value.every(item => item.checked);
+});
 
 // 전화번호
 const phoneFields = ref({
@@ -71,21 +78,24 @@ const loginStore = userLoginStore();
 const isVerificationRequested = ref('false');
 
 const authenticatePhone = async () => {
+  // 약관 동의 여부 체크
+  if (!isAllChecked.value) {
+    alert("모든 약관에 동의해야 인증번호를 요청할 수 있습니다.");
+    return; // 약관 동의가 안 되면 요청하지 않음
+  }
+
   isVerificationRequested.value = true;
 
   // 상태 업데이트
   loginStore.setPhoneNumbers(selectedPhonePrefix.value, phoneMiddle.value, phoneSuffix.value);
 
   try {
-    const message = await loginStore.handlePhoneAuthentication();
-    console.log(message);
+    await loginStore.handlePhoneAuthentication();
+    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
+    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
   }
-};
-
-const handleInputChange = () => {
-  loginStore.setPhoneNumbers(selectedPhonePrefix.value, phoneMiddle.value, phoneSuffix.value);
 };
 
 // 인증 번호 확인
@@ -116,35 +126,99 @@ const searchZipCode = () => {
   new daum.Postcode({
     oncomplete: function (data) {
       postcode.value = data.zonecode; // 올바른 키 사용
-      roadAddress.value = data.roadAddress; // 도로명 주소
-      jibunAddress.value = data.jibunAddress; // 지번 주소
-      detailAddress.value = ''; // 상세주소
-      extraAddress.value = ''; // 참고항목
+      loginStore.roadAddress = data.roadAddress; // 도로명 주소
+      loginStore.jibunAddress = data.jibunAddress; // 지번 주소
+      loginStore.detailAddress = ''; // 상세주소 초기화
     },
   }).open();
 };
+const selectedDomain = ref('');
 
-
-
-// 회원가입
-const email = ref('');
-const password = ref('');
-const name = ref('');
-
-async function registerUser() {
-  try {
-    const success = await userStore.registerUser();
-    if (success) {
-      router.push('/joinComplete'); // 회원가입 성공 후 리다이렉트
-    }
-  } catch (error) {
-    console.error("회원가입 실패:", error);
-    // 에러 처리 (예: 사용자에게 에러 메시지 표시)
-  }
+const updateEmailSuffix = () => {
+  if (selectedDomain !== 'etc') {
+    loginStore.signUpformData.emailSuffix = selectedDomain;
+  } else {
+    // 기타 선택 시, 입력된 값을 이메일 suffix로 설정
+    loginStore.signUpformData.emailSuffix = loginStore.signUpformData.emailSuffix;
+  };
 }
+
+// 이메일 중복 체크
+const checkDuplicateId = async () => {
+  const email = `${loginStore.signUpformData.emailPrefix}@${selectedDomain.value === 'etc' ? loginStore.signUpformData.emailSuffix : selectedDomain.value}`;
+
+  // 이메일 중복 체크 액션 호출
+  const isDuplicated = await loginStore.checkEmailIsDuplicated(email);
+  if (isDuplicated) {
+    alert('사용 가능한 이메일입니다.');
+  } else {
+    alert('이미 사용 중인 이메일입니다.');
+  }
+};
+
+// 비밀번호 유효성 검사
+const password = ref("");
+const passwordError = ref(false);
+
+const isPasswordValid = computed(() => {
+  // 비밀번호 유효성 검사: 최소 8자, 최대 16자, 대문자, 숫자 포함
+  const minLength = password.value.length >= 8;
+  const maxLength = password.value.length <= 16;
+  const hasUpperCase = /[A-Z]/.test(password.value);
+  const hasNumber = /\d/.test(password.value);
+
+  return minLength && maxLength && hasUpperCase && hasNumber;
+});
+// 비밀번호 입력 시 오류 여부 업데이트
+watch(password, (newVal) => {
+  passwordError.value = !isPasswordValid.value;
+});
+
 </script>
 
 <template>
+
+  <!-- 약관 동의 -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="form-check text-start mt-2">
+        <input class="form-check-input custom-checkbox" type="checkbox" id="privacyConsent" v-model="isChecked"
+          @change="toggleAll" />
+        <label class="form-check-label fw-bold text-black fs-7 mb-0" for="privacyConsent">
+          휴대폰 본인확인 전체동의
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <hr style="border-top: 2px solid #ccc;" />
+
+  <div class="row mb-3">
+    <div class="col-5" v-for="(item, index) in consentItems" :key="index">
+      <div class="form-check text-start">
+        <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent1_' + index"
+          v-model="item.checked" />
+        <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent1_' + index">
+          {{ item.label }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <hr style="border-top: 2px solid #ccc;" />
+
+  <div class="row mb-4">
+    <div class="col-5" v-for="(item, index) in consentItems2" :key="index">
+      <div class="form-check text-start">
+        <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent2_' + index"
+          v-model="item.checked" />
+        <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent2_' + index">
+          {{ item.label }}
+        </label>
+      </div>
+    </div>
+  </div>
+  <hr style="border-top: 2px solid #ccc;" />
   <div class="align-items-start" loading="lazy">
     <table class="table">
       <tbody>
@@ -158,26 +232,50 @@ async function registerUser() {
 
         <!-- 아이디 -->
         <tr>
-          <td class="fw-bold fs-8">아이디</td>
+          <td class="fw-bold fs-8 col-1">아이디</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.email" required class="input-group-outline mb-0" id="email"
-                :label="{ text: '아이디', class: 'form-label' }" type="text" />
+              <MaterialInput v-model="loginStore.signUpformData.emailPrefix" required class="input-group-outline mb-0"
+                id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
+              <span class="mx-1">@</span>
+
+              <template v-if="selectedDomain === 'etc'">
+                <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
+                  id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
+              </template>
+
+              <template v-else>
+                <select v-model="selectedDomain" class="form-select ms-2" @change="updateEmailSuffix" style="flex: 1;">
+                  <option value="" disabled selected>도메인 선택</option>
+                  <option value="gmail.com">gmail.com</option>
+                  <option value="naver.com">naver.com</option>
+                  <option value="daum.net">daum.net</option>
+                  <option value="etc">기타</option>
+                </select>
+              </template>
+
+              <button class="btn custom-btn ms-2 mt-3" @click="checkDuplicateId">
+                중복 체크
+              </button>
             </div>
           </td>
         </tr>
-
 
         <!-- 비밀번호 -->
         <tr>
           <td class="fw-bold fs-8">비밀번호</td>
           <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0" id="password"
+            <div class="d-flex flex-column align-items-start col-5">
+              <MaterialInput v-model="password" required class="input-group-outline mb-0" id="password"
                 :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              <div v-if="passwordError" class="text-danger small mt-1">
+                비밀번호는 최소 8자 이상, 최대 16자 이하와 대문자와 숫자를 포함해야 합니다.
+              </div>
             </div>
           </td>
         </tr>
+
+
 
         <!-- 성함 -->
         <tr>
@@ -245,21 +343,47 @@ async function registerUser() {
             <div class="d-flex align-items-stretch col-4">
               <MaterialInput v-model="postcode" class="input-group-outline mb-0 me-2" placeholder="우편번호"
                 style="flex: 1;" />
-              <button type="button" class="btn btn-outline-primary mb-0" @click="searchZipCode">주소 검색</button>
+              <button type="button" class="btn btn-outline-primary mb-0 custom-btn" @click="searchZipCode">주소
+                검색</button>
             </div>
             <div class="mt-2 col-5">
-              <MaterialInput v-model="roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
-              <MaterialInput v-model="jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
-              <MaterialInput v-model="detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
+              <MaterialInput v-model="loginStore.roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
+              <MaterialInput v-model="loginStore.jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
+              <MaterialInput v-model="loginStore.detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
             </div>
           </td>
         </tr>
+
+        <tr>
+          <td class="fw-bold fs-8">마케팅 수신 동의 여부</td>
+          <td>
+            <div class="d-flex align-items-stretch col-4">
+              <label class="me-2">
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="Y"
+                  class="form-check-input" />
+                예
+              </label>
+              <label>
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="N"
+                  class="form-check-input" />
+                아니요
+              </label>
+            </div>
+          </td>
+        </tr>
+
+
+
       </tbody>
     </table>
   </div>
 </template>
 
-<style>
+<style scoped>
+.table td {
+  vertical-align: middle;
+}
+
 .form-select:focus {
   border-color: #007bff !important;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
@@ -269,6 +393,7 @@ async function registerUser() {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
   width: 80px;
+  font-size: 15px;
 }
 
 .slide-fade-enter-active,
