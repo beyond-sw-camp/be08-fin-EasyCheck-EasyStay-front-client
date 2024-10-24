@@ -14,6 +14,27 @@ import AccommodationInfo from "./Sections/AccommodationInfo.vue";
 import AccomodationImage from "./Sections/AccomodationImage.vue";
 import RoomInfo from "./Sections/RoomInfo.vue";
 import EventInfo from "./Sections/EventInfo.vue";
+
+import { useRoute } from "vue-router";
+import { useRoomStore } from "@/stores/roomStore.js";
+import { useEventStore } from "@/stores/eventStore.js";
+import { useAccommodationStore } from "@/stores/accommodationStore.js";
+import { onMounted } from "vue";
+
+const route = useRoute();
+
+const roomStore = useRoomStore();
+const eventStore = useEventStore();
+const accommodationStore = useAccommodationStore();
+
+onMounted(async () => {
+  // 숙박시설에 존재하는 객실 조회
+  await roomStore.fetchAccommodationRooms(route.params.accommodationId);
+  // 숙박시설에 해당하는 이벤트 조회
+  await eventStore.fetchAccommodationEvents(route.params.accommodationId);
+  // 숙박시설 단일 조회
+  await accommodationStore.fetchAccommodationById(route.params.accommodationId);
+});
 </script>
 
 <style lang="scss" scoped>
