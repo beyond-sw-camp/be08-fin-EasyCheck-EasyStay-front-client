@@ -38,7 +38,7 @@
           class="form-control search-input"
           @input="filterNotices"
         />
-        <button class="btn btn-primary search-btn" @click="filterNotices">
+        <button class="btn btn-warning search-btn" @click="filterNotices">
           검색
         </button>
       </div>
@@ -160,7 +160,7 @@ onMounted(fetchNotices);
 
 .search-btn {
   background-color: #007bff; /* 파란색 버튼 */
-  border: 2px solid #007bff;
+  //   border: 2px solid #007bff;
   border-radius: 0 4px 4px 0; /* 우측 모서리 둥글게 */
   color: white;
   padding: 10px 20px;
@@ -170,7 +170,7 @@ onMounted(fetchNotices);
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: #0056b3; /* 호버 시 더 어두운 파란색 */
+    // background-color: #0056b3; /* 호버 시 더 어두운 파란색 */
   }
 }
 
