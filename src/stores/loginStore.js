@@ -4,7 +4,7 @@ import router from "@/router";
 
 export const userLoginStore = defineStore("userStore", {
   state: () => ({
-    id: null,
+    email: null,
     password: null,
     message: null,
     selectedPhonePrefix: "",
@@ -27,6 +27,15 @@ export const userLoginStore = defineStore("userStore", {
       verificationCode: "",
       marketingConsent: "N",
     },
+
+    guestLoginForm: {
+      guestName: "",
+      guestPhone: "",
+      verificationCode: "",
+    },
+
+    // 마이페이지에서 유저 정보 가져오기
+    userInfo: {},
   }),
 
   getters: {
@@ -206,6 +215,43 @@ export const userLoginStore = defineStore("userStore", {
       this.$reset();
       this.isLoggedIn = false;
       router.push("/");
+    },
+
+    // 비회원 인증번호 요청
+    async guestRequestVerificationCode() {
+      const guestPhone = this.guestLoginForm.guestPhone;
+      console.log("인증 요청 데이터:", guestPhone);
+
+      try {
+        const response = await apiClient.post("/sms/code", {
+          receivingPhoneNumber: guestPhone,
+        });
+
+        console.log("인증 코드 요청 성공: ", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("인증 코드 요청 실패:", error);
+        throw new Error(error.response?.data?.message || "인증 코드 요청 실패");
+      }
+    },
+
+    // 비회원 휴대폰 인증
+    async guestVerifyCode(phone, verificationCode) {
+      console.log("Phone: ", phone);
+      console.log("VerficationCode: ", verificationCode);
+
+      try {
+        const response = await apiClient.post("/sms/verify", {
+          phone,
+          code: verificationCode,
+        });
+        if (response.status === 200) {
+          alert("인증에 성공했습니다!");
+        }
+      } catch (error) {
+        console.error("Error in verifyCode:", error.message);
+        alert("인증에 실패했습니다. 확인 후 다시 시도해주세요.");
+      }
     },
   },
 });
