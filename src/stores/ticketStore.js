@@ -41,5 +41,31 @@ export const useTicketStore = defineStore("ticketStore", {
         console.error("Invalid ticket id");
       }
     },
+
+    groupTicketsByType(tickets) {
+      const groupedTickets = {};
+
+      tickets.forEach((ticket) => {
+        const typeKey = ticket.ticketName.replace(/ \(대인\)| \(소인\)/g, "");
+
+        if (!groupedTickets[typeKey]) {
+          groupedTickets[typeKey] = {
+            name: typeKey,
+            description: ticket.ticketName.split(" - ")[1] || "",
+            adultTicket: null,
+            childTicket: null,
+            themeParkId: ticket.themeParkId,
+          };
+        }
+
+        if (ticket.ticketName.includes("대인")) {
+          groupedTickets[typeKey].adultTicket = ticket;
+        } else if (ticket.ticketName.includes("소인")) {
+          groupedTickets[typeKey].childTicket = ticket;
+        }
+      });
+
+      return Object.values(groupedTickets);
+    },
   },
 });
