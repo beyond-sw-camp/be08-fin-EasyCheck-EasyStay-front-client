@@ -13,30 +13,14 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
+import { useRoomStore } from "@/stores/roomStore.js";
+
 import InfoCard from "@/components/Cards/Room/InfoCard.vue";
 
-const rooms = [
-  {
-    roomId: 0,
-    title: "디럭스",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room1.JPG",
-  },
-  {
-    roomId: 1,
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room4.JPG",
-    title: "스위트",
-  },
-  {
-    roomId: 2,
-    title: "패밀리",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room2.JPG",
-  },
-  {
-    roomId: 3,
-    title: "프레지덴셜",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room3.jpg",
-  },
-];
+const roomStore = useRoomStore();
+
+const { compactRoomList: rooms } = storeToRefs(roomStore);
 </script>
 
 <style lang="scss" scoped>
