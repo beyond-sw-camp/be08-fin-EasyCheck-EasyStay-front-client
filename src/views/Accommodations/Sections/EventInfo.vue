@@ -13,28 +13,12 @@
 
 <script setup>
 import InfoCard from "@/components/Cards/Room/InfoCard.vue";
+import { storeToRefs } from "pinia";
+import { useEventStore } from "@/stores/eventStore.js";
 
-const events = [
-  {
-    roomId: 0,
+const eventStore = useEventStore();
 
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room1.JPG",
-  },
-  {
-    roomId: 1,
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room4.JPG",
-  },
-  {
-    roomId: 2,
-
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room2.JPG",
-  },
-  {
-    roomId: 3,
-
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room3.jpg",
-  },
-];
+const { compactEventList: events } = storeToRefs(eventStore);
 </script>
 
 <style lang="scss" scoped></style>
