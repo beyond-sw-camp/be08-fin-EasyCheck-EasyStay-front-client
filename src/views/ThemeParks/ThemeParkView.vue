@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, defineProps } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
@@ -107,14 +107,6 @@ import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
-// props에서 themeParkId를 받아오기
-const props = defineProps({
-  themeParkId: {
-    type: [String, Number],
-    required: true,
-  }
-});
-
 const accommodations = ref([]);
 const themeParks = ref([]);
 
@@ -123,29 +115,36 @@ const accommodationStore = useAccommodationStore();
 const router = useRouter();
 const route = useRoute();
 
-const currentAccommodationId = ref(1);
-const currentThemeParkId = ref(Number(props.themeParkId) || parseInt(route.params.themeParkId, 10) || null);
+const currentAccommodationId = ref(null);
+const currentThemeParkId = ref(null);
 
 onMounted(async () => {
   await accommodationStore.fetchResortAccommodations();
   accommodations.value = accommodationStore.accommodations || [];
-  fetchThemeParksData();
+
+  if (accommodations.value.length > 0) {
+    currentAccommodationId.value =
+      parseInt(route.params.accommodationId, 10) || accommodations.value[0].id;
+    await fetchThemeParksData(currentAccommodationId.value);
+
+    if (route.params.themeParkId) {
+      currentThemeParkId.value = parseInt(route.params.themeParkId, 10);
+    }
+  }
 });
 
 watch(
   () => route.params.themeParkId,
-  (newId) => {
-    currentThemeParkId.value = parseInt(newId, 10);
-    fetchThemeParksData();
+  async (newId) => {
+    if (newId) {
+      currentThemeParkId.value = parseInt(newId, 10);
+    }
   }
 );
 
-const fetchThemeParksData = async () => {
-  await themeParkStore.fetchThemeParks(currentAccommodationId.value);
+const fetchThemeParksData = async (accommodationId) => {
+  await themeParkStore.fetchThemeParks(accommodationId);
   themeParks.value = themeParkStore.themeParks || [];
-  if (themeParks.value.length > 0 && !currentThemeParkId.value) {
-    currentThemeParkId.value = themeParks.value[0].id;
-  }
 };
 
 const currentThemePark = computed(() => {
@@ -157,15 +156,28 @@ const currentThemePark = computed(() => {
 
 const changeAccommodation = async (accommodationId) => {
   currentAccommodationId.value = accommodationId;
-  fetchThemeParksData();
+  await fetchThemeParksData(accommodationId);
+
+  if (themeParks.value.length > 0) {
+    currentThemeParkId.value = themeParks.value[0].id;
+  }
+
+  router.push({
+    name: "ThemePark",
+    params: { accommodationId, themeParkId: currentThemeParkId.value },
+  });
 };
 
 const changeThemePark = (themeParkId) => {
   if (themeParks.value.some((park) => park.id === themeParkId)) {
     currentThemeParkId.value = themeParkId;
+
     router.push({
       name: "ThemePark",
-      params: { themeParkId: themeParkId },
+      params: {
+        accommodationId: currentAccommodationId.value,
+        themeParkId,
+      },
     });
   } else {
     console.error("Invalid theme park id");

@@ -19,8 +19,11 @@ export const useThemeParkStore = defineStore("themeparkStore", {
           `/accommodations/${accommodationId}/parks`
         );
         this.themeParks = response.data.data;
+
         if (this.themeParks.length > 0) {
           this.currentThemePark = this.themeParks[0];
+        } else {
+          this.currentThemePark = null;
         }
       } catch (error) {
         console.error("Failed to fetch theme parks:", error);
@@ -40,13 +43,6 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
     setCurrentThemeParkById(parkId) {
       const numericParkId = Number(parkId);
-
-      console.log("Received parkId:", numericParkId);
-      console.log(
-        "Available themeParks:",
-        this.themeParks.map((park) => park.id)
-      );
-
       const park = this.themeParks.find(
         (park) => Number(park.id) === numericParkId
       );
@@ -61,6 +57,15 @@ export const useThemeParkStore = defineStore("themeparkStore", {
     ensureCurrentThemePark(parkId) {
       if (!this.currentThemePark || this.currentThemePark.id !== parkId) {
         this.setCurrentThemeParkById(parkId);
+      }
+    },
+
+    async fetchAndSetFirstThemePark(accommodationId) {
+      await this.fetchThemeParks(accommodationId);
+      
+      if (this.themeParks.length > 0) {
+        const firstParkId = this.themeParks[0].id;
+        this.setCurrentThemeParkById(firstParkId);
       }
     },
   },

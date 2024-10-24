@@ -192,11 +192,12 @@ const router = createRouter({
       }),
     },
     {
-      path: "/themepark/:themeparkId",
+      path: "/:accommodationId/themepark",
       name: "ThemePark",
       component: ThemeParkView,
       props: (route) => ({
-        themeParkId: route.query.themeParkId || 1,
+        themeParkId: parseInt(route.params.themeParkId, 10) || 1,
+        accommodationId: parseInt(route.params.accommodationId, 10) || 1,
       }),
     },
     {
@@ -347,7 +348,7 @@ const router = createRouter({
       component: NoticeDetail,
     },
   ],
-});
+ });
 
 router.beforeEach((to, from, next) => {
   if (to.name === "TicketOrderView") {
