@@ -39,11 +39,28 @@ export const useThemeParkStore = defineStore("themeparkStore", {
     },
 
     setCurrentThemeParkById(parkId) {
-      const park = this.themeParks.find((park) => park.id === parkId);
+      const numericParkId = Number(parkId);
+
+      console.log("Received parkId:", numericParkId);
+      console.log(
+        "Available themeParks:",
+        this.themeParks.map((park) => park.id)
+      );
+
+      const park = this.themeParks.find(
+        (park) => Number(park.id) === numericParkId
+      );
+
       if (park) {
         this.currentThemePark = park;
       } else {
-        console.error("Invalid theme park id");
+        console.error(`Invalid theme park id: ${numericParkId}`);
+      }
+    },
+
+    ensureCurrentThemePark(parkId) {
+      if (!this.currentThemePark || this.currentThemePark.id !== parkId) {
+        this.setCurrentThemeParkById(parkId);
       }
     },
   },
