@@ -20,7 +20,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <section class="mb-5 pb-5">
+    <section class="mt-5 pt-5 mb-5 pb-5">
         <div class="container mt-sm-5 mt-3">
             <div class="row">
                 <div class="col-lg-3">

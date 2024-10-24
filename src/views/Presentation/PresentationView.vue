@@ -6,7 +6,6 @@ import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
 import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
 import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
-import DefaultFooter from "../../examples/footers/FooterDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
@@ -193,6 +192,7 @@ onUnmounted(() => {
       <div class="roomSearchForm-container">
         <div class="container p-0">
           <RoomSearchForm class="m-auto" :accommodations="accommodations" @search="onSearchRooms" />
+          <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
         </div>
       </div>
     </Header>
@@ -206,7 +206,6 @@ onUnmounted(() => {
         </section>
       </div>
     </div>
-    <!-- <DefaultFooter /> -->
   </div>
 </template>
 
