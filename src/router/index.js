@@ -26,6 +26,9 @@ import ElTypography from "../layouts/sections/elements/typography/TypographyView
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
+import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
+import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
@@ -196,9 +199,22 @@ const router = createRouter({
       }),
     },
     {
-      path: "/ticket-order/:themeParkId",
+      path: "/themepark/:themeParkId/tickets",
+      name: "TicketSelection",
+      component: TicketSelectionView,
+      props: true,
+    },
+    {
+      path: "/ticketorder",
       name: "TicketOrderView",
       component: TicketOrderView,
+      props: true,
+    },
+    {
+      path: "/usageguide/:guidePageName",
+      name: "UsageGuide",
+      component: UsageGuideWrapper,
+      props: true,
     },
     {
       path: "/room/:roomId",
