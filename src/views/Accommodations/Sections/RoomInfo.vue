@@ -5,7 +5,13 @@
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4">
         <div class="col" :key="room.roomId" v-for="room in rooms">
-          <info-card :info="room" />
+          <router-link
+            :to="{
+              path: `/room/${room.roomId}`,
+            }"
+          >
+            <info-card :info="room" />
+          </router-link>
         </div>
       </div>
     </div>

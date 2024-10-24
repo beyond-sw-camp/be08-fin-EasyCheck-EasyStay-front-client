@@ -10,7 +10,7 @@ export const useEventStore = defineStore("eventStore", {
   getters: {
     compactEventList: (state) =>
       state.events.map((event) => ({
-        eventId: event.roomId,
+        eventId: event.eventId,
         imgUrl: event.images[0] || null,
       })),
   },
