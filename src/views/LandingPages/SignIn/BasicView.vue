@@ -36,17 +36,16 @@ function login() {
   };
 
   userLogin.login(formData)
-    .then(response => { // response 객체를 받음
-      console.log("응답 데이터:", response); // 응답 데이터 로그 출력
-      email.value = response.user.email; // 사용자 정보에서 이메일을 가져옴
-      router.go(-1); // 이전 페이지로 이동
+    .then(response => {
+      console.log("응답 데이터:", response);
+      email.value = response.user.email;
+      router.go(-1);
       console.log("Success Login");
     })
     .catch(error => {
       console.log("Login Fail: ", error);
     });
 }
-
 
 </script>
 
