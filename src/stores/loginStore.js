@@ -16,6 +16,8 @@ export const userLoginStore = defineStore("userStore", {
     detailAddress: "",
 
     userData: "",
+    // 로그인 상태 저장
+    isLoggedIn: false,
 
     signUpformData: {
       emailPrefix: "",
@@ -28,9 +30,6 @@ export const userLoginStore = defineStore("userStore", {
   }),
 
   getters: {
-    inUserLogin(state) {
-      return state.id != null;
-    },
     isAllChecked(state) {
       // 약관동의의 필수 체크박스가 체크되었는지 확인
       return (
@@ -41,6 +40,11 @@ export const userLoginStore = defineStore("userStore", {
   },
 
   actions: {
+    // 로그인 상태
+    async setLoginStatus(status) {
+      this.isLoggedIn = status;
+    },
+
     // 일반회원 - 로그인
     async login(formData) {
       try {
@@ -48,6 +52,7 @@ export const userLoginStore = defineStore("userStore", {
 
         if (response && response.data) {
           localStorage.setItem("accessToken", response.data.accessToken);
+          userLoginStore.setLoginStatus(true);
           console.log("로그인 성공, 저장된 토큰:", response.data.accessToken);
           router.push("/");
 
@@ -199,6 +204,7 @@ export const userLoginStore = defineStore("userStore", {
       // 토큰 삭제
       localStorage.removeItem("accessToken");
       this.$reset();
+      this.isLoggedIn = false;
       router.push("/");
     },
   },
