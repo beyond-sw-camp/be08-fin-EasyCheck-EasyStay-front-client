@@ -203,7 +203,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/ticket-order/:ticketId",
+      path: "/ticketorder",
       name: "TicketOrderView",
       component: TicketOrderView,
       props: true,
