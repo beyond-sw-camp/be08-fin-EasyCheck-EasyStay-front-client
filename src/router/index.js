@@ -52,6 +52,8 @@ import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
+import NoticesListView from "@/views/Notices/NoticesListView.vue";
+import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -297,6 +299,16 @@ const router = createRouter({
       path: "/payment",
       name: "PaymentPage",
       component: PaymentPage,
+    },
+    {
+      path: "/noticesListView",
+      name: "noticesListView",
+      component: NoticesListView,
+    },
+    {
+      path: "/suggestionsListView",
+      name: "SuggestionsListView",
+      component: SuggestionsListView,
     },
   ],
 });
