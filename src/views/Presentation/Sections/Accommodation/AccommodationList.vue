@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import apiClient from "@/api";
 import ExampleCard from "../../Components/ExampleCard.vue";
 
 const accommodations = ref([]);
 
 const fetchAccommodations = async () => {
     try {
-        const response = await axios.get('/api/v1/accommodations');
+        const response = await apiClient.get('/accommodations');
         accommodations.value = response.data;
     } catch (error) {
         console.error("Failed to fetch accommodations:", error);

@@ -42,6 +42,20 @@ export const useAccommodationStore = defineStore("accommodationStore", {
       }
     },
 
+    // 리조트 시설만 조회 호출
+    async fetchResortAccommodations() {
+      try {
+        const response = await apiClient.get(`/accommodations`);
+        console.log("Full API Response:", response.data); // API에서 받은 전체 데이터 로그
+        this.accommodations = response.data.filter(
+          (accommodation) => accommodation.accommodationType === "RESORT"
+        );
+        console.log("Filtered Accommodations:", this.accommodations); // 필터링 후 데이터 로그
+      } catch (error) {
+        console.error("Failed to fetch accommodations:", error);
+      }
+    },
+
     // 시설 수정 API 호출
     async updateAccommodation(id, updateData) {
       try {
