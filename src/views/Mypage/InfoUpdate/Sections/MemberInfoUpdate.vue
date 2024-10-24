@@ -11,15 +11,22 @@ import setMaterialInput from "@/assets/js/material-input";
 import MaterialButton from "@/components/MaterialButton.vue";
 
 const store = userLoginStore();
-const userInfo = ref({});
+const userInfo = ref({
+  email: '',
+  password: '',
+  name: '',
+  phone: '',
+  addr: '',
+  addr_detail: '',
+});
 const error = ref(null);
 
 // Initialize MaterialInput on mount
 onMounted(async () => {
   setMaterialInput();
-
   try {
     const response = await apiClient.get("/users/info");
+    console.log(response.data); // 응답 데이터 확인
     userInfo.value = response.data; // 사용자 정보 저장
   } catch (error) {
     console.error("사용자 정보 로드 오류:", error.response?.data?.message || "정보를 가져오는 데 실패했습니다.");
@@ -85,7 +92,6 @@ const postcode = ref('');
 const roadAddress = ref('');
 const jibunAddress = ref('');
 const detailAddress = ref('');
-const extraAddress = ref('');
 
 const searchZipCode = () => {
   new daum.Postcode({
@@ -94,12 +100,37 @@ const searchZipCode = () => {
       roadAddress.value = data.roadAddress; // 도로명주소
       jibunAddress.value = data.jibunAddress; // 지번주소
       detailAddress.value = ''; // 상세주소 초기화
-      extraAddress.value = ''; // 참고항목 초기화
     },
   }).open();
 };
 
 const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보여줄지 여부
+
+// 새로운 비밀번호를 저장할 ref
+const oldPassword = ref(''); // 현재 비밀번호
+const newPassword = ref(''); // 새 비밀번호
+
+// 비밀번호 변경 메소드
+const changePW = async () => {
+  try {
+    // 값 로그 찍기
+    console.log("비밀번호 변경 요청 데이터:", {
+      email: userInfo.value.email,
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value,
+    });
+
+    const response = await apiClient.patch("/users/change-password", {
+      email: userInfo.value.email, // 이메일 추가
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value,
+    });
+
+    console.log("비밀번호 변경 성공:", response.data);
+  } catch (error) {
+    console.error("비밀번호 변경 오류:", error.response?.data?.message || "비밀번호 변경에 실패했습니다.");
+  }
+};
 
 
 </script>
@@ -133,8 +164,8 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
           <td>
             <div class="d-flex flex-column">
               <div class="d-flex align-items-center mb-2 col-5">
-                <MaterialInput class="input-group-outline mb-0" id="password"
-                  :label="{ text: '비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
+                <MaterialInput v-model="oldPassword" class="input-group-outline mb-0" id="current-password"
+                  :label="{ text: '현재 비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
                 <MaterialButton @click="showNewPasswordInput = !showNewPasswordInput" class="btn btn-light ms-2"
                   style="width: 80px; padding: 5px;">
                   변경
@@ -143,10 +174,9 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
 
               <transition name="slide-fade">
                 <div v-if="showNewPasswordInput" class="d-flex align-items-center col-5">
-                  <MaterialInput class="input-group-outline mb-0" id="new-password"
+                  <MaterialInput v-model="newPassword" class="input-group-outline mb-0" id="new-password"
                     :label="{ text: '새 비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
-                  <MaterialButton @click="showNewPasswordInput = false" class="btn ms-2 btn-dark"
-                    style="width: 80px; padding: 5px;">
+                  <MaterialButton @click="changePW" class="btn ms-2 btn-dark" style="width: 80px; padding: 5px;">
                     변경 완료
                   </MaterialButton>
                 </div>
@@ -219,7 +249,7 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
   </div>
 </template>
 
-<style>
+<style scoped>
 .form-select:focus {
   border-color: #007bff !important;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
@@ -245,5 +275,9 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
 .input-group-outline {
   /* 두 개의 입력박스가 같은 너비를 차지하도록 */
   flex: 1;
+}
+
+.table td {
+  vertical-align: middle;
 }
 </style>
