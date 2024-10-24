@@ -57,6 +57,7 @@ import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
+import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -339,6 +340,11 @@ const router = createRouter({
       path: "/suggestionsListView",
       name: "SuggestionsListView",
       component: SuggestionsListView,
+    },
+    {
+      path: "/noticesListView/noticeDetail",
+      name: "NoticeDetail",
+      component: NoticeDetail,
     },
   ],
 });
