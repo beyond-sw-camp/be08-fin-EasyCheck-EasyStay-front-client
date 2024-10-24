@@ -54,6 +54,8 @@
           v-for="notice in filteredNotices"
           :key="notice.id"
           class="notice-item border p-3 mb-3"
+          @click="goToNoticeDetail(notice.id)"
+          style="cursor: pointer"
         >
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
@@ -69,9 +71,16 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+
+const router = useRouter();
+
+const goToNoticeDetail = (id) => {
+  router.push({ name: "NoticeDetail", params: { id } });
+};
 
 const branches = ref([
   { id: 1, name: "Seoul 리조트" },
