@@ -298,6 +298,20 @@ const router = createRouter({
       name: "PaymentPage",
       component: PaymentPage,
     },
+    {
+      path: "/users/mypage",
+      component: MypageView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem("accessToken");
+        console.log("token:", token);
+        if (token) {
+          next();
+        } else {
+          alert("로그인이 필요합니다.");
+          next({ path: "/users/login" });
+        }
+      },
+    },
   ],
 });
 

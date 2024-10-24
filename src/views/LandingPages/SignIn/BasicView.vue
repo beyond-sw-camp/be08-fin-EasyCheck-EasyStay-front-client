@@ -29,27 +29,24 @@ const password = ref('');
 const status = ref('');
 const role = ref('');
 
-async function login() {
+function login() {
   const formData = {
     email: email.value,
     password: password.value,
-    status: status.value,
-    role: role.value
   };
 
-  try {
-    const response = await userLogin.login(formData);
-    console.log("응답 데이터:", response);
-
-    if (response) {
-      // router.push('/'); // 로그인 성공 후 메인 페이지로 이동
-      router.go(-1);
+  userLogin.login(formData)
+    .then(response => { // response 객체를 받음
+      console.log("응답 데이터:", response); // 응답 데이터 로그 출력
+      email.value = response.user.email; // 사용자 정보에서 이메일을 가져옴
+      router.go(-1); // 이전 페이지로 이동
       console.log("Success Login");
-    }
-  } catch (error) {
-    console.log("Login Fail: ", error);
-  }
+    })
+    .catch(error => {
+      console.log("Login Fail: ", error);
+    });
 }
+
 
 </script>
 

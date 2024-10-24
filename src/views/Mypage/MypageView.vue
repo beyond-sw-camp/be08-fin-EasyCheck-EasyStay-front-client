@@ -1,7 +1,9 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { RouterLink } from "vue-router";
-import { onMounted } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
+import apiClient from "@/api";
+import { userLoginStore } from "@/stores/loginStore";
 
 // example components
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -9,8 +11,29 @@ import Header from "@/examples/Header.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
-onMounted(() => {
+
+const userStore = userLoginStore();
+const error = ref(null);
+const router = useRouter();
+
+onMounted(async () => {
   setMaterialInput();
+
+  // 사용자 정보 가져오기
+  const token = localStorage.getItem("accessToken");
+  console.log("token: ", token);
+
+  if (token) {
+    try {
+      await userStore.getUserData();
+    } catch (err) {
+      error.value = "사용자 정보를 가져오는 데 실패했습니다.";
+      console.error("API 오류:", err);
+    }
+  } else {
+    alert("로그인이 필요합니다.");
+    router.push("/users/login");
+  }
 });
 
 import easystayImage from '@/assets/img/easystay.png';
@@ -38,7 +61,7 @@ import easystayImage from '@/assets/img/easystay.png';
               <div class="py-3 mb-3 text-center" style="background-color: rgba(255, 255, 255, 0.3); width: 100%;">
                 <h3 class="text-black font-weight-bolder mb-0 mt-4">마이페이지</h3>
                 <div class="row mt-3 text-black justify-content-center fs-4">
-              </div>
+                </div>
                 <div class="row mt-3 justify-content-center">
                   <div class="d-flex justify-content-center w-50">
                     <RouterLink to="/users/infoUpdate" class="mx-3">회원 정보 수정 ></RouterLink>
@@ -77,54 +100,22 @@ import easystayImage from '@/assets/img/easystay.png';
         </div>
 
         <div style="border-top: 1px solid #000; width: 25%; margin: 10px auto;"></div>
-    
+
         <div class="row justify-content-center text-black fs-6 mb-4">
           <div class="text-center mt-3">
             <h5 class="custom-font">EASY STAY's membership offers special value.</h5>
+            <div v-if="error" class="text-danger">{{ error }}</div>
+            <div v-else>
+              <!-- 사용자 정보 표시 -->
+              <div>환영합니다, {{ userStore.userData.name }}님!</div>
+              <div>회원 ID: {{ userStore.userData.email }}</div>
+            </div>
+
           </div>
         </div>
 
       </div>
     </div>
-
-    <!-- 푸터 -->
-    <footer class="footer position-absolute bottom-2 py-2 w-100">
-      <div class="container">
-        <div class="row align-items-center justify-content-lg-between">
-          <div class="col-12 col-md-6 my-auto">
-            <div class="copyright text-center text-sm text-dark text-lg-start">
-              © {{ new Date().getFullYear() }}, made with
-              <i class="fa fa-heart" aria-hidden="true"></i> by
-              <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                class="font-weight-bold text-dark" target="_blank">EASY CHECK</a>
-              for a better web.
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                  class="nav-link text-dark" target="_blank">EASY CHECK</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                  class="nav-link text-dark" target="_blank">About
-                  Us</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
-                  class="nav-link text-dark" target="_blank">GitHub</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-dark"
-                  target="_blank">License</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
-
   </Header>
 </template>
 
