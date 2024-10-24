@@ -55,10 +55,10 @@
             class="form-select bordered domain-select"
           >
             <option value="">도메인 선택</option>
-            <option value="gmail.com">gmail.com</option>
-            <option value="naver.com">naver.com</option>
-            <option value="daum.net">daum.net</option>
-            <option value="yahoo.com">yahoo.com</option>
+            <option value="@gmail.com">@gmail.com</option>
+            <option value="@naver.com">@naver.com</option>
+            <option value="@daum.net">@daum.net</option>
+            <option value="@yahoo.com">@yahoo.com</option>
             <option value="기타">기타</option>
           </select>
           <input
