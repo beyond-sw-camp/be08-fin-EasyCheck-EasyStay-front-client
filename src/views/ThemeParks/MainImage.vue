@@ -1,13 +1,17 @@
 <template>
-  <div class="carousel slide">
+  <div v-if="themePark && themePark.imageUrls" class="carousel slide">
     <div class="carousel-inner">
       <div
         v-for="(url, index) in themePark.imageUrls"
         :key="url"
-        class="w-100"
-        :class="['carousel-item', { active: index === activeIndex }]"
+        class="carousel-item"
+        :class="{ active: index === activeIndex }"
       >
-        <img :src="url" :alt="`Slide ${index + 1}`" />
+        <img
+          :src="url"
+          :alt="`Slide ${index + 1}`"
+          class="w-100 carousel-image"
+        />
         <div class="carousel-caption">
           <h2 class="carousel-title">{{ themePark.name }}</h2>
           <p class="carousel-description">{{ themePark.description }}</p>
@@ -27,50 +31,44 @@
       <span class="visually-hidden">Next</span>
     </button>
   </div>
+  <div v-else>
+    <p>테마파크 정보를 불러오는 중입니다...</p>
+  </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps, watch } from "vue";
 
-const themePark = ref(
-  {
-    id: 1,
-    name: "설악 워터피아",
-    description:
-      "눈 앞에서 시원하게 펼쳐지는 설악산의 풍광과 뜨끈뜨끈한 천연온천을 즐기며 진정한 힐링과 치유의 시간을 즐겨보세요~",
-    location: "속초 리조트",
-    imageUrls: [
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
-    ],
+const props = defineProps({
+  themePark: {
+    type: Object,
+    required: true,
   },
-  {
-    id: 2,
-    name: "인피니티 풀",
-    description:
-      "하늘의 끝 바다의 너머로 헤엄쳐가는 환상적인 느낌, 마치 동해의 수평선 너머로 헤엄쳐가는 듯한 멋진 경험을 선사합니다.",
-    location: "속초 리조트",
-    imageUrls: [
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation5.jpg",
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation1.jpg",
-      "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-    ],
-  }
-);
+});
 
 const activeIndex = ref(0);
 
 const nextSlide = () => {
-  activeIndex.value =
-    (activeIndex.value + 1) % themePark.value.imageUrls.length;
+  if (props.themePark && props.themePark.imageUrls) {
+    activeIndex.value =
+      (activeIndex.value + 1) % props.themePark.imageUrls.length;
+  }
 };
 
 const prevSlide = () => {
-  activeIndex.value =
-    (activeIndex.value - 1 + themePark.value.imageUrls.length) %
-    themePark.value.imageUrls.length;
+  if (props.themePark && props.themePark.imageUrls) {
+    activeIndex.value =
+      (activeIndex.value - 1 + props.themePark.imageUrls.length) %
+      props.themePark.imageUrls.length;
+  }
 };
+
+watch(
+  () => props.themePark,
+  () => {
+    activeIndex.value = 0;
+  }
+);
 </script>
 
 <style scoped lang="scss">
@@ -87,6 +85,12 @@ const prevSlide = () => {
 .carousel-item {
   height: 100%;
   position: relative;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 0;
+}
+
+.carousel-item.active {
+  opacity: 1;
 }
 
 .icon-wrapper {
@@ -98,7 +102,7 @@ const prevSlide = () => {
   border-radius: 100%;
 }
 
-img {
+.carousel-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
