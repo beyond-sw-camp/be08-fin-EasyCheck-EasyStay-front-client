@@ -16,6 +16,9 @@
                 :readonly="isLoggedIn"
               />
             </div>
+            <span v-if="!isBuyerNameValid" class="error-message">
+              이름을 입력해 주세요.
+            </span>
           </div>
 
           <div class="form-group">
@@ -29,6 +32,9 @@
                 :readonly="isLoggedIn"
               />
             </div>
+            <span v-if="!isBuyerPhoneValid" class="error-message">
+              올바른 휴대전화 번호를 입력해 주세요.
+            </span>
           </div>
 
           <div class="form-group email-group">
@@ -52,6 +58,9 @@
                 style="flex: 1"
               />
             </div>
+            <span v-if="!isEmailValid" class="error-message">
+              유효한 이메일 주소를 입력해 주세요.
+            </span>
           </div>
         </div>
       </fieldset>
@@ -60,7 +69,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch } from "vue";
+import { defineProps, defineEmits, ref, watch, computed } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 
 const props = defineProps({
@@ -71,12 +80,20 @@ const props = defineProps({
   isLoggedIn: Boolean,
 });
 
-const emit = defineEmits();
+const emit = defineEmits(["update:buyerName", "update:buyerPhone", "update:buyerEmail", "update:buyerEmailDomain"]);
 
 const buyerName = ref(props.buyerName);
 const buyerPhone = ref(props.buyerPhone);
 const buyerEmail = ref(props.buyerEmail);
 const buyerEmailDomain = ref(props.buyerEmailDomain);
+
+// 유효성 검사를 위한 computed properties
+const isBuyerNameValid = computed(() => buyerName.value.trim() !== "");
+const isBuyerPhoneValid = computed(() => /^\d{10,11}$/.test(buyerPhone.value)); // 10자리 또는 11자리의 숫자만 허용
+const isEmailValid = computed(() => {
+  const email = `${buyerEmail.value.trim()}@${buyerEmailDomain.value.trim()}`;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+});
 
 watch(buyerName, (newValue) => {
   emit("update:buyerName", newValue);
@@ -113,5 +130,11 @@ watch(buyerEmailDomain, (newValue) => {
 .input-group-add {
   font-size: 1rem;
   align-self: center;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
 }
 </style>
