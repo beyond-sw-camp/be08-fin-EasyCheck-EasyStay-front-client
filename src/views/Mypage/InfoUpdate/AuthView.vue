@@ -37,7 +37,7 @@ function goToMain() {
 const authenticatePhone = async () => {
   try {
     await loginStore.handlePhoneAuthentication(); // 전화번호 인증 요청
-    isAuthenticated.value = true; // 인증 성공 시 상태 업데이트
+    loginStore.isAuthenticated = true; // 인증 성공 시 상태 업데이트
     alert("인증이 완료되었습니다."); // 성공 메시지
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
@@ -45,18 +45,15 @@ const authenticatePhone = async () => {
   }
 };
 
-const handleNext = async () => {
-  const phone = `${loginStore.selectedPhonePrefix}${loginStore.phoneMiddle}${loginStore.phoneSuffix}`;
-  const isVerified = await loginStore.verifyCode(phone, loginStore.verificationCode); // 인증 확인
-
-  if (isVerified) {
+const handleNext = () => {
+  // 인증 상태 확인
+  if (loginStore.isAuthenticated) {
     // 인증 완료 시 다음 단계로 진행
     router.push('/users/pwUpdate');
   } else {
     alert("전화번호 인증을 완료해야 다음 단계로 진행할 수 있습니다.");
   }
 };
-
 
 </script>
 
