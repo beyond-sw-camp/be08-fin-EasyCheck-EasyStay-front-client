@@ -1,7 +1,7 @@
 <template>
   <NavbarDefault :sticky="true" />
   <div class="ticket-selection container my-5">
-    <h2 class="mb-4">{{ themeParkName }} 이용권 선택</h2>
+    <h2 class="mb-4">{{ currentThemeParkName || "알 수 없음" }} 이용권 선택</h2>
     <div class="ticket-list row">
       <div
         v-for="ticketGroup in groupedTickets"
@@ -51,33 +51,55 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, computed, defineProps } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useThemeParkStore } from "@/stores/themeParkStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
-  themeParkId: {
-    type: [String, Number],
+  accommodationId: {
+    type: Number,
     required: true,
   },
-  themeParkName: {
-    type: String,
+  themeParkId: {
+    type: Number,
     required: true,
   },
 });
 
-const groupedTickets = ref([]);
 const router = useRouter();
+const groupedTickets = ref([]);
 const ticketStore = useTicketStore();
 const themeParkStore = useThemeParkStore();
 const isLoggedIn = ref(false);
 
+const currentThemeParkName = computed(() => {
+  const themeParkName = themeParkStore.currentThemePark?.name;
+  return (
+    themeParkName ||
+    localStorage.getItem("currentThemeParkName") ||
+    "알 수 없음"
+  );
+});
+
 onMounted(async () => {
-  const themeParkId = Number(props.themeParkId);
-  await ticketStore.fetchTickets(themeParkId);
+  const storedThemeParkName = localStorage.getItem("currentThemeParkName");
+
+  if (!storedThemeParkName) {
+    await themeParkStore.fetchThemeParkById(
+      props.accommodationId,
+      props.themeParkId
+    );
+    const fetchedName = themeParkStore.currentThemePark?.name;
+
+    if (fetchedName) {
+      localStorage.setItem("currentThemeParkName", fetchedName);
+    }
+  }
+
+  await ticketStore.fetchTickets(props.themeParkId);
 
   if (ticketStore.tickets && ticketStore.tickets.data) {
     const today = dayjs();
@@ -86,8 +108,6 @@ onMounted(async () => {
       const saleEnd = dayjs(ticket.saleEndDate);
       return today.isAfter(saleStart) && today.isBefore(saleEnd);
     });
-
-    console.log("Valid Tickets:", validTickets);
 
     groupedTickets.value = ticketStore.groupTicketsByType(validTickets);
   } else {
@@ -105,10 +125,6 @@ const getDiscountedPrice = (price) => {
 const handlePurchase = (ticketGroup) => {
   const themeParkId = Number(ticketGroup.themeParkId);
 
-  console.log("Attempting to set theme park with ID:", themeParkId);
-
-  themeParkStore.setCurrentThemeParkById(themeParkId);
-
   if (!isLoggedIn.value) {
     router.push({ path: "/users/login" });
   } else {
@@ -118,7 +134,7 @@ const handlePurchase = (ticketGroup) => {
         adultTicket: JSON.stringify(ticketGroup.adultTicket),
         childTicket: JSON.stringify(ticketGroup.childTicket),
         themeParkId: themeParkId,
-        themeParkName: props.themeParkName,
+        accommodationId: props.accommodationId,
       },
     });
   }

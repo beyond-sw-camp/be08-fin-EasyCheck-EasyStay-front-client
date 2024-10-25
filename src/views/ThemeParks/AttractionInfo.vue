@@ -84,6 +84,16 @@ const fetchAttractions = () => {
 
 const attractions = computed(() => attractionStore.attractions);
 
+watch(
+  () => props.themeParkId,
+  async (newThemeParkId) => {
+    if (newThemeParkId) {
+      await fetchAttractions();
+    }
+  },
+  { immediate: true }
+);
+
 const openModal = (attraction) => {
   selectedAttraction.value = attraction;
   showModal.value = true;

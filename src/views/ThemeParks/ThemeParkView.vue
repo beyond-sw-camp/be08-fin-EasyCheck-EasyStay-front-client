@@ -2,7 +2,7 @@
   <NavbarDefault :sticky="true" />
   <MainImage v-if="currentThemePark" :themePark="currentThemePark" />
 
-  <section class="accommodation-tabs px-8 py-4" v-if="accommodations.length">
+  <section class="accommodation-tabs px-8 pt-4" v-if="accommodations.length">
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -34,7 +34,7 @@
     </div>
   </section>
 
-  <section class="themepark-tabs px-8 py-4" v-if="themeParks.length">
+  <section class="themepark-tabs px-8" v-if="themeParks.length">
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, defineProps } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
@@ -107,44 +107,62 @@ import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
+const props = defineProps({
+  themeParkId: {
+    type: [String, Number],
+    required: false,
+  },
+  accommodationId: {
+    type: [String, Number],
+    required: true,
+  },
+});
+
 const accommodations = ref([]);
 const themeParks = ref([]);
 
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 const router = useRouter();
-const route = useRoute();
 
-const currentAccommodationId = ref(null);
-const currentThemeParkId = ref(null);
+const currentAccommodationId = ref(Number(props.accommodationId) || 1);
+const currentThemeParkId = ref(Number(props.themeParkId) || null);
+
+const fetchThemeParksData = async () => {
+  await themeParkStore.fetchThemeParks(currentAccommodationId.value);
+  themeParks.value = themeParkStore.themeParks || [];
+
+  if (!currentThemeParkId.value && themeParks.value.length > 0) {
+    currentThemeParkId.value = themeParks.value[0].id;
+    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
+  }
+};
 
 onMounted(async () => {
   await accommodationStore.fetchResortAccommodations();
   accommodations.value = accommodationStore.accommodations || [];
 
-  if (accommodations.value.length > 0) {
-    currentAccommodationId.value =
-      parseInt(route.params.accommodationId, 10) || accommodations.value[0].id;
-    await fetchThemeParksData(currentAccommodationId.value);
-
-    if (route.params.themeParkId) {
-      currentThemeParkId.value = parseInt(route.params.themeParkId, 10);
-    }
-  }
+  await fetchThemeParksData();
+  handleInitialThemeParkSelection();
 });
 
 watch(
-  () => route.params.themeParkId,
-  async (newId) => {
-    if (newId) {
-      currentThemeParkId.value = parseInt(newId, 10);
-    }
-  }
+  () => [props.accommodationId, props.themeParkId],
+  async () => {
+    currentAccommodationId.value = Number(props.accommodationId);
+    currentThemeParkId.value = Number(props.themeParkId) || null;
+    await fetchThemeParksData();
+  },
+  { immediate: true }
 );
 
-const fetchThemeParksData = async (accommodationId) => {
-  await themeParkStore.fetchThemeParks(accommodationId);
-  themeParks.value = themeParkStore.themeParks || [];
+const handleInitialThemeParkSelection = () => {
+  if (currentThemeParkId.value) {
+    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
+  } else if (themeParks.value.length > 0) {
+    currentThemeParkId.value = themeParks.value[0].id;
+    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
+  }
 };
 
 const currentThemePark = computed(() => {
@@ -156,27 +174,32 @@ const currentThemePark = computed(() => {
 
 const changeAccommodation = async (accommodationId) => {
   currentAccommodationId.value = accommodationId;
-  await fetchThemeParksData(accommodationId);
+  await fetchThemeParksData();
 
   if (themeParks.value.length > 0) {
     currentThemeParkId.value = themeParks.value[0].id;
+    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
   }
 
   router.push({
     name: "ThemePark",
-    params: { accommodationId, themeParkId: currentThemeParkId.value },
+    params: {
+      accommodationId: accommodationId,
+      themeParkId: currentThemeParkId.value,
+    },
   });
 };
 
 const changeThemePark = (themeParkId) => {
   if (themeParks.value.some((park) => park.id === themeParkId)) {
     currentThemeParkId.value = themeParkId;
+    themeParkStore.setCurrentThemeParkById(themeParkId);
 
     router.push({
       name: "ThemePark",
       params: {
         accommodationId: currentAccommodationId.value,
-        themeParkId,
+        themeParkId: themeParkId,
       },
     });
   } else {
@@ -185,12 +208,15 @@ const changeThemePark = (themeParkId) => {
 };
 
 const goToTicketSelectionView = () => {
+  // accommodationId 값을 콘솔 로그로 확인
+  console.log("Accommodation ID:", props.accommodationId);
+
   if (currentThemePark.value) {
     router.push({
       name: "TicketSelection",
       params: {
         themeParkId: Number(currentThemePark.value.id),
-        themeParkName: currentThemePark.value.name,
+        accommodationId: Number(props.accommodationId),
       },
     });
   } else {
