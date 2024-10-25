@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { userLoginStore } from '@/stores/loginStore';
 
 // Vue Material Kit 2 components
@@ -91,10 +91,10 @@ const authenticatePhone = async () => {
 
   try {
     await loginStore.handlePhoneAuthentication();
-    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
+    alert("인증번호 요청이 성공적으로 전송되었습니다.");
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
-    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
+    alert("인증번호 요청 중 오류가 발생했습니다.");
   }
 };
 
@@ -114,91 +114,6 @@ const requestVerification = async () => {
     console.error('Error during verification:', error.message);
   }
 };
-
-// 우편번호 검색 핸들러
-const postcode = ref('');
-const roadAddress = ref('');
-const jibunAddress = ref('');
-const detailAddress = ref('');
-const extraAddress = ref('');
-
-const searchZipCode = () => {
-  new daum.Postcode({
-    oncomplete: function (data) {
-      postcode.value = data.zonecode; // 올바른 키 사용
-      loginStore.roadAddress = data.roadAddress; // 도로명 주소
-      loginStore.jibunAddress = data.jibunAddress; // 지번 주소
-      loginStore.detailAddress = ''; // 상세주소 초기화
-    },
-  }).open();
-};
-
-const selectedDomain = ref('');
-const isCustomDomain = ref(false);
-
-const onDomainChange = () => {
-  if (selectedDomain.value === 'etc') {
-    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
-  } else {
-    isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
-    loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
-  }
-};
-
-const updateEmailSuffix = () => {
-  if (selectedDomain !== 'etc') {
-    loginStore.signUpformData.emailSuffix = selectedDomain;
-  }
-
-  const email = createEmail(); // 이메일 생성
-  console.log('Generated Email:', email);
-  loginStore.signUpformData.email = email; // 이메일 값 저장
-};
-
-
-const createEmail = () => {
-  const emailPrefix = loginStore.signUpformData.emailPrefix || '';
-  const emailSuffix = loginStore.signUpformData.emailSuffix || '';
-
-  // prefix와 suffix가 비어있는 경우에 대해 처리
-  if (!emailPrefix || !emailSuffix) {
-    console.error('이메일 구성 오류: prefix 또는 suffix가 비어있습니다.');
-    return '이메일을 제대로 입력하세요'; // 오류 메시지
-  }
-
-  return `${emailPrefix}@${emailSuffix}`;
-};
-
-// 이메일 중복 체크
-const checkDuplicateId = async () => {
-  const email = `${loginStore.signUpformData.emailPrefix}@${selectedDomain.value === 'etc' ? loginStore.signUpformData.emailSuffix : selectedDomain.value}`;
-
-  // 이메일 중복 체크 액션 호출
-  const isDuplicated = await loginStore.checkEmailIsDuplicated(email);
-  if (isDuplicated) {
-    alert('사용 가능한 이메일입니다.');
-  } else {
-    alert('이미 사용 중인 이메일입니다.');
-  }
-};
-
-// 비밀번호 유효성 검사
-const password = ref("");
-const passwordError = ref(false);
-
-const isPasswordValid = computed(() => {
-  // 비밀번호 유효성 검사: 최소 8자, 최대 16자, 대문자, 숫자 포함
-  const minLength = password.value.length >= 8;
-  const maxLength = password.value.length <= 16;
-  const hasUpperCase = /[A-Z]/.test(password.value);
-  const hasNumber = /\d/.test(password.value);
-
-  return minLength && maxLength && hasUpperCase && hasNumber;
-});
-// 비밀번호 입력 시 오류 여부 업데이트
-watch(password, (newVal) => {
-  passwordError.value = !isPasswordValid.value;
-});
 
 </script>
 
@@ -255,54 +170,6 @@ watch(password, (newVal) => {
             </div>
           </td>
         </tr>
-
-        <!-- 아이디 -->
-        <tr>
-          <td class="fw-bold fs-8 col-1">아이디</td>
-          <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.emailPrefix" required class="input-group-outline mb-0"
-                id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
-              <span class="mx-1">@</span>
-
-              <template v-if="isCustomDomain">
-                <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
-                  id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
-              </template>
-
-              <template v-else>
-                <select v-model="selectedDomain" class="form-select ms-2" @change="onDomainChange" style="flex: 1;">
-                  <option value="" disabled selected>도메인 선택</option>
-                  <option value="gmail.com">gmail.com</option>
-                  <option value="naver.com">naver.com</option>
-                  <option value="daum.net">daum.net</option>
-                  <option value="etc">기타</option>
-                </select>
-              </template>
-
-              <button class="btn custom-btn ms-2 mt-3" @click="checkDuplicateId">
-                중복 체크
-              </button>
-            </div>
-          </td>
-        </tr>
-
-
-        <!-- 비밀번호 -->
-        <tr>
-          <td class="fw-bold fs-8">비밀번호</td>
-          <td>
-            <div class="d-flex flex-column align-items-start col-5">
-              <MaterialInput v-model="password" required class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
-              <div v-if="passwordError" class="text-danger small mt-1">
-                비밀번호는 최소 8자 이상, 최대 16자 이하와 대문자와 숫자를 포함해야 합니다.
-              </div>
-            </div>
-          </td>
-        </tr>
-
-
 
         <!-- 성함 -->
         <tr>
@@ -362,45 +229,6 @@ watch(password, (newVal) => {
             </td>
           </tr>
         </transition>
-
-
-        <!-- 주소 -->
-        <tr>
-          <td class="fw-bold fs-8">주소</td>
-          <td>
-            <div class="d-flex align-items-stretch col-4">
-              <MaterialInput v-model="postcode" class="input-group-outline mb-0 me-2" placeholder="우편번호"
-                style="flex: 1;" />
-              <button type="button" class="btn btn-outline-primary mb-0 custom-btn" @click="searchZipCode">주소
-                검색</button>
-            </div>
-            <div class="mt-2 col-5">
-              <MaterialInput v-model="loginStore.roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
-              <MaterialInput v-model="loginStore.jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
-              <MaterialInput v-model="loginStore.detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="fw-bold fs-8">마케팅 수신 동의 여부</td>
-          <td>
-            <div class="d-flex align-items-stretch col-4">
-              <label class="me-2">
-                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="Y"
-                  class="form-check-input" />
-                예
-              </label>
-              <label>
-                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="N"
-                  class="form-check-input" />
-                아니요
-              </label>
-            </div>
-          </td>
-        </tr>
-
-
 
       </tbody>
     </table>

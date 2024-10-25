@@ -13,16 +13,11 @@
       <!-- 지점 선택 -->
       <div class="mb-4">
         <label for="resort-select" class="form-label">지점 선택</label>
-        <select
-          id="resort-select"
-          v-model="selectedBranch"
-          @change="fetchNotices"
-          class="form-select"
-        >
+        <select id="resort-select" v-model="query.branch" class="form-select">
           <option
-            v-for="branch in branches"
+            v-for="branch in accommodations"
             :key="branch.id"
-            :value="branch.id"
+            :value="branch.name"
           >
             {{ branch.name }}
           </option>
@@ -33,10 +28,9 @@
       <div class="mb-4 input-group">
         <input
           type="text"
-          v-model="searchQuery"
+          v-model="query.content"
           placeholder="검색어 입력..."
           class="form-control search-input"
-          @input="filterNotices"
         />
         <button class="btn btn-warning search-btn" @click="filterNotices">
           검색
@@ -45,7 +39,7 @@
 
       <!-- 공지사항 총 개수 -->
       <div class="mb-3">
-        <p>Total notices: {{ filteredNotices.length }}</p>
+        <!-- <p>Total notices: {{ notices?.length }}</p> -->
       </div>
 
       <!-- 공지사항 리스트 -->
@@ -59,7 +53,7 @@
         >
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
-          <small class="text-muted">{{ formatDate(notice.date) }}</small>
+          <p>{{ notice.accommodationName }}</p>
         </div>
       </div>
       <div v-else>
@@ -70,78 +64,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useNoticeStore } from "@/stores/notice";
 
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
+
+const noticeStore = useNoticeStore();
+
+// 여기서 state 꺼내올 수 있음
+// getters도 filteredNotices 이런식으로 받아올 수 있음
+const { accommodations, query, filteredNotices } = storeToRefs(noticeStore);
+
+onMounted(async () => {
+  // 지점 목록 조회하는 함수 호출 actions에서
+  await noticeStore.fetchNotices();
+  // 공지사항 조회하는 함수 호출 actions에서
+  await noticeStore.fetchAccommodations();
+});
 
 const goToNoticeDetail = (id) => {
   router.push({ name: "NoticeDetail", params: { id } });
 };
-
-const branches = ref([
-  { id: 1, name: "Seoul 리조트" },
-  { id: 2, name: "Busan 리조트" },
-  { id: 3, name: "Jeju 리조트" },
-]);
-
-const selectedBranch = ref(branches.value[0].id);
-const notices = ref([]);
-const filteredNotices = ref([]);
-const searchQuery = ref("");
-
-const fetchNotices = async () => {
-  const exampleNotices = {
-    1: [
-      {
-        id: 1,
-        title: "서울리조트 휴관 안내",
-        content:
-          "서울리조트가 2024년 10월 23일부터 11월 23일까지 내부 사정상 휴관함을 알려드립니다. 그동안의 예약은 불가하며.....",
-        date: "2024-10-20",
-      },
-      {
-        id: 2,
-        title: "서울리조트 편의시설 리모델링 안내",
-        content:
-          "서울리조트 CU가 리모델링함을 안내해드립니다. 2024/10/30부터 3일간 리모델링으로 인한 휴점을 안내해드립니다.",
-        date: "2024-10-21",
-      },
-    ],
-    2: [
-      {
-        id: 3,
-        title: "부산 해운대",
-        content:
-          "부산 리조트를 사용하시는 고객분들께 안내해드립니다. 리조트 앞 해운대 바로국밥을 꼭 드셔보시길 바랍니다.",
-        date: "2024-10-18",
-      },
-    ],
-    3: [],
-  };
-
-  notices.value = exampleNotices[selectedBranch.value] || [];
-  filterNotices();
-};
-
-const filterNotices = () => {
-  const query = searchQuery.value.toLowerCase();
-  filteredNotices.value = notices.value.filter(
-    (notice) =>
-      notice.title.toLowerCase().includes(query) ||
-      notice.content.toLowerCase().includes(query)
-  );
-};
-
-const formatDate = (date) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(date).toLocaleDateString(undefined, options);
-};
-
-onMounted(fetchNotices);
 </script>
 
 <style lang="scss" scoped>
@@ -169,7 +117,6 @@ onMounted(fetchNotices);
 
 .search-btn {
   background-color: #007bff; /* 파란색 버튼 */
-  //   border: 2px solid #007bff;
   border-radius: 0 4px 4px 0; /* 우측 모서리 둥글게 */
   color: white;
   padding: 10px 20px;

@@ -5,22 +5,27 @@
 <script>
 import apiClient from "@/api";
 
-export function processPayment(reservationId, totalPrice) {
+export function processPayment(reservationId, totalPrice, paymentMethod) {
   const { IMP } = window;
   IMP.init("imp18668427");
 
   IMP.request_pay(
     {
-      pg: "html5_inicis",
-      pay_method: "card",
-      merchant_uid: `ORD${new Date().getTime()}`,
-      name: `EasyStay`,
+      pg: "html5_inicis", // 결제 서비스 제공사 (예: html5_inicis, kcp, kakao 등)
+      pay_method: paymentMethod, // 선택한 결제 방법 (card 또는 vbank)
+      merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
+      name: `EasyStay 결제`,
       amount: totalPrice,
       buyer_email: "bo9701@naver.com",
       buyer_name: "테스터",
       buyer_tel: "010-5182-6177",
       buyer_addr: "인천광역시 남동구 서창동",
       buyer_postcode: "07222",
+
+      // 가상계좌를 선택한 경우, 입금 기한 및 필수 정보 추가
+      vbank_due: paymentMethod === "vbank" ? getVbankDueDate() : undefined,
+      bank: paymentMethod === "vbank" ? "우리은행" : undefined, // 은행 정보 추가 (예시)
+      accountHolder: paymentMethod === "vbank" ? "테스터" : undefined, // 가상계좌 입금자명 추가 (예시)
     },
     async (rsp) => {
       if (rsp.success) {
@@ -32,10 +37,14 @@ export function processPayment(reservationId, totalPrice) {
           await apiClient.post("/payment", {
             impUid: rsp.imp_uid,
             reservationId: reservationId,
-            method: "CARD", // 결제 방법
+            method: paymentMethod, // 선택한 결제 방법
             amount: totalPrice,
-            paymentDate: new Date().toISOString(), // 결제 날짜
-            completionStatus: "COMPLETE", // 완료 상태
+            paymentDate: new Date().toISOString(),
+            completionStatus: "COMPLETE",
+            // 가상계좌 추가 필드들
+            depositDeadline: paymentMethod === "vbank" ? getVbankDueDate() : null,
+            bank: paymentMethod === "vbank" ? "우리은행" : null,
+            accountHolder: paymentMethod === "vbank" ? "테스터" : null,
           });
           alert("결제 내역이 데이터베이스에 저장되었습니다.");
         } catch (error) {
@@ -59,6 +68,17 @@ export function processPayment(reservationId, totalPrice) {
       }
     }
   );
+}
+
+// 가상계좌 입금 기한 설정 함수
+function getVbankDueDate() {
+  const today = new Date();
+  const dueDate = new Date(today.setDate(today.getDate() + 7)); // 7일 후로 설정
+
+  // ISO-8601 형식으로 변환 (예: 2024-10-31T05:43:00)
+  const isoDate = dueDate.toISOString().slice(0, 19); // "YYYY-MM-DDTHH:MM:SS" 형식으로 자름
+  console.log("vbank_due:", isoDate); // 로그로 확인
+  return isoDate;
 }
 
 export async function refundPayment(paymentId, impUid) {

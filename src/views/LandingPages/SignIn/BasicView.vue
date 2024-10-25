@@ -40,31 +40,14 @@ function login() {
   loginStore.login(formData)
     .then(response => {
       console.log("응답 데이터:", response);
-      email.value = response.user.email;
-      router.go(-1);
+      loginStore.setLoginStatus(true); // 로그인 상태 설정
+      router.go(-1); // 이전 페이지로 이동
       console.log("Success Login");
     })
     .catch(error => {
       console.log("Login Fail: ", error);
     });
 }
-
-const guestName = ref('');
-const guestPhone = ref('');
-
-// 비회원 휴대폰 인증번호 요청
-const requestVerficationCode = async () => {
-  loginStore.guestPhone = guestPhone.value;
-
-
-  try {
-    await loginStore.guestRequestVerificationCode();
-    alert('인증 코드가 발송되었습니다.');
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
 </script>
 
 <template>

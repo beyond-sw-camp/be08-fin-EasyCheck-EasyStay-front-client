@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 import apiClient from "@/api";
+import { mypageStore } from '@/stores/mypageStore';
 
 // Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
@@ -10,17 +11,23 @@ import MaterialInput from "@/components/MaterialInput.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import MaterialButton from "@/components/MaterialButton.vue";
 
-const store = userLoginStore();
-const userInfo = ref({});
+const userInfo = ref({
+  email: '',
+  password: '',
+  name: '',
+  phone: '',
+  addr: '',
+  addr_detail: '',
+});
 const error = ref(null);
 
 // Initialize MaterialInput on mount
 onMounted(async () => {
   setMaterialInput();
-
   try {
     const response = await apiClient.get("/users/info");
-    userInfo.value = response.data; // 사용자 정보 저장
+    console.log(response.data);
+    userInfo.value = response.data;
   } catch (error) {
     console.error("사용자 정보 로드 오류:", error.response?.data?.message || "정보를 가져오는 데 실패했습니다.");
   }
@@ -53,17 +60,9 @@ function toggleAll() {
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
-    { id: 'phonePrefix1', text: '02' },
-    { id: 'phonePrefix2', text: '031' },
-    { id: 'phonePrefix3', text: '032' },
-    { id: 'phonePrefix4', text: '033' },
-    { id: 'phonePrefix5', text: '041' },
-    { id: 'phonePrefix6', text: '042' },
-    { id: 'phonePrefix7', text: '043' },
-    { id: 'phonePrefix8', text: '044' },
-    { id: 'phonePrefix9', text: '051' },
-    { id: 'phonePrefix10', text: '052' },
-    { id: 'phonePrefix11', text: '053' },
+    { id: 'phonePrefix1', text: '010' },
+    { id: 'phonePrefix2', text: '02' },
+    { id: 'phonePrefix3', text: '051' },
   ],
 });
 
@@ -85,7 +84,6 @@ const postcode = ref('');
 const roadAddress = ref('');
 const jibunAddress = ref('');
 const detailAddress = ref('');
-const extraAddress = ref('');
 
 const searchZipCode = () => {
   new daum.Postcode({
@@ -94,12 +92,11 @@ const searchZipCode = () => {
       roadAddress.value = data.roadAddress; // 도로명주소
       jibunAddress.value = data.jibunAddress; // 지번주소
       detailAddress.value = ''; // 상세주소 초기화
-      extraAddress.value = ''; // 참고항목 초기화
     },
   }).open();
 };
 
-const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보여줄지 여부
+const mypage = mypageStore();
 
 
 </script>
@@ -127,34 +124,6 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
             </div>
           </td>
         </tr>
-
-        <tr>
-          <td class="fw-bold fs-8">비밀번호</td>
-          <td>
-            <div class="d-flex flex-column">
-              <div class="d-flex align-items-center mb-2 col-5">
-                <MaterialInput class="input-group-outline mb-0" id="password"
-                  :label="{ text: '비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
-                <MaterialButton @click="showNewPasswordInput = !showNewPasswordInput" class="btn btn-light ms-2"
-                  style="width: 80px; padding: 5px;">
-                  변경
-                </MaterialButton>
-              </div>
-
-              <transition name="slide-fade">
-                <div v-if="showNewPasswordInput" class="d-flex align-items-center col-5">
-                  <MaterialInput class="input-group-outline mb-0" id="new-password"
-                    :label="{ text: '새 비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
-                  <MaterialButton @click="showNewPasswordInput = false" class="btn ms-2 btn-dark"
-                    style="width: 80px; padding: 5px;">
-                    변경 완료
-                  </MaterialButton>
-                </div>
-              </transition>
-            </div>
-          </td>
-        </tr>
-
 
         <!-- 성함 -->
         <tr>
@@ -219,7 +188,7 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
   </div>
 </template>
 
-<style>
+<style scoped>
 .form-select:focus {
   border-color: #007bff !important;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
@@ -245,5 +214,9 @@ const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보
 .input-group-outline {
   /* 두 개의 입력박스가 같은 너비를 차지하도록 */
   flex: 1;
+}
+
+.table td {
+  vertical-align: middle;
 }
 </style>
