@@ -132,16 +132,42 @@ const searchZipCode = () => {
     },
   }).open();
 };
+
 const selectedDomain = ref('');
+const isCustomDomain = ref(false);
+
+const onDomainChange = () => {
+  if (selectedDomain.value === 'etc') {
+    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
+  } else {
+    isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
+    loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
+  }
+};
 
 const updateEmailSuffix = () => {
   if (selectedDomain !== 'etc') {
     loginStore.signUpformData.emailSuffix = selectedDomain;
-  } else {
-    // 기타 선택 시, 입력된 값을 이메일 suffix로 설정
-    loginStore.signUpformData.emailSuffix = loginStore.signUpformData.emailSuffix;
-  };
-}
+  }
+
+  const email = createEmail(); // 이메일 생성
+  console.log('Generated Email:', email);
+  loginStore.signUpformData.email = email; // 이메일 값 저장
+};
+
+
+const createEmail = () => {
+  const emailPrefix = loginStore.signUpformData.emailPrefix || '';
+  const emailSuffix = loginStore.signUpformData.emailSuffix || '';
+
+  // prefix와 suffix가 비어있는 경우에 대해 처리
+  if (!emailPrefix || !emailSuffix) {
+    console.error('이메일 구성 오류: prefix 또는 suffix가 비어있습니다.');
+    return '이메일을 제대로 입력하세요'; // 오류 메시지
+  }
+
+  return `${emailPrefix}@${emailSuffix}`;
+};
 
 // 이메일 중복 체크
 const checkDuplicateId = async () => {
@@ -239,13 +265,13 @@ watch(password, (newVal) => {
                 id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
               <span class="mx-1">@</span>
 
-              <template v-if="selectedDomain === 'etc'">
+              <template v-if="isCustomDomain">
                 <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
                   id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
               </template>
 
               <template v-else>
-                <select v-model="selectedDomain" class="form-select ms-2" @change="updateEmailSuffix" style="flex: 1;">
+                <select v-model="selectedDomain" class="form-select ms-2" @change="onDomainChange" style="flex: 1;">
                   <option value="" disabled selected>도메인 선택</option>
                   <option value="gmail.com">gmail.com</option>
                   <option value="naver.com">naver.com</option>
@@ -260,6 +286,7 @@ watch(password, (newVal) => {
             </div>
           </td>
         </tr>
+
 
         <!-- 비밀번호 -->
         <tr>
@@ -327,7 +354,7 @@ watch(password, (newVal) => {
           <tr v-if="isVerificationRequested">
             <td class="fw-bold fs-8">인증번호</td>
             <td>
-              <div class="d-flex align-items-center justify-content-center col-5">
+              <div class="d-flex align-items-center justify-content-start col-5">
                 <MaterialInput class="input-group-outline mb-0" v-model="loginStore.verificationCode" type="text"
                   placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
                 <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
@@ -335,6 +362,7 @@ watch(password, (newVal) => {
             </td>
           </tr>
         </transition>
+
 
         <!-- 주소 -->
         <tr>

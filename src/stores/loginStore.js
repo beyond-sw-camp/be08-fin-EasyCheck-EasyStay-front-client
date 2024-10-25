@@ -27,7 +27,7 @@ export const userLoginStore = defineStore("userStore", {
     // 일반회원 - 회원가입
     signUpformData: {
       emailPrefix: "",
-      emialSuffix: "",
+      emailSuffix: "",
       password: "",
       name: "",
       verificationCode: "",
@@ -156,8 +156,8 @@ export const userLoginStore = defineStore("userStore", {
       const addr = `${this.roadAddress} ${this.detailAddress}`;
       const addrDetail = this.jibunAddress;
 
-      const emailPrefix = this.emailPrefix;
-      const emailSuffix = this.emialSuffix;
+      const emailPrefix = this.signUpformData.emailPrefix;
+      const emailSuffix = this.signUpformData.emailSuffix;
 
       // 전화번호 구성
       const phonePrefix = this.selectedPhonePrefix;
