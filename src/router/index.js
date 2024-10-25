@@ -88,6 +88,11 @@ const router = createRouter({
       component: SignInBasicView,
     },
     {
+      path: "/",
+      name: "logout",
+      component: PresentationView,
+    },
+    {
       path: "/sections/page-sections/page-headers",
       name: "page-headers",
       component: PageHeaders,
