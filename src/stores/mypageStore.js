@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
-import router from "@/router";
 import { userLoginStore } from "@/stores/loginStore";
 
 export const mypageStore = defineStore("mypageStore", {
@@ -8,34 +7,32 @@ export const mypageStore = defineStore("mypageStore", {
     userData: {},
 
     changePW: {
+      email: "",
       oldPassword: "",
       newPassword: "",
-      showNewPasswordInput: false,
     },
   }),
 
   actions: {
-    actions: {
-      async verifyOldPassword(oldPassword) {
-        const response = await apiClient.post("/api/change-password", {
-          email: this.userData.email, // 현재 사용자 이메일
-          password: oldPassword,
+    // 비밀번호 변경 메서드
+    async changePassword(oldPassword, newPassword) {
+      const loginStore = userLoginStore();
+      await loginStore.getUserData();
+
+      const email = loginStore.userData.email;
+      console.log("현재 사용자 이메일:", email);
+
+      try {
+        const response = await apiClient.patch("/users/change-password", {
+          email,
+          oldPassword,
+          newPassword,
         });
-
-        return response.status === 200; // 비밀번호가 일치하는 경우
-      },
-
-      async changePassword() {
-        const response = await apiClient.post("/api/change-password", {
-          email: this.userData.email, // 현재 사용자 이메일
-          oldPassword: this.changePW.oldPassword, // 현재 비밀번호
-          newPassword: this.changePW.newPassword, // 새 비밀번호
-        });
-
-        if (response.status !== 200) {
-          throw new Error("비밀번호 변경에 실패했습니다.");
-        }
-      },
+        console.log("비밀번호 변경 성공:", response.data);
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || "비밀번호 변경 실패");
+      }
     },
   },
 });
