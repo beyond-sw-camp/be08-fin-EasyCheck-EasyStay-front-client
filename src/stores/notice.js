@@ -20,12 +20,14 @@ export const useNoticeStore = defineStore("notice", {
         state.notices.filter((notice) => {
           // 지점(branch) 조건 체크 - 정확히 일치
           const branchMatch =
-            !state.query.branch || notice.branch === state.query.branch;
+            !state.query.branch ||
+            notice.accommodationName === state.query.branch;
 
           // title 또는 content 조건 체크 (둘 중 하나라도 일치하면 OK)
           const searchMatch =
             !state.query.content ||
-            (state.query.content && notice.title.includes(state.query.title)) ||
+            (state.query.content &&
+              notice.title.includes(state.query.content)) ||
             (state.query.content &&
               notice.content.includes(state.query.content));
 

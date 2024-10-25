@@ -17,7 +17,7 @@
           <option
             v-for="branch in accommodations"
             :key="branch.id"
-            :value="branch.id"
+            :value="branch.name"
           >
             {{ branch.name }}
           </option>
@@ -53,9 +53,7 @@
         >
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
-          <small class="text-muted">{{
-            formatDate(notice.created_date)
-          }}</small>
+          <p>{{ notice.accommodationName }}</p>
         </div>
       </div>
       <div v-else>
@@ -84,16 +82,13 @@ const { accommodations, query, filteredNotices } = storeToRefs(noticeStore);
 
 onMounted(async () => {
   // 지점 목록 조회하는 함수 호출 actions에서
+  await noticeStore.fetchNotices();
   // 공지사항 조회하는 함수 호출 actions에서
+  await noticeStore.fetchAccommodations();
 });
 
 const goToNoticeDetail = (id) => {
   router.push({ name: "NoticeDetail", params: { id } });
-};
-
-const formatDate = (date) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(date).toLocaleDateString(undefined, options);
 };
 </script>
 
