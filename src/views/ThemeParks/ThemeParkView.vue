@@ -34,7 +34,7 @@
     </div>
   </section>
 
-  <section class="themepark-tabs px-8" v-if="themeParks.length">
+  <section class="themepark-tabs px-8" v-if="themeParks.length !== 0">
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -46,7 +46,7 @@
               <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
                 <button
                   class="nav-link px-4 py-2"
-                  :class="{ active: tab.id === themePark.id }"
+                  :class="{ active: tab.id === currentThemeParkId }"
                   @click="changeThemePark(tab.id)"
                   role="tab"
                 >
@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useThemeParkStore } from "@/stores/themeparkStore";
@@ -113,40 +113,30 @@ const router = useRouter();
 const route = useRoute();
 
 // 현재 선택한 숙박시설 식별자
-const currentAccommodationId = ref(Number(route.query.accommodationId));
+const currentAccommodationId = computed(
+  () => Number(route.query.accommodationId) || null
+);
 // 현재 선택한 테마파크 식별자
-const currentThemeParkId = ref(Number(route.query.currentThemeParkId) || null);
+const currentThemeParkId = computed(
+  () => Number(route.query.currentThemeParkId) || null
+);
 
 onMounted(async () => {
   // 모든 숙박시설 조회
   await accommodationStore.fetchResortAccommodations();
-
-  await fetchThemeParksData();
-  // handleInitialThemeParkSelection();
 });
 
 // pinia 스토어에서 fetch 받은 accommodations 받아오기
 const { accommodations } = storeToRefs(accommodationStore);
 const { themeParks, themePark } = storeToRefs(themeParkStore);
 
-console.log(themePark);
-
-const fetchThemeParksData = async () => {
-  await themeParkStore.fetchThemeParks(currentAccommodationId.value);
-
-  if (!currentThemeParkId.value && themeParks.value.length > 0) {
-    currentThemeParkId.value = themeParks[0].id;
-    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
-  }
-};
-
 // accommodationId가 바뀌는 경우
 // accommodation fetch
 watch(
   () => route.query.accommodationId,
   async (newAccommodationId) => {
-    currentAccommodationId.value = Number(newAccommodationId);
     await accommodationStore.fetchAccommodationById(newAccommodationId);
+    await themeParkStore.fetchThemeParks(newAccommodationId);
   },
   { immediate: true }
 );
@@ -156,32 +146,15 @@ watch(
 watch(
   () => route.query.themeParkId,
   (newThemeParkId) => {
-    console.log("watch");
-
-    currentThemeParkId.value = Number(newThemeParkId) || null;
-    themeParkStore.fetchThemeParkById(
-      route.query.accommodationId,
-      newThemeParkId
-    );
+    if (newThemeParkId) {
+      themeParkStore.fetchThemeParkById(
+        route.query.accommodationId,
+        newThemeParkId
+      );
+    }
   },
   { immediate: true }
 );
-
-const handleInitialThemeParkSelection = () => {
-  if (currentThemeParkId.value) {
-    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
-  } else if (themeParks.value.length > 0) {
-    currentThemeParkId.value = themeParks.value[0].id;
-    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
-  }
-};
-
-const currentThemePark = computed(() => {
-  return (
-    themeParks.value.find((park) => park.id === currentThemeParkId.value) ||
-    null
-  );
-});
 
 // 숙박 시설 변경
 const changeAccommodation = async (accommodationId) =>

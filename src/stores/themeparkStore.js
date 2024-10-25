@@ -5,7 +5,6 @@ export const useThemeParkStore = defineStore("themeparkStore", {
   state: () => ({
     themeParks: [],
     themePark: null,
-    currentThemePark: null,
   }),
 
   getters: {
@@ -16,30 +15,15 @@ export const useThemeParkStore = defineStore("themeparkStore", {
   actions: {
     async fetchThemeParks(accommodationId) {
       try {
-        const cachedThemeParks = localStorage.getItem(
-          `themeParks_${accommodationId}`
+        const response = await apiClient.get(
+          `/accommodations/${accommodationId}/parks`
         );
-        if (cachedThemeParks) {
-          this.themeParks = JSON.parse(cachedThemeParks);
-          if (this.themeParks.length > 0) {
-            this.currentThemePark = this.themeParks[0];
-          }
+        this.themeParks = response.data.data;
+
+        if (this.themeParks.length > 0) {
+          this.themePark = this.themeParks[0];
         } else {
-          const response = await apiClient.get(
-            `/accommodations/${accommodationId}/parks`
-          );
-          this.themeParks = response.data.data;
-
-          if (this.themeParks.length > 0) {
-            this.currentThemePark = this.themeParks[0];
-          } else {
-            this.currentThemePark = null;
-          }
-
-          localStorage.setItem(
-            `themeParks_${accommodationId}`,
-            JSON.stringify(this.themeParks)
-          );
+          this.themePark = null;
         }
       } catch (error) {
         console.error("Failed to fetch theme parks:", error);
