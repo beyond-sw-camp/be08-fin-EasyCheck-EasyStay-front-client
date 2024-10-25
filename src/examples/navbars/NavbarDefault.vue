@@ -114,7 +114,7 @@ watch(
                     <!-- 로그인 여부에 따라 버튼 렌더링 -->
                     <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
                         <RouterLink :to="{ name: 'Mypage' }" role="button"
-                            class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+                            class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
                             <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">person</i>
                             MyPage
                         </RouterLink>
@@ -129,7 +129,7 @@ watch(
                     <!-- 로그아웃 버튼: 로그인 상태일 때만 표시 -->
                     <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
                         <RouterLink :to="{ name: 'logout' }" role="button" @click="useUserLoginStore.logout"
-                            class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+                            class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
                             <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">logout</i>
                             Sign Out
                         </RouterLink>
