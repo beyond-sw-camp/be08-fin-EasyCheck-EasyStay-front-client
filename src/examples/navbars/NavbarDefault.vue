@@ -1,7 +1,8 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
+import { userLoginStore } from "@/stores/loginStore.js";
 
 const props = defineProps({
     action: {
@@ -12,53 +13,58 @@ const props = defineProps({
         default: () => ({
             route: "https://www.creative-tim.com/product/vue-material-kit",
             color: "bg-gradient-success",
-            label: "Reservation"
-        })
+            label: "Reservation",
+        }),
     },
     transparent: {
         type: Boolean,
-        default: false
+        default: false,
     },
     light: {
         type: Boolean,
-        default: false
+        default: false,
     },
     dark: {
         type: Boolean,
-        default: false
+        default: false,
     },
     sticky: {
         type: Boolean,
-        default: false
+        default: false,
     },
     darkText: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 });
 
+const router = useRouter(); // 라우터 인스턴스
+const useUserLoginStore = userLoginStore(); // 로그인 상태 체크
 let isScrolled = ref(false);
 
 const saveScrollState = () => {
-    localStorage.setItem('isScrolled', isScrolled.value ? 'true' : 'false');
+    localStorage.setItem("isScrolled", isScrolled.value ? "true" : "false");
 };
 
 const loadScrollState = () => {
-    const storedState = localStorage.getItem('isScrolled');
-    if (storedState === 'true') {
-        isScrolled.value = true;
-    } else {
-        isScrolled.value = false;
-    }
+    const storedState = localStorage.getItem("isScrolled");
+    isScrolled.value = storedState === "true";
 };
 
 const handleScroll = () => {
-    if (window.scrollY > 10) {
-        isScrolled.value = true;
-    } else {
-        isScrolled.value = false;
-    }
+    isScrolled.value = window.scrollY > 10;
     saveScrollState();
+};
+
+const handleReservationClick = () => {
+    console.log("로그인 상태:", useUserLoginStore.isLoggedIn); // 로그인 상태를 로그로 출력
+
+    if (!useUserLoginStore.isLoggedIn) {
+        alert("로그인을 하세요.");
+        router.push({ name: "login" });
+    } else {
+        router.push({ name: "reservation" }); // 로그인 시 예약 페이지로 이동
+    }
 };
 
 onMounted(() => {
@@ -80,11 +86,7 @@ const { type } = useWindowsWidth();
 watch(
     () => type.value,
     (newValue) => {
-        if (newValue === "mobile") {
-            textDark.value = true;
-        } else {
-            textDark.value = false;
-        }
+        textDark.value = newValue === "mobile";
     }
 );
 </script>
@@ -109,17 +111,34 @@ watch(
             </a>
             <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
                 <ul class="navbar-nav navbar-nav-hover ms-auto align-items-center">
-                    <li class="nav-item mx-2">
-                        <RouterLink :to="{ name: 'login' }" role="button"
+                    <!-- 로그인 여부에 따라 버튼 렌더링 -->
+                    <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
+                        <RouterLink :to="{ name: 'Mypage' }" role="button"
                             class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
                             <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">person</i>
+                            MyPage
+                        </RouterLink>
+                    </li>
+                    <li v-else class="nav-item mx-2">
+                        <RouterLink :to="{ name: 'login' }" role="button"
+                            class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+                            <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">login</i>
                             Sign In / Sign Up
                         </RouterLink>
                     </li>
-                    <li class="nav-item mx-2">
-                        <RouterLink :to="{ name: '' }" role="button" class="reservation-btn btn btn-sm mb-0 ms-auto">
-                            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
+                    <!-- 로그아웃 버튼: 로그인 상태일 때만 표시 -->
+                    <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
+                        <RouterLink :to="{ name: 'logout' }" role="button" @click="useUserLoginStore.logout"
+                            class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+                            <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">logout</i>
+                            Sign Out
                         </RouterLink>
+                    </li>
+                    <!-- 공통: Reservation 버튼 -->
+                    <li class="nav-item mx-2">
+                        <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto">
+                            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
+                        </button>
                     </li>
                     <li class="nav-item ms-lg-2">
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
