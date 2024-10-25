@@ -34,11 +34,8 @@ export const userLoginStore = defineStore("userStore", {
       marketingConsent: "N",
     },
 
-    guestLoginForm: {
-      guestName: "",
-      guestPhone: "",
-      verificationCode: "",
-    },
+    // 인증 여부 저장 상태
+    isAuthenticated: false,
 
     // 마이페이지에서 유저 정보 가져오기
     userInfo: {},
@@ -64,6 +61,7 @@ export const userLoginStore = defineStore("userStore", {
     async login(loginData) {
       try {
         const response = await apiClient.post("/users/login", loginData);
+        console.log(response.data);
 
         if (response && response.data) {
           localStorage.setItem("accessToken", response.data.accessToken);
@@ -144,11 +142,14 @@ export const userLoginStore = defineStore("userStore", {
         });
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
+          this.isAuthenticated = true;
+          return true;
         }
       } catch (error) {
         console.error("Error in verifyCode:", error.message);
         alert("인증에 실패했습니다. 확인 후 다시 시도해주세요.");
       }
+      return false;
     },
 
     // 일반회원 - 회원가입
