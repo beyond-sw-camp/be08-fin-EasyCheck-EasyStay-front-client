@@ -38,8 +38,8 @@ const props = defineProps({
     },
 });
 
-const router = useRouter(); // 라우터 인스턴스
-const useUserLoginStore = userLoginStore(); // 로그인 상태 체크
+const router = useRouter();
+const useUserLoginStore = userLoginStore();
 let isScrolled = ref(false);
 
 const saveScrollState = () => {
@@ -57,13 +57,13 @@ const handleScroll = () => {
 };
 
 const handleReservationClick = () => {
-    console.log("로그인 상태:", useUserLoginStore.isLoggedIn); // 로그인 상태를 로그로 출력
+    console.log("로그인 상태:", useUserLoginStore.isLoggedIn);
 
     if (!useUserLoginStore.isLoggedIn) {
         alert("로그인을 하세요.");
         router.push({ name: "login" });
     } else {
-        router.push({ name: "reservation" }); // 로그인 시 예약 페이지로 이동
+        router.push({ name: "reservation" });
     }
 };
 
@@ -111,7 +111,6 @@ watch(
             </a>
             <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
                 <ul class="navbar-nav navbar-nav-hover ms-auto align-items-center">
-                    <!-- 로그인 여부에 따라 버튼 렌더링 -->
                     <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
                         <RouterLink :to="{ name: 'Mypage' }" role="button"
                             class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
@@ -126,7 +125,6 @@ watch(
                             Sign In / Sign Up
                         </RouterLink>
                     </li>
-                    <!-- 로그아웃 버튼: 로그인 상태일 때만 표시 -->
                     <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
                         <RouterLink :to="{ name: 'logout' }" role="button" @click="useUserLoginStore.logout"
                             class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
@@ -134,14 +132,13 @@ watch(
                             Sign Out
                         </RouterLink>
                     </li>
-                    <!-- 공통: Reservation 버튼 -->
                     <li class="nav-item mx-2">
                         <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto">
                             <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
                         </button>
                     </li>
-                    <li class="nav-item ms-lg-2">
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    <li class="nav-item mx-2">
+                        <button class="navbar-toggler d-lg-block" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false"
                             aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon mt-2">
