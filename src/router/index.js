@@ -25,6 +25,7 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
 import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
@@ -192,19 +193,27 @@ const router = createRouter({
       }),
     },
     {
-      path: "/:accommodationId/themepark",
+      path: "/:accommodationId/themepark/:themeParkId?",
       name: "ThemePark",
       component: ThemeParkView,
       props: (route) => ({
-        themeParkId: parseInt(route.params.themeParkId, 10) || 1,
+        themeParkId: parseInt(route.params.themeParkId, 10) || null,
         accommodationId: parseInt(route.params.accommodationId, 10) || 1,
       }),
     },
     {
-      path: "/themepark/:themeParkId/tickets",
+      path: "/themepark/error",
+      name: "ThemeParkErrorPage",
+      component: ThemeParkErrorPage,
+    },
+    {
+      path: "/:accommodationId/themepark/:themeParkId/tickets",
       name: "TicketSelection",
       component: TicketSelectionView,
-      props: true,
+      props: (route) => ({
+        accommodationId: Number(route.params.accommodationId),
+        themeParkId: Number(route.params.themeParkId),
+      }),
     },
     {
       path: "/ticketorder",
