@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 import apiClient from "@/api";
+import { mypageStore } from '@/stores/mypageStore';
 
 // Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
@@ -10,7 +11,6 @@ import MaterialInput from "@/components/MaterialInput.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import MaterialButton from "@/components/MaterialButton.vue";
 
-const store = userLoginStore();
 const userInfo = ref({
   email: '',
   password: '',
@@ -26,8 +26,8 @@ onMounted(async () => {
   setMaterialInput();
   try {
     const response = await apiClient.get("/users/info");
-    console.log(response.data); // 응답 데이터 확인
-    userInfo.value = response.data; // 사용자 정보 저장
+    console.log(response.data);
+    userInfo.value = response.data;
   } catch (error) {
     console.error("사용자 정보 로드 오류:", error.response?.data?.message || "정보를 가져오는 데 실패했습니다.");
   }
@@ -60,17 +60,9 @@ function toggleAll() {
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
-    { id: 'phonePrefix1', text: '02' },
-    { id: 'phonePrefix2', text: '031' },
-    { id: 'phonePrefix3', text: '032' },
-    { id: 'phonePrefix4', text: '033' },
-    { id: 'phonePrefix5', text: '041' },
-    { id: 'phonePrefix6', text: '042' },
-    { id: 'phonePrefix7', text: '043' },
-    { id: 'phonePrefix8', text: '044' },
-    { id: 'phonePrefix9', text: '051' },
-    { id: 'phonePrefix10', text: '052' },
-    { id: 'phonePrefix11', text: '053' },
+    { id: 'phonePrefix1', text: '010' },
+    { id: 'phonePrefix2', text: '02' },
+    { id: 'phonePrefix3', text: '051' },
   ],
 });
 
@@ -104,33 +96,7 @@ const searchZipCode = () => {
   }).open();
 };
 
-const showNewPasswordInput = ref(false); // 새 비밀번호 입력박스를 보여줄지 여부
-
-// 새로운 비밀번호를 저장할 ref
-const oldPassword = ref(''); // 현재 비밀번호
-const newPassword = ref(''); // 새 비밀번호
-
-// 비밀번호 변경 메소드
-const changePW = async () => {
-  try {
-    // 값 로그 찍기
-    console.log("비밀번호 변경 요청 데이터:", {
-      email: userInfo.value.email,
-      oldPassword: oldPassword.value,
-      newPassword: newPassword.value,
-    });
-
-    const response = await apiClient.patch("/users/change-password", {
-      email: userInfo.value.email, // 이메일 추가
-      oldPassword: oldPassword.value,
-      newPassword: newPassword.value,
-    });
-
-    console.log("비밀번호 변경 성공:", response.data);
-  } catch (error) {
-    console.error("비밀번호 변경 오류:", error.response?.data?.message || "비밀번호 변경에 실패했습니다.");
-  }
-};
+const mypage = mypageStore();
 
 
 </script>
@@ -158,33 +124,6 @@ const changePW = async () => {
             </div>
           </td>
         </tr>
-
-        <tr>
-          <td class="fw-bold fs-8">비밀번호</td>
-          <td>
-            <div class="d-flex flex-column">
-              <div class="d-flex align-items-center mb-2 col-5">
-                <MaterialInput v-model="oldPassword" class="input-group-outline mb-0" id="current-password"
-                  :label="{ text: '현재 비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
-                <MaterialButton @click="showNewPasswordInput = !showNewPasswordInput" class="btn btn-light ms-2"
-                  style="width: 80px; padding: 5px;">
-                  변경
-                </MaterialButton>
-              </div>
-
-              <transition name="slide-fade">
-                <div v-if="showNewPasswordInput" class="d-flex align-items-center col-5">
-                  <MaterialInput v-model="newPassword" class="input-group-outline mb-0" id="new-password"
-                    :label="{ text: '새 비밀번호', class: 'form-label' }" type="password" style="width: 150px;" />
-                  <MaterialButton @click="changePW" class="btn ms-2 btn-dark" style="width: 80px; padding: 5px;">
-                    변경 완료
-                  </MaterialButton>
-                </div>
-              </transition>
-            </div>
-          </td>
-        </tr>
-
 
         <!-- 성함 -->
         <tr>
