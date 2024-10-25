@@ -4,18 +4,13 @@ import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
 import { userLoginStore } from "@/stores/loginStore.js";
 
+// 네비게이션 토글 상태
+const isNavOpen = ref(false);
+const toggleNav = () => {
+    isNavOpen.value = !isNavOpen.value;
+};
+
 const props = defineProps({
-    action: {
-        type: Object,
-        route: String,
-        color: String,
-        label: String,
-        default: () => ({
-            route: "https://www.creative-tim.com/product/vue-material-kit",
-            color: "bg-gradient-success",
-            label: "Reservation",
-        }),
-    },
     transparent: {
         type: Boolean,
         default: false,
@@ -63,7 +58,7 @@ const handleReservationClick = () => {
         alert("로그인을 하세요.");
         router.push({ name: "login" });
     } else {
-        router.push({ name: "reservation" });
+        router.push({ name: "Reservation" });
     }
 };
 
@@ -105,10 +100,23 @@ watch(
             ]" :to="{ name: 'presentation' }" rel="tooltip" title="Designed and Coded by EasyCheck">
                 EasyStay
             </RouterLink>
-            <a href="https://www.creative-tim.com/product/vue-material-kit-pro"
-                class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block">
-                <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
-            </a>
+            <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
+                <li class="nav-item mx-2">
+                    <button @click="handleReservationClick"
+                        class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block">
+                        <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
+                    </button>
+                </li>
+                <li class="nav-item mx-2">
+                    <button class="navbar-toggler mb-0 ms-auto d-lg-none d-lg-block" type="button" @click="toggleNav">
+                        <span class="navbar-toggler-icon mt-2">
+                            <span class="navbar-toggler-bar bar1"></span>
+                            <span class="navbar-toggler-bar bar2"></span>
+                            <span class="navbar-toggler-bar bar3"></span>
+                        </span>
+                    </button>
+                </li>
+            </ul>
             <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
                 <ul class="navbar-nav navbar-nav-hover ms-auto align-items-center">
                     <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
@@ -137,10 +145,9 @@ watch(
                             <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
                         </button>
                     </li>
+                    <!-- 네비게이션 토글 버튼 -->
                     <li class="nav-item mx-2">
-                        <button class="navbar-toggler d-lg-block" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false"
-                            aria-label="Toggle navigation">
+                        <button class="navbar-toggler d-lg-block" type="button" @click="toggleNav">
                             <span class="navbar-toggler-icon mt-2">
                                 <span class="navbar-toggler-bar bar1"></span>
                                 <span class="navbar-toggler-bar bar2"></span>
@@ -155,6 +162,12 @@ watch(
 </template>
 
 <style>
+@media (max-width: 991px) {
+    .navbar-expand-lg .navbar-nav {
+        flex-direction: row;
+    }
+}
+
 .bg-transparent-black {
     background: rgba(0, 0, 0, 0.6) !important;
     backdrop-filter: blur(5px) !important;
@@ -182,9 +195,5 @@ watch(
 .reservation-btn:hover {
     background-color: rgba(0, 0, 0, 0.8) !important;
     color: white !important;
-}
-
-.always-visible {
-    display: block !important;
 }
 </style>
