@@ -1,26 +1,35 @@
 <template>
   <div class="card p-4 mb-5">
-    <h4 class="mb-3">{{ themeParkName }} 구매상품 정보</h4>
+    <h4 class="mb-3">구매상품 정보</h4>
     <div class="table-responsive">
       <table class="table table-bordered">
         <tbody>
           <tr>
             <td class="label-cell">지점</td>
             <td class="content-cell">
-              <span>{{ themeParkName }}</span>
+              <span>{{ themeParkStore.currentThemePark?.name || "알 수 없음" }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">티켓 이름</td>
+            <td class="content-cell">
+              <span>
+                {{ adultTicket?.ticketName || "알 수 없음" }} /
+                {{ childTicket?.ticketName || "알 수 없음" }}
+              </span>
             </td>
           </tr>
           <tr>
             <td class="label-cell">유효기간</td>
             <td class="content-cell">
-              <span
-                >{{ formatDate(adultTicket.validFromDate) }} ~
-                {{ formatDate(adultTicket.validToDate) }}</span
-              >
+              <span>
+                {{ formatDate(adultTicket.validFromDate) }} ~
+                {{ formatDate(adultTicket.validToDate) }}
+              </span>
               <br />
-              <small class="text-muted"
-                >* 유효기간 중 언제든지 사용 가능한 상품입니다.</small
-              >
+              <small class="text-muted">
+                * 유효기간 중 언제든지 사용 가능한 상품입니다.
+              </small>
             </td>
           </tr>
           <tr>
@@ -41,7 +50,8 @@
                       id="adultCount"
                       class="form-control quantity-input"
                       v-model="adultCount"
-                      min="0"
+                      :min="0"
+                      @input="preventNegative(adultCount)"
                     />
                     <button
                       class="btn btn-primary quantity-btn mb-0"
@@ -50,9 +60,9 @@
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
-                  <small class="text-muted price-info"
-                    >대인 / 온라인회원가 {{ adultTicket.price }}원</small
-                  >
+                  <small class="text-muted price-info">
+                    대인 / {{ adultTicket.price }}원
+                  </small>
                 </div>
 
                 <div class="quantity-group">
@@ -69,7 +79,8 @@
                       id="childCount"
                       class="form-control quantity-input"
                       v-model="childCount"
-                      min="0"
+                      :min="0"
+                      @input="preventNegative(childCount)"
                     />
                     <button
                       class="btn btn-primary quantity-btn mb-0"
@@ -78,9 +89,9 @@
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
-                  <small class="text-muted price-info"
-                    >소인 / 온라인회원가 {{ childTicket.price }}원</small
-                  >
+                  <small class="text-muted price-info">
+                    소인 / {{ childTicket.price }}원
+                  </small>
                 </div>
               </div>
             </td>
@@ -98,15 +109,17 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps } from "vue";
+import { ref, computed, defineProps, onMounted, watch } from "vue";
+import { useThemeParkStore } from "@/stores/themeParkStore";
 import dayjs from "dayjs";
 
 const props = defineProps({
   adultTicket: Object,
   childTicket: Object,
-  themeParkName: String,
+  themeParkId: Number,
 });
 
+const themeParkStore = useThemeParkStore();
 const adultCount = ref(0);
 const childCount = ref(0);
 
@@ -120,6 +133,10 @@ const decrementChild = () => {
   if (childCount.value > 0) childCount.value--;
 };
 
+const preventNegative = (count) => {
+  if (count.value < 0) count.value = 0;
+};
+
 const formattedTotalPrice = computed(() => {
   const adultTotal = adultCount.value * (props.adultTicket?.price || 0);
   const childTotal = childCount.value * (props.childTicket?.price || 0);
@@ -129,6 +146,20 @@ const formattedTotalPrice = computed(() => {
 const formatDate = (date) => {
   return dayjs(date).format("YYYY-MM-DD");
 };
+
+onMounted(() => {
+  if (props.themeParkId) {
+    themeParkStore.fetchThemeParkById(props.themeParkId);
+  }
+});
+
+watch(adultCount, (newValue) => {
+  if (newValue < 0) adultCount.value = 0;
+});
+
+watch(childCount, (newValue) => {
+  if (newValue < 0) childCount.value = 0;
+});
 </script>
 
 <style scoped>
@@ -185,10 +216,6 @@ const formatDate = (date) => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.bi {
-  font-size: 24px;
 }
 
 .quantity-input {
