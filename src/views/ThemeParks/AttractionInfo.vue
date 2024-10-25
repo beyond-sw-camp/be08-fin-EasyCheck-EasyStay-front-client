@@ -65,6 +65,9 @@ const router = useRouter();
 const selectedAttraction = ref(null);
 const showModal = ref(false);
 
+console.log("attractionInfo");
+console.log(props.currentThemePark);
+
 onMounted(() => {
   fetchAttractions();
 });

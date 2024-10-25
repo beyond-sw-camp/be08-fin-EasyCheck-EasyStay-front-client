@@ -4,6 +4,7 @@ import apiClient from "@/api";
 export const useThemeParkStore = defineStore("themeparkStore", {
   state: () => ({
     themeParks: [],
+    themePark: null,
     currentThemePark: null,
   }),
 
@@ -47,24 +48,38 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
     async fetchThemeParkById(accommodationId, parkId) {
       try {
-        const cachedThemePark = localStorage.getItem(
-          `themePark_${accommodationId}_${parkId}`
+        // Debug 로그 추가
+        console.log(
+          "fetchThemeParkById 호출: accommodationId =",
+          accommodationId,
+          "parkId =",
+          parkId
         );
-        if (cachedThemePark) {
-          this.currentThemePark = JSON.parse(cachedThemePark);
-        } else {
-          const response = await apiClient.get(
-            `/accommodations/${accommodationId}/parks/${parkId}`
-          );
-          this.currentThemePark = response.data.data;
 
-          localStorage.setItem(
-            `themePark_${accommodationId}_${parkId}`,
-            JSON.stringify(this.currentThemePark)
+        if (!accommodationId || !parkId) {
+          throw new Error(
+            `Invalid parameters: accommodationId = ${accommodationId}, parkId = ${parkId}`
           );
         }
+
+        console.log(
+          "API 호출: /accommodations/",
+          accommodationId,
+          "/parks/",
+          parkId
+        );
+
+        const response = await apiClient.get(
+          `/accommodations/${accommodationId}/parks/${parkId}`
+        );
+        console.log(response.data);
+
+        this.themePark = response.data.data;
       } catch (error) {
-        console.error(`Failed to fetch theme park with id ${parkId}:`, error);
+        console.error(
+          `Failed to fetch theme park with accommodationId ${accommodationId} and parkId ${parkId}:`,
+          error
+        );
       }
     },
 

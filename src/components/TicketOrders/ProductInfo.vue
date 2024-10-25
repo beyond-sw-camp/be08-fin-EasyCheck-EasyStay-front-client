@@ -1,5 +1,5 @@
 <template>
-  <div class="card p-4 mb-5">
+  <div v-if="isLoaded" class="card p-4 mb-5">
     <h4 class="mb-3">구매상품 정보</h4>
     <div class="table-responsive">
       <table class="table table-bordered">
@@ -7,9 +7,7 @@
           <tr>
             <td class="label-cell">지점</td>
             <td class="content-cell">
-              <span>{{
-                themeParkStore.currentThemePark?.name || "알 수 없음"
-              }}</span>
+              <span>{{ themePark?.data?.name || "알 수 없음" }}</span>
             </td>
           </tr>
           <tr>
@@ -25,8 +23,8 @@
             <td class="label-cell">유효기간</td>
             <td class="content-cell">
               <span>
-                {{ formatDate(adultTicket.validFromDate) }} ~
-                {{ formatDate(adultTicket.validToDate) }}
+                {{ formatDate(adultTicket?.validFromDate) }} ~
+                {{ formatDate(adultTicket?.validToDate) }}
               </span>
               <br />
               <small class="text-muted">
@@ -62,7 +60,7 @@
                     </button>
                   </div>
                   <small class="text-muted price-info">
-                    대인 / {{ adultTicket.price }}원
+                    대인 / {{ adultTicket?.price || 0 }}원
                   </small>
                 </div>
 
@@ -90,7 +88,7 @@
                     </button>
                   </div>
                   <small class="text-muted price-info">
-                    소인 / {{ childTicket.price }}원
+                    소인 / {{ childTicket?.price || 0 }}원
                   </small>
                 </div>
               </div>
@@ -109,44 +107,62 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, watch, onMounted } from "vue";
-import { useThemeParkStore } from "@/stores/themeParkStore";
+import { onMounted, computed, ref } from "vue";
+import { useTicketStore } from "@/stores/ticketStore";
 import dayjs from "dayjs";
+import { storeToRefs } from "pinia";
+import { useThemeParkStore } from "@/stores/themeparkStore";
+
+const ticketStore = useTicketStore();
+const { adultTicket, childTicket } = storeToRefs(ticketStore);
+const themeParkStore = useThemeParkStore();
+
+const { themePark } = storeToRefs(themeParkStore);
 
 const props = defineProps({
+  adultTicketId: {
+    type: String,
+    required: true,
+  },
+  childTicketId: {
+    type: String,
+    required: true,
+  },
   themeParkId: {
     type: Number,
     required: true,
-    validator: (value) => {
-      if (typeof value === "string") {
-        return !isNaN(Number(value));
-      }
-      return typeof value === "number";
-    },
-    adultTicket: Object,
-    childTicket: Object,
-    modelValueAdultCount: Number,
-    modelValueChildCount: Number,
   },
 });
 
-const themeParkStore = useThemeParkStore();
+const isLoaded = ref(false);
 
-const localAdultCount = ref(props.modelValueAdultCount || 0);
-const localChildCount = ref(props.modelValueChildCount || 0);
+const formatDate = (date) => {
+  return date ? dayjs(date).format("YYYY-MM-DD") : "알 수 없음";
+};
 
-const emit = defineEmits([
-  "update:modelValueAdultCount",
-  "update:modelValueChildCount",
-]);
+onMounted(async () => {
+  try {
+    if (props.adultTicketId) {
+      await ticketStore.fetchAdultTicket(Number(props.adultTicketId));
+    }
 
-watch(localAdultCount, (newVal) => {
-  emit("update:modelValueAdultCount", newVal);
+    if (props.childTicketId) {
+      await ticketStore.fetchChildTicket(Number(props.childTicketId));
+    }
+    console.log(props.themeParkId);
+
+    if (props.themeParkId) {
+      await themeParkStore.fetchThemeParkById(Number(props.themeParkId));
+    }
+
+    isLoaded.value = true;
+  } catch (error) {
+    console.error("데이터 로드 중 오류 발생:", error);
+  }
 });
 
-watch(localChildCount, (newVal) => {
-  emit("update:modelValueChildCount", newVal);
-});
+const localAdultCount = ref(0);
+const localChildCount = ref(0);
 
 const incrementAdult = () => localAdultCount.value++;
 const decrementAdult = () => {
@@ -159,19 +175,9 @@ const decrementChild = () => {
 };
 
 const formattedTotalPrice = computed(() => {
-  const adultTotal = localAdultCount.value * (props.adultTicket?.price || 0);
-  const childTotal = localChildCount.value * (props.childTicket?.price || 0);
+  const adultTotal = localAdultCount.value * (adultTicket.value?.price || 0);
+  const childTotal = localChildCount.value * (childTicket.value?.price || 0);
   return `₩ ${(adultTotal + childTotal).toLocaleString()}`;
-});
-
-const formatDate = (date) => {
-  return dayjs(date).format("YYYY-MM-DD");
-};
-
-onMounted(() => {
-  if (props.themeParkId) {
-    themeParkStore.fetchThemeParkById(props.themeParkId);
-  }
 });
 </script>
 

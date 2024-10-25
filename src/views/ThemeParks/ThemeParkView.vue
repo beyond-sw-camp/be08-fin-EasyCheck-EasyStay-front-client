@@ -1,6 +1,6 @@
 <template>
   <NavbarDefault :sticky="true" />
-  <MainImage v-if="currentThemePark" :themePark="currentThemePark" />
+  <MainImage v-if="themePark != null" :themePark="themePark" />
 
   <section class="accommodation-tabs px-8 pt-4" v-if="accommodations.length">
     <div class="container">
@@ -43,18 +43,14 @@
               class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs"
               role="tablist"
             >
-              <li
-                class="nav-item"
-                v-for="themePark in themeParks"
-                :key="themePark.id"
-              >
+              <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
                 <button
                   class="nav-link px-4 py-2"
-                  :class="{ active: currentThemeParkId === themePark.id }"
-                  @click="changeThemePark(themePark.id)"
+                  :class="{ active: tab.id === themePark.id }"
+                  @click="changeThemePark(tab.id)"
                   role="tab"
                 >
-                  {{ themePark.name }}
+                  {{ tab.name }}
                 </button>
               </li>
             </ul>
@@ -67,15 +63,15 @@
   <div class="container-fluid px-8">
     <div class="section-divider"></div>
     <AttractionInfo
-      v-if="currentThemePark"
-      :themeParkId="Number(currentThemePark.id)"
-      :currentThemePark="currentThemePark"
+      v-if="themePark != null"
+      :themeParkId="Number(themePark.id)"
+      :currentThemePark="themePark"
     />
   </div>
 
   <div
     class="container-fluid d-flex justify-content-center my-5"
-    v-if="currentThemePark?.ticketAvailable"
+    v-if="themePark?.ticketAvailable"
   >
     <MaterialButton
       color="danger"
@@ -84,21 +80,22 @@
       @click="goToTicketSelectionView"
       class="mx-3"
     >
-      {{ currentThemePark.name }} 이용권 구매하기
+      {{ themePark.name }} 이용권 구매하기
     </MaterialButton>
   </div>
 
   <div class="section-divider my-4"></div>
   <NoticeInfo
-    v-if="currentThemePark"
+    v-if="themePark != null"
     class="px-8"
-    :themeParkName="currentThemePark.name"
+    :themeParkName="themePark.name"
   />
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, defineProps } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -107,51 +104,65 @@ import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
-const props = defineProps({
-  themeParkId: {
-    type: [String, Number],
-    required: false,
-  },
-  accommodationId: {
-    type: [String, Number],
-    required: true,
-  },
-});
-
-const accommodations = ref([]);
-const themeParks = ref([]);
-
+// pinia 스토어
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
-const router = useRouter();
 
-const currentAccommodationId = ref(Number(props.accommodationId) || 1);
-const currentThemeParkId = ref(Number(props.themeParkId) || null);
+// 라우터 객체
+const router = useRouter();
+const route = useRoute();
+
+// 현재 선택한 숙박시설 식별자
+const currentAccommodationId = ref(Number(route.query.accommodationId));
+// 현재 선택한 테마파크 식별자
+const currentThemeParkId = ref(Number(route.query.currentThemeParkId) || null);
+
+onMounted(async () => {
+  // 모든 숙박시설 조회
+  await accommodationStore.fetchResortAccommodations();
+
+  await fetchThemeParksData();
+  // handleInitialThemeParkSelection();
+});
+
+// pinia 스토어에서 fetch 받은 accommodations 받아오기
+const { accommodations } = storeToRefs(accommodationStore);
+const { themeParks, themePark } = storeToRefs(themeParkStore);
+
+console.log(themePark);
 
 const fetchThemeParksData = async () => {
   await themeParkStore.fetchThemeParks(currentAccommodationId.value);
-  themeParks.value = themeParkStore.themeParks || [];
 
   if (!currentThemeParkId.value && themeParks.value.length > 0) {
-    currentThemeParkId.value = themeParks.value[0].id;
+    currentThemeParkId.value = themeParks[0].id;
     themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
   }
 };
 
-onMounted(async () => {
-  await accommodationStore.fetchResortAccommodations();
-  accommodations.value = accommodationStore.accommodations || [];
-
-  await fetchThemeParksData();
-  handleInitialThemeParkSelection();
-});
-
+// accommodationId가 바뀌는 경우
+// accommodation fetch
 watch(
-  () => [props.accommodationId, props.themeParkId],
-  async () => {
-    currentAccommodationId.value = Number(props.accommodationId);
-    currentThemeParkId.value = Number(props.themeParkId) || null;
-    await fetchThemeParksData();
+  () => route.query.accommodationId,
+  async (newAccommodationId) => {
+    currentAccommodationId.value = Number(newAccommodationId);
+    await accommodationStore.fetchAccommodationById(newAccommodationId);
+  },
+  { immediate: true }
+);
+
+// themeParkId 변경될 경우
+// 다시 해당 테마파크 정보 fetch
+watch(
+  () => route.query.themeParkId,
+  (newThemeParkId) => {
+    console.log("watch");
+
+    currentThemeParkId.value = Number(newThemeParkId) || null;
+    themeParkStore.fetchThemeParkById(
+      route.query.accommodationId,
+      newThemeParkId
+    );
   },
   { immediate: true }
 );
@@ -172,57 +183,34 @@ const currentThemePark = computed(() => {
   );
 });
 
-const changeAccommodation = async (accommodationId) => {
-  currentAccommodationId.value = accommodationId;
-  await fetchThemeParksData();
-
-  if (themeParks.value.length > 0) {
-    currentThemeParkId.value = themeParks.value[0].id;
-    themeParkStore.setCurrentThemeParkById(currentThemeParkId.value);
-  }
-
+// 숙박 시설 변경
+const changeAccommodation = async (accommodationId) =>
   router.push({
     name: "ThemePark",
-    params: {
+    query: {
+      ...route.query,
       accommodationId: accommodationId,
-      themeParkId: currentThemeParkId.value,
     },
   });
-};
 
-const changeThemePark = (themeParkId) => {
-  if (themeParks.value.some((park) => park.id === themeParkId)) {
-    currentThemeParkId.value = themeParkId;
-    themeParkStore.setCurrentThemeParkById(themeParkId);
+// 테마파크 변경
+const changeThemePark = (themeParkId) =>
+  router.push({
+    name: "ThemePark",
+    query: {
+      ...route.query,
+      themeParkId: themeParkId,
+    },
+  });
 
-    router.push({
-      name: "ThemePark",
-      params: {
-        accommodationId: currentAccommodationId.value,
-        themeParkId: themeParkId,
-      },
-    });
-  } else {
-    console.error("Invalid theme park id");
-  }
-};
-
-const goToTicketSelectionView = () => {
-  // accommodationId 값을 콘솔 로그로 확인
-  console.log("Accommodation ID:", props.accommodationId);
-
-  if (currentThemePark.value) {
-    router.push({
-      name: "TicketSelection",
-      params: {
-        themeParkId: Number(currentThemePark.value.id),
-        accommodationId: Number(props.accommodationId),
-      },
-    });
-  } else {
-    console.error("Invalid theme park data not available.");
-  }
-};
+const goToTicketSelectionView = () =>
+  router.push({
+    name: "TicketSelection",
+    query: {
+      themeParkId: route.query.themeParkId,
+      accommodationId: route.query.accommodationId,
+    },
+  });
 </script>
 
 <style scoped>

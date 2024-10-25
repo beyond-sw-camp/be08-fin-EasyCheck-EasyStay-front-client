@@ -200,33 +200,25 @@ const router = createRouter({
       }),
     },
     {
-      path: "/:accommodationId/themepark/:themeParkId?",
+      path: "/themepark",
       name: "ThemePark",
       component: ThemeParkView,
-      props: (route) => ({
-        themeParkId: parseInt(route.params.themeParkId, 10) || null,
-        accommodationId: parseInt(route.params.accommodationId, 10) || 1,
-      }),
     },
     {
-      path: "/themepark/error",
-      name: "ThemeParkErrorPage",
-      component: ThemeParkErrorPage,
-    },
-    {
-      path: "/:accommodationId/themepark/:themeParkId/tickets",
+      path: "/themepark/tickets",
       name: "TicketSelection",
       component: TicketSelectionView,
-      props: (route) => ({
-        accommodationId: Number(route.params.accommodationId),
-        themeParkId: Number(route.params.themeParkId),
-      }),
     },
     {
       path: "/ticketorder",
       name: "TicketOrderView",
       component: TicketOrderView,
       props: true,
+    },
+    {
+      path: "/themepark/error",
+      name: "ThemeParkErrorPage",
+      component: ThemeParkErrorPage,
     },
     {
       path: "/usageguide/:guidePageName",
@@ -369,7 +361,7 @@ const router = createRouter({
       component: NoticeDetail,
     },
   ],
- });
+});
 
 router.beforeEach((to, from, next) => {
   if (to.name === "TicketOrderView") {

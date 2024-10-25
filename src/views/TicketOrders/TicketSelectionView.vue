@@ -18,7 +18,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.adultTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.adultTicket.price) }}원
                   (회원가)
                 </span>
@@ -28,7 +28,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.childTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.childTicket.price) }}원
                   (회원가)
                 </span>
@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, onMounted, computed, defineProps } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useThemeParkStore } from "@/stores/themeParkStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -84,7 +84,17 @@ const currentThemeParkName = computed(() => {
   );
 });
 
+const checkLoginStatus = () => {
+  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+};
+
 onMounted(async () => {
+  // 로그인 상태 체크
+  checkLoginStatus();
+
+  // localStorage 내용을 확인하기 위해 콘솔로그 추가
+  console.log("현재 localStorage 상태:", localStorage);
+
   const storedThemeParkName = localStorage.getItem("currentThemeParkName");
 
   if (!storedThemeParkName) {
@@ -113,8 +123,6 @@ onMounted(async () => {
   } else {
     console.error("Tickets data is missing or invalid.");
   }
-
-  checkLoginStatus();
 });
 
 const getDiscountedPrice = (price) => {
@@ -126,6 +134,10 @@ const handlePurchase = (ticketGroup) => {
   const themeParkId = Number(ticketGroup.themeParkId);
   const accommodationId = Number(props.accommodationId);
 
+  // localStorage에 저장하기 전에 로그 추가
+  console.log("themeParkId를 localStorage에 저장:", themeParkId);
+  console.log("accommodationId를 localStorage에 저장:", accommodationId);
+
   if (!isLoggedIn.value) {
     router.push({ path: "/users/login" });
   } else {
@@ -136,16 +148,8 @@ const handlePurchase = (ticketGroup) => {
 
     router.push({
       name: "TicketOrderView",
-      query: {
-        themeParkId: themeParkId,
-        accommodationId: accommodationId,
-      },
     });
   }
-
-  const checkLoginStatus = () => {
-    isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
-  };
 };
 </script>
 

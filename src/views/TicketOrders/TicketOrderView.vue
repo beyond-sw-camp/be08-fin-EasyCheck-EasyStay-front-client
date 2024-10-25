@@ -6,11 +6,13 @@
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
+    <!-- adultTicketId와 childTicketId를 직접 ProductInfo로 전달 -->
     <ProductInfo
-      v-if="isDataValid"
+      v-if="isDataValid && adultTicketId && childTicketId"
       class="mb-4"
-      :adultTicket="adultTicket"
-      :childTicket="childTicket"
+      :adultTicketId="adultTicketId"
+      :childTicketId="childTicketId"
+      :accommodationId="accommodationId"
       :themeParkId="themeParkId"
       v-model:adultCount="adultCount"
       v-model:childCount="childCount"
@@ -55,7 +57,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeParkStore";
-import { useTicketStore } from "@/stores/ticketStore";
 import ProductInfo from "@/components/TicketOrders/ProductInfo.vue";
 import BuyerInfo from "@/components/TicketOrders/BuyerInfo.vue";
 import UsageInfo from "@/components/TicketOrders/UsageInfo.vue";
@@ -64,34 +65,15 @@ import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
 const router = useRouter();
 const themeParkStore = useThemeParkStore();
-const ticketStore = useTicketStore();
 
-const adultTicket = ref({});
-const childTicket = ref({});
+// localStorage에서 adultTicketId, childTicketId, accommodationId 가져오기
+const adultTicketId = ref(localStorage.getItem("selectedAdultTicketId"));
+const childTicketId = ref(localStorage.getItem("selectedChildTicketId"));
 const themeParkId = ref(Number(localStorage.getItem("selectedThemeParkId")));
+const accommodationId = ref(
+  Number(localStorage.getItem("selectedAccommodationId"))
+); // 추가됨
 const isDataValid = ref(true);
-
-const loadTicketsFromLocalStorage = async () => {
-  const adultTicketId = localStorage.getItem("selectedAdultTicketId");
-  const childTicketId = localStorage.getItem("selectedChildTicketId");
-
-  try {
-    if (adultTicketId) {
-      adultTicket.value = await ticketStore.fetchTicketById(
-        Number(adultTicketId)
-      );
-    }
-
-    if (childTicketId) {
-      childTicket.value = await ticketStore.fetchTicketById(
-        Number(childTicketId)
-      );
-    }
-  } catch (error) {
-    console.error("티켓 정보를 불러오는 중 오류가 발생했습니다:", error);
-    isDataValid.value = false;
-  }
-};
 
 const buyerName = ref("");
 const buyerPhone = ref("");
@@ -106,16 +88,16 @@ const childCount = ref(0);
 const isModalOpen = ref(false);
 const modalType = ref("");
 
+// 테마파크 이름을 로드
 const loadThemeParkName = async () => {
   try {
     if (themeParkId.value) {
-      await themeParkStore.fetchThemeParkById(Number(themeParkId.value));
+      await themeParkStore.fetchThemeParkById(
+        accommodationId.value,
+        themeParkId.value
+      );
 
-      if (
-        !themeParkStore.currentThemePark?.name ||
-        !adultTicket.value.price ||
-        !childTicket.value.price
-      ) {
+      if (!themeParkStore.currentThemePark?.name) {
         isDataValid.value = false;
       }
     } else {
@@ -128,8 +110,19 @@ const loadThemeParkName = async () => {
 };
 
 onMounted(async () => {
-  await loadTicketsFromLocalStorage();
-  await loadThemeParkName();
+  try {
+    console.log(
+      "TicketOrderView에서 accommodationId 확인:",
+      accommodationId.value
+    );
+    console.log("TicketOrderView에서 themeParkId 확인:", themeParkId.value);
+
+    await loadThemeParkName();
+    isDataValid.value = adultTicketId.value && childTicketId.value;
+  } catch (error) {
+    console.error("데이터 로드 중 오류 발생:", error);
+    isDataValid.value = false;
+  }
 });
 
 const isFormValid = computed(() => {
@@ -149,14 +142,7 @@ const handleCancel = () => {
 const handleSubmit = async () => {
   if (isFormValid.value) {
     try {
-      const reservationId = `RES${new Date().getTime()}`;
-      const totalPrice =
-        (adultTicket.value.price || 0) * adultCount.value +
-        (childTicket.value.price || 0) * childCount.value;
-      router.push({
-        name: "TicketPayment",
-        params: { reservationId, totalPrice },
-      });
+      // 구매하기 로직 추가
     } catch (error) {
       console.error("주문 및 결제 처리 중 오류 발생:", error);
     }

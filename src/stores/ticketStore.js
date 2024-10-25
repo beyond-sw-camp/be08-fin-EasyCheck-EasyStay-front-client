@@ -4,12 +4,16 @@ import apiClient from "@/api";
 export const useTicketStore = defineStore("ticketStore", {
   state: () => ({
     tickets: [],
-    currentTicket: null,
+    adultTicket: null,
+    childTicket: null,
+    themePark: null,
   }),
 
   getters: {
     allTickets: (state) => state.tickets,
-    currentTicketDetails: (state) => state.currentTicket,
+    currentAdultTicket: (state) => state.adultTicket,
+    currentChildTicket: (state) => state.childTicket,
+    currentThemePark: (state) => state.themePark,
   },
 
   actions: {
@@ -22,23 +26,39 @@ export const useTicketStore = defineStore("ticketStore", {
       }
     },
 
-    async fetchTicketById(ticketId) {
+    async fetchAdultTicket(adultTicketId) {
       try {
-        const response = await apiClient.get(`/parks/${ticketId}`);
-        this.ticketDetails = response.data.data;
-        return this.ticketDetails;
+        const response = await apiClient.get(`/parks/${adultTicketId}`);
+        this.adultTicket = response.data.data;
       } catch (error) {
-        console.error(`Failed to fetch ticket with id ${ticketId}:`, error);
-        return null;
+        console.error(
+          `Failed to fetch adult ticket with id ${adultTicketId}:`,
+          error
+        );
       }
     },
 
-    setCurrentTicketById(ticketId) {
-      const ticket = this.tickets.find((ticket) => ticket.id === ticketId);
-      if (ticket) {
-        this.currentTicket = ticket;
-      } else {
-        console.error("Invalid ticket id");
+    async fetchChildTicket(childTicketId) {
+      try {
+        const response = await apiClient.get(`/parks/${childTicketId}`);
+        this.childTicket = response.data.data;
+      } catch (error) {
+        console.error(
+          `Failed to fetch child ticket with id ${childTicketId}:`,
+          error
+        );
+      }
+    },
+
+    async fetchThemePark(themeParkId) {
+      try {
+        const response = await apiClient.get(`/parks/${themeParkId}`);
+        this.themePark = response.data.data;
+      } catch (error) {
+        console.error(
+          `Failed to fetch theme park with id ${themeParkId}:`,
+          error
+        );
       }
     },
 

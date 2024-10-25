@@ -2,7 +2,7 @@
   <div class="modal-backdrop" @click.self="closeModal">
     <div class="modal-content">
       <button class="close-btn" @click="closeModal">&times;</button>
-      <h2>{{ type }} 개인정보 수집 및 이용동의</h2>
+      <h3 class="pb-3">{{ type }} 개인정보 수집 및 이용동의</h3>
       <p v-if="type === '필수'">
         1. 개인정보의 수집·이용 목적<br />
         - 테마파크 예약 및 재방문 서비스 제공<br /><br />
