@@ -15,15 +15,30 @@ export const useThemeParkStore = defineStore("themeparkStore", {
   actions: {
     async fetchThemeParks(accommodationId) {
       try {
-        const response = await apiClient.get(
-          `/accommodations/${accommodationId}/parks`
+        const cachedThemeParks = localStorage.getItem(
+          `themeParks_${accommodationId}`
         );
-        this.themeParks = response.data.data;
-
-        if (this.themeParks.length > 0) {
-          this.currentThemePark = this.themeParks[0];
+        if (cachedThemeParks) {
+          this.themeParks = JSON.parse(cachedThemeParks);
+          if (this.themeParks.length > 0) {
+            this.currentThemePark = this.themeParks[0];
+          }
         } else {
-          this.currentThemePark = null;
+          const response = await apiClient.get(
+            `/accommodations/${accommodationId}/parks`
+          );
+          this.themeParks = response.data.data;
+
+          if (this.themeParks.length > 0) {
+            this.currentThemePark = this.themeParks[0];
+          } else {
+            this.currentThemePark = null;
+          }
+
+          localStorage.setItem(
+            `themeParks_${accommodationId}`,
+            JSON.stringify(this.themeParks)
+          );
         }
       } catch (error) {
         console.error("Failed to fetch theme parks:", error);
@@ -32,10 +47,22 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
     async fetchThemeParkById(accommodationId, parkId) {
       try {
-        const response = await apiClient.get(
-          `/accommodations/${accommodationId}/parks/${parkId}`
+        const cachedThemePark = localStorage.getItem(
+          `themePark_${accommodationId}_${parkId}`
         );
-        this.currentThemePark = response.data;
+        if (cachedThemePark) {
+          this.currentThemePark = JSON.parse(cachedThemePark);
+        } else {
+          const response = await apiClient.get(
+            `/accommodations/${accommodationId}/parks/${parkId}`
+          );
+          this.currentThemePark = response.data.data;
+
+          localStorage.setItem(
+            `themePark_${accommodationId}_${parkId}`,
+            JSON.stringify(this.currentThemePark)
+          );
+        }
       } catch (error) {
         console.error(`Failed to fetch theme park with id ${parkId}:`, error);
       }
@@ -49,6 +76,10 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
       if (park) {
         this.currentThemePark = park;
+        localStorage.setItem(
+          `themePark_${park.accommodationId}_${parkId}`,
+          JSON.stringify(park)
+        );
       } else {
         console.error(`Invalid theme park id: ${numericParkId}`);
       }
@@ -62,11 +93,18 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
     async fetchAndSetFirstThemePark(accommodationId) {
       await this.fetchThemeParks(accommodationId);
-      
+
       if (this.themeParks.length > 0) {
         const firstParkId = this.themeParks[0].id;
         this.setCurrentThemeParkById(firstParkId);
       }
+    },
+
+    clearCache(accommodationId, parkId) {
+      localStorage.removeItem(`themeParks_${accommodationId}`);
+      localStorage.removeItem(`themePark_${accommodationId}_${parkId}`);
+      this.themeParks = [];
+      this.currentThemePark = null;
     },
   },
 });
