@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
+import dayjs from "dayjs";
 
 export const useTicketStore = defineStore("ticketStore", {
   state: () => ({
@@ -10,6 +11,15 @@ export const useTicketStore = defineStore("ticketStore", {
   }),
 
   getters: {
+    validTickets: (state) => {
+      state.tickets.filter((ticket) => {
+        const today = dayjs();
+
+        const saleStart = dayjs(ticket.saleStartDate);
+        const saleEnd = dayjs(ticket.saleEndDate);
+        return today.isAfter(saleStart) && today.isBefore(saleEnd);
+      });
+    },
     allTickets: (state) => state.tickets,
     currentAdultTicket: (state) => state.adultTicket,
     currentChildTicket: (state) => state.childTicket,

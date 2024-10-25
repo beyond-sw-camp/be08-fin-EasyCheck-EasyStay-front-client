@@ -1,7 +1,9 @@
 <template>
   <NavbarDefault :sticky="true" />
   <div class="ticket-selection container my-5">
-    <h2 class="mb-4">{{ currentThemeParkName || "알 수 없음" }} 이용권 선택</h2>
+    <h2 v-if="accommodation" class="mb-4">
+      {{ accommodation.name || "알 수 없음" }} 이용권 선택
+    </h2>
     <div class="ticket-list row">
       <div
         v-for="ticketGroup in groupedTickets"
@@ -51,29 +53,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { ref, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
+import { useAccommodationStore } from "@/stores/accommodationStore";
 import { useThemeParkStore } from "@/stores/themeParkStore";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import dayjs from "dayjs";
 
-const props = defineProps({
-  accommodationId: {
-    type: Number,
-    required: true,
-  },
-  themeParkId: {
-    type: Number,
-    required: true,
-  },
-});
-
+const route = useRoute();
 const router = useRouter();
 const groupedTickets = ref([]);
+
 const ticketStore = useTicketStore();
 const themeParkStore = useThemeParkStore();
+const accmomodationStore = useAccommodationStore();
 const isLoggedIn = ref(false);
+
+const themeParkId = computed(() => route.query.themeParkId);
+const accommodationId = computed(() => route.query.accommodationId);
+
+const { accommodation } = storeToRefs(accmomodationStore);
+
+onMounted(async () => {
+  await accmomodationStore.fetchAccommodationById(accommodationId.value);
+  await themeParkStore.fetchThemeParkById(
+    accommodationId.value,
+    themeParkId.value
+  );
+  await ticketStore.fetchTickets(themeParkId.value);
+});
 
 const currentThemeParkName = computed(() => {
   const themeParkName = themeParkStore.currentThemePark?.name;
@@ -92,24 +102,7 @@ onMounted(async () => {
   // 로그인 상태 체크
   checkLoginStatus();
 
-  // localStorage 내용을 확인하기 위해 콘솔로그 추가
-  console.log("현재 localStorage 상태:", localStorage);
-
-  const storedThemeParkName = localStorage.getItem("currentThemeParkName");
-
-  if (!storedThemeParkName) {
-    await themeParkStore.fetchThemeParkById(
-      props.accommodationId,
-      props.themeParkId
-    );
-    const fetchedName = themeParkStore.currentThemePark?.name;
-
-    if (fetchedName) {
-      localStorage.setItem("currentThemeParkName", fetchedName);
-    }
-  }
-
-  await ticketStore.fetchTickets(props.themeParkId);
+  await ticketStore.fetchTickets(themeParkId.value);
 
   if (ticketStore.tickets && ticketStore.tickets.data) {
     const today = dayjs();
@@ -132,7 +125,7 @@ const getDiscountedPrice = (price) => {
 
 const handlePurchase = (ticketGroup) => {
   const themeParkId = Number(ticketGroup.themeParkId);
-  const accommodationId = Number(props.accommodationId);
+  const accommodationId = Number(accommodationId.value);
 
   // localStorage에 저장하기 전에 로그 추가
   console.log("themeParkId를 localStorage에 저장:", themeParkId);
