@@ -7,7 +7,9 @@
           <tr>
             <td class="label-cell">지점</td>
             <td class="content-cell">
-              <span>{{ themeParkStore.currentThemePark?.name || "알 수 없음" }}</span>
+              <span>{{
+                themeParkStore.currentThemePark?.name || "알 수 없음"
+              }}</span>
             </td>
           </tr>
           <tr>
@@ -49,9 +51,8 @@
                       type="number"
                       id="adultCount"
                       class="form-control quantity-input"
-                      v-model="adultCount"
-                      :min="0"
-                      @input="preventNegative(adultCount)"
+                      v-model="localAdultCount"
+                      min="0"
                     />
                     <button
                       class="btn btn-primary quantity-btn mb-0"
@@ -78,9 +79,8 @@
                       type="number"
                       id="childCount"
                       class="form-control quantity-input"
-                      v-model="childCount"
-                      :min="0"
-                      @input="preventNegative(childCount)"
+                      v-model="localChildCount"
+                      min="0"
                     />
                     <button
                       class="btn btn-primary quantity-btn mb-0"
@@ -109,37 +109,58 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, onMounted, watch } from "vue";
+import { ref, computed, defineProps, watch, onMounted } from "vue";
 import { useThemeParkStore } from "@/stores/themeParkStore";
 import dayjs from "dayjs";
 
 const props = defineProps({
-  adultTicket: Object,
-  childTicket: Object,
-  themeParkId: Number,
+  themeParkId: {
+    type: Number,
+    required: true,
+    validator: (value) => {
+      if (typeof value === "string") {
+        return !isNaN(Number(value));
+      }
+      return typeof value === "number";
+    },
+    adultTicket: Object,
+    childTicket: Object,
+    modelValueAdultCount: Number,
+    modelValueChildCount: Number,
+  },
 });
 
 const themeParkStore = useThemeParkStore();
-const adultCount = ref(0);
-const childCount = ref(0);
 
-const incrementAdult = () => adultCount.value++;
+const localAdultCount = ref(props.modelValueAdultCount || 0);
+const localChildCount = ref(props.modelValueChildCount || 0);
+
+const emit = defineEmits([
+  "update:modelValueAdultCount",
+  "update:modelValueChildCount",
+]);
+
+watch(localAdultCount, (newVal) => {
+  emit("update:modelValueAdultCount", newVal);
+});
+
+watch(localChildCount, (newVal) => {
+  emit("update:modelValueChildCount", newVal);
+});
+
+const incrementAdult = () => localAdultCount.value++;
 const decrementAdult = () => {
-  if (adultCount.value > 0) adultCount.value--;
+  if (localAdultCount.value > 0) localAdultCount.value--;
 };
 
-const incrementChild = () => childCount.value++;
+const incrementChild = () => localChildCount.value++;
 const decrementChild = () => {
-  if (childCount.value > 0) childCount.value--;
-};
-
-const preventNegative = (count) => {
-  if (count.value < 0) count.value = 0;
+  if (localChildCount.value > 0) localChildCount.value--;
 };
 
 const formattedTotalPrice = computed(() => {
-  const adultTotal = adultCount.value * (props.adultTicket?.price || 0);
-  const childTotal = childCount.value * (props.childTicket?.price || 0);
+  const adultTotal = localAdultCount.value * (props.adultTicket?.price || 0);
+  const childTotal = localChildCount.value * (props.childTicket?.price || 0);
   return `₩ ${(adultTotal + childTotal).toLocaleString()}`;
 });
 
@@ -151,14 +172,6 @@ onMounted(() => {
   if (props.themeParkId) {
     themeParkStore.fetchThemeParkById(props.themeParkId);
   }
-});
-
-watch(adultCount, (newValue) => {
-  if (newValue < 0) adultCount.value = 0;
-});
-
-watch(childCount, (newValue) => {
-  if (newValue < 0) childCount.value = 0;
 });
 </script>
 

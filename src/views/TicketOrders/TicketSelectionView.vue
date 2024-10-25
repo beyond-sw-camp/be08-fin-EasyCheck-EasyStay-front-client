@@ -124,24 +124,28 @@ const getDiscountedPrice = (price) => {
 
 const handlePurchase = (ticketGroup) => {
   const themeParkId = Number(ticketGroup.themeParkId);
+  const accommodationId = Number(props.accommodationId);
 
   if (!isLoggedIn.value) {
     router.push({ path: "/users/login" });
   } else {
+    localStorage.setItem("selectedAdultTicketId", ticketGroup.adultTicket.id);
+    localStorage.setItem("selectedChildTicketId", ticketGroup.childTicket.id);
+    localStorage.setItem("selectedThemeParkId", themeParkId);
+    localStorage.setItem("selectedAccommodationId", accommodationId);
+
     router.push({
       name: "TicketOrderView",
-      params: {
-        adultTicket: JSON.stringify(ticketGroup.adultTicket),
-        childTicket: JSON.stringify(ticketGroup.childTicket),
+      query: {
         themeParkId: themeParkId,
-        accommodationId: props.accommodationId,
+        accommodationId: accommodationId,
       },
     });
   }
-};
 
-const checkLoginStatus = () => {
-  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+  const checkLoginStatus = () => {
+    isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+  };
 };
 </script>
 
@@ -159,11 +163,6 @@ const checkLoginStatus = () => {
 
 .ticket-card:hover {
   transform: scale(1.05);
-}
-
-.card-img-top {
-  height: 200px;
-  object-fit: cover;
 }
 
 .card-prices {

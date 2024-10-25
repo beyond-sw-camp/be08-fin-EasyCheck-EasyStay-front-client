@@ -80,7 +80,12 @@ const props = defineProps({
   isLoggedIn: Boolean,
 });
 
-const emit = defineEmits(["update:buyerName", "update:buyerPhone", "update:buyerEmail", "update:buyerEmailDomain"]);
+const emit = defineEmits([
+  "update:buyerName",
+  "update:buyerPhone",
+  "update:buyerEmail",
+  "update:buyerEmailDomain",
+]);
 
 const buyerName = ref(props.buyerName);
 const buyerPhone = ref(props.buyerPhone);

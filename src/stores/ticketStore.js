@@ -15,21 +15,21 @@ export const useTicketStore = defineStore("ticketStore", {
   actions: {
     async fetchTickets(themeParkId) {
       try {
-        const response = await apiClient.get(`parks/${themeParkId}/tickets`);
+        const response = await apiClient.get(`/parks/${themeParkId}/tickets`);
         this.tickets = response.data;
       } catch (error) {
         console.error("Failed to fetch tickets:", error);
       }
     },
 
-    async fetchTicket(themeParkId, ticketId) {
+    async fetchTicketById(ticketId) {
       try {
-        const response = await apiClient.get(
-          `parks/${themeParkId}/tickets/${ticketId}`
-        );
-        this.currentTicket = response.data;
+        const response = await apiClient.get(`/parks/${ticketId}`);
+        this.ticketDetails = response.data.data;
+        return this.ticketDetails;
       } catch (error) {
         console.error(`Failed to fetch ticket with id ${ticketId}:`, error);
+        return null;
       }
     },
 
