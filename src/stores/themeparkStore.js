@@ -10,6 +10,7 @@ export const useThemeParkStore = defineStore("themeparkStore", {
   getters: {
     allThemeParks: (state) => state.themeParks,
     currentThemeParkDetails: (state) => state.currentThemePark,
+    themeParkId: (state) => state.themePark.id,
   },
 
   actions: {
@@ -65,45 +66,6 @@ export const useThemeParkStore = defineStore("themeparkStore", {
           error
         );
       }
-    },
-
-    setCurrentThemeParkById(parkId) {
-      const numericParkId = Number(parkId);
-      const park = this.themeParks.find(
-        (park) => Number(park.id) === numericParkId
-      );
-
-      if (park) {
-        this.currentThemePark = park;
-        localStorage.setItem(
-          `themePark_${park.accommodationId}_${parkId}`,
-          JSON.stringify(park)
-        );
-      } else {
-        console.error(`Invalid theme park id: ${numericParkId}`);
-      }
-    },
-
-    ensureCurrentThemePark(parkId) {
-      if (!this.currentThemePark || this.currentThemePark.id !== parkId) {
-        this.setCurrentThemeParkById(parkId);
-      }
-    },
-
-    async fetchAndSetFirstThemePark(accommodationId) {
-      await this.fetchThemeParks(accommodationId);
-
-      if (this.themeParks.length > 0) {
-        const firstParkId = this.themeParks[0].id;
-        this.setCurrentThemeParkById(firstParkId);
-      }
-    },
-
-    clearCache(accommodationId, parkId) {
-      localStorage.removeItem(`themeParks_${accommodationId}`);
-      localStorage.removeItem(`themePark_${accommodationId}_${parkId}`);
-      this.themeParks = [];
-      this.currentThemePark = null;
     },
   },
 });
