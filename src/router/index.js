@@ -25,6 +25,7 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+import ThemeParkInfo from "@/views/ThemeParks/ThemeParkInfo.vue";
 import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
@@ -199,21 +200,38 @@ const router = createRouter({
         accommodationId: route.query.accommodationId || 1,
       }),
     },
+    // 테마파크 라우팅
     {
       path: "/themepark",
       name: "ThemePark",
       component: ThemeParkView,
-    },
-    {
-      path: "/themepark/tickets",
-      name: "TicketSelection",
-      component: TicketSelectionView,
-    },
-    {
-      path: "/ticketorder",
-      name: "TicketOrderView",
-      component: TicketOrderView,
-      props: true,
+      redirect: { name: "ThemeParkInfo" },
+      children: [
+        {
+          path: "",
+          component: ThemeParkInfo,
+          name: "ThemeParkInfo",
+        },
+        {
+          path: "tickets",
+          name: "TicketSelection",
+          component: TicketSelectionView,
+        },
+        {
+          path: "order",
+          name: "TicketOrder",
+          component: TicketOrderView,
+          beforeEnter: (to, from, next) => {
+            // 새로고침이나 직접 URL 접근인 경우
+            if (from.name === undefined) {
+              console.log("새로고침 시도");
+
+              return next({ name: "ThemeParkInfo" });
+            }
+            return next();
+          },
+        },
+      ],
     },
     {
       path: "/themepark/error",

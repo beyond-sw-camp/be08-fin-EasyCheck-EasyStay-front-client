@@ -1,5 +1,4 @@
 <template>
-  <NavbarDefault :sticky="true" />
   <div class="ticket-selection container my-5">
     <h2 v-if="accommodation" class="mb-4">
       {{ accommodation.name || "알 수 없음" }} 이용권 선택
@@ -54,68 +53,32 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
-import { useThemeParkStore } from "@/stores/themeParkStore";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-import dayjs from "dayjs";
+import { userLoginStore } from "@/stores/loginStore";
 
+// 라우팅
 const route = useRoute();
 const router = useRouter();
-const groupedTickets = ref([]);
 
+// pinia 스토어
+const authStore = userLoginStore();
 const ticketStore = useTicketStore();
-const themeParkStore = useThemeParkStore();
+
 const accmomodationStore = useAccommodationStore();
-const isLoggedIn = ref(false);
 
-const themeParkId = computed(() => route.query.themeParkId);
-const accommodationId = computed(() => route.query.accommodationId);
-
+// pina state, getters
+const { isLoggedIn } = storeToRefs(authStore);
+const { groupedTickets } = storeToRefs(ticketStore);
 const { accommodation } = storeToRefs(accmomodationStore);
 
+const themeParkId = computed(() => route.query.themeParkId);
+
+// 숙박시설, 테마파크, 티켓 정보 조회하기
 onMounted(async () => {
-  await accmomodationStore.fetchAccommodationById(accommodationId.value);
-  await themeParkStore.fetchThemeParkById(
-    accommodationId.value,
-    themeParkId.value
-  );
   await ticketStore.fetchTickets(themeParkId.value);
-});
-
-const currentThemeParkName = computed(() => {
-  const themeParkName = themeParkStore.currentThemePark?.name;
-  return (
-    themeParkName ||
-    localStorage.getItem("currentThemeParkName") ||
-    "알 수 없음"
-  );
-});
-
-const checkLoginStatus = () => {
-  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
-};
-
-onMounted(async () => {
-  // 로그인 상태 체크
-  checkLoginStatus();
-
-  await ticketStore.fetchTickets(themeParkId.value);
-
-  if (ticketStore.tickets && ticketStore.tickets.data) {
-    const today = dayjs();
-    const validTickets = ticketStore.tickets.data.filter((ticket) => {
-      const saleStart = dayjs(ticket.saleStartDate);
-      const saleEnd = dayjs(ticket.saleEndDate);
-      return today.isAfter(saleStart) && today.isBefore(saleEnd);
-    });
-
-    groupedTickets.value = ticketStore.groupTicketsByType(validTickets);
-  } else {
-    console.error("Tickets data is missing or invalid.");
-  }
 });
 
 const getDiscountedPrice = (price) => {
@@ -124,25 +87,8 @@ const getDiscountedPrice = (price) => {
 };
 
 const handlePurchase = (ticketGroup) => {
-  const themeParkId = Number(ticketGroup.themeParkId);
-  const accommodationId = Number(accommodationId.value);
-
-  // localStorage에 저장하기 전에 로그 추가
-  console.log("themeParkId를 localStorage에 저장:", themeParkId);
-  console.log("accommodationId를 localStorage에 저장:", accommodationId);
-
-  if (!isLoggedIn.value) {
-    router.push({ path: "/users/login" });
-  } else {
-    localStorage.setItem("selectedAdultTicketId", ticketGroup.adultTicket.id);
-    localStorage.setItem("selectedChildTicketId", ticketGroup.childTicket.id);
-    localStorage.setItem("selectedThemeParkId", themeParkId);
-    localStorage.setItem("selectedAccommodationId", accommodationId);
-
-    router.push({
-      name: "TicketOrderView",
-    });
-  }
+  ticketStore.selectTicket(ticketGroup);
+  router.replace({ name: "TicketOrder" });
 };
 </script>
 
