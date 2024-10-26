@@ -1,14 +1,11 @@
 <template>
-  <NavbarDefault :sticky="true" />
   <div class="container py-5 my-5">
     <h2 class="text-left mb-4">입장권 구매</h2>
     <p class="text-left text-muted pb-4">
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
-    <!-- adultTicketId와 childTicketId를 직접 ProductInfo로 전달 -->
-    <ProductInfo
-      v-if="isDataValid && adultTicketId && childTicketId"
+    <product-info
       class="mb-4"
       :adultTicketId="adultTicketId"
       :childTicketId="childTicketId"
@@ -18,7 +15,7 @@
       v-model:childCount="childCount"
     />
 
-    <BuyerInfo
+    <buyer-info
       class="mb-4"
       v-model:buyerName="buyerName"
       v-model:buyerPhone="buyerPhone"
@@ -26,14 +23,14 @@
       v-model:buyerEmailDomain="buyerEmailDomain"
     />
 
-    <UsageInfo
+    <usage-info
       class="mb-4"
       v-model:termsChecked1="termsChecked1"
       v-model:termsChecked2="termsChecked2"
       @openModal="handleOpenModal"
     />
 
-    <PrivacyAgreementModal
+    <privacy-agreement-modal
       v-if="isModalOpen"
       :type="modalType"
       @close="closeModal"
@@ -54,26 +51,30 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-import { useThemeParkStore } from "@/stores/themeParkStore";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useThemeParkStore } from "@/stores/themeparkStore";
+import { useTicketStore } from "@/stores/ticketStore";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+
 import ProductInfo from "@/components/TicketOrders/ProductInfo.vue";
 import BuyerInfo from "@/components/TicketOrders/BuyerInfo.vue";
 import UsageInfo from "@/components/TicketOrders/UsageInfo.vue";
 import PrivacyAgreementModal from "@/components/TicketOrders/PrivacyAgreementModal.vue";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
+// 라우터
 const router = useRouter();
-const themeParkStore = useThemeParkStore();
 
-// localStorage에서 adultTicketId, childTicketId, accommodationId 가져오기
-const adultTicketId = ref(localStorage.getItem("selectedAdultTicketId"));
-const childTicketId = ref(localStorage.getItem("selectedChildTicketId"));
-const themeParkId = ref(Number(localStorage.getItem("selectedThemeParkId")));
-const accommodationId = ref(
-  Number(localStorage.getItem("selectedAccommodationId"))
-); // 추가됨
-const isDataValid = ref(true);
+// pinia 스토어
+const ticketStore = useTicketStore();
+const themeParkStore = useThemeParkStore();
+const accommodationStore = useAccommodationStore();
+
+// pinia 스토어 state, getters
+const { themeParkId } = storeToRefs(themeParkStore);
+const { accommodationId } = storeToRefs(accommodationStore);
+const { adultTicketId, childTicketId } = storeToRefs(ticketStore);
 
 const buyerName = ref("");
 const buyerPhone = ref("");
@@ -88,41 +89,22 @@ const childCount = ref(0);
 const isModalOpen = ref(false);
 const modalType = ref("");
 
-// 테마파크 이름을 로드
-const loadThemeParkName = async () => {
-  try {
-    if (themeParkId.value) {
-      await themeParkStore.fetchThemeParkById(
-        accommodationId.value,
-        themeParkId.value
-      );
-
-      if (!themeParkStore.currentThemePark?.name) {
-        isDataValid.value = false;
-      }
-    } else {
-      isDataValid.value = false;
-    }
-  } catch (error) {
-    console.error("테마파크 정보를 불러오는 중 오류가 발생했습니다:", error);
-    isDataValid.value = false;
-  }
+// 페이지 이탈 방지 처리
+const handleBeforeUnload = (e) => {
+  const message =
+    "페이지를 벗어나면 입력하신 정보가 모두 사라집니다. 계속하시겠습니까?";
+  e.returnValue = message; // Chrome에서 필요
+  return message; // 다른 브라우저를 위해 필요
 };
 
-onMounted(async () => {
-  try {
-    console.log(
-      "TicketOrderView에서 accommodationId 확인:",
-      accommodationId.value
-    );
-    console.log("TicketOrderView에서 themeParkId 확인:", themeParkId.value);
+onMounted(() => {
+  // 페이지 이탈 방지 이벤트 등록
+  window.addEventListener("beforeunload", handleBeforeUnload);
+});
 
-    await loadThemeParkName();
-    isDataValid.value = adultTicketId.value && childTicketId.value;
-  } catch (error) {
-    console.error("데이터 로드 중 오류 발생:", error);
-    isDataValid.value = false;
-  }
+onUnmounted(() => {
+  // 이벤트 리스너 제거
+  window.removeEventListener("beforeunload", handleBeforeUnload);
 });
 
 const isFormValid = computed(() => {
@@ -135,8 +117,15 @@ const isFormValid = computed(() => {
   );
 });
 
+// Cancel 버튼 핸들러도 수정
 const handleCancel = () => {
-  router.go(-1);
+  router.replace({
+    name: "TicketSelection",
+    query: {
+      accommodationId: accommodationId.value,
+      themeParkId: themeParkId.value,
+    },
+  });
 };
 
 const handleSubmit = async () => {
