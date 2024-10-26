@@ -33,10 +33,9 @@ function goToMain() {
 const registerUser = async () => {
   const success = await loginStore.registerUser();
   if (success) {
-    router.push('/joinComplete'); // 성공 시 페이지 이동
+    router.push('/joinComplete');
   }
 };
-
 
 </script>
 
