@@ -78,13 +78,13 @@ import easystayImage from '@/assets/img/easystay.png';
           <div class="bg-white p-4 min-vh-15 mt-3">
             <div class="d-flex justify-content-center">
               <div class="text-center mx-5">
-                <RouterLink to="users/roomReservations">
+                <RouterLink to="/users/roomReservationLists">
                   <span class="material-icons" style="font-size: 70px;">description</span>
                   <div class="mt-2">객실 예약 내역</div>
                 </RouterLink>
               </div>
               <div class="text-center mx-5">
-                <RouterLink to="users/attractionReservations">
+                <RouterLink to="/users/themeparkReservationLists">
                   <span class="material-icons" style="font-size: 70px;">attractions</span>
                   <div class="mt-2">테마파크 예약 내역</div>
                 </RouterLink>

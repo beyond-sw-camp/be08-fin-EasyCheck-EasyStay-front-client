@@ -56,6 +56,8 @@ import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
 import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
 import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
+import RoomReservationList from "@/views/Mypage/RoomReservationList/RoomReservationList.vue";
+import ThemeparkReservationList from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationList.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
@@ -363,6 +365,16 @@ const router = createRouter({
       path: "/users/mypage/infoAuth",
       name: "InfoAuthView",
       component: InfoAuthView,
+    },
+    {
+      path: "/users/roomReservationLists",
+      name: "RoomReservationList",
+      component: RoomReservationList,
+    },
+    {
+      path: "/users/themeparkReservationLists",
+      name: "ThemeparkReservationList",
+      component: ThemeparkReservationList,
     },
   ],
 });
