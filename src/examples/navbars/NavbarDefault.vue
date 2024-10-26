@@ -173,7 +173,10 @@ watch(
     backdrop-filter: blur(5px) !important;
 }
 
-.navbar-brand,
+.navbar-brand {
+    font-size: 1.2rem !important;
+}
+
 .nav-link,
 .reservation-btn {
     font-size: 1rem !important;
