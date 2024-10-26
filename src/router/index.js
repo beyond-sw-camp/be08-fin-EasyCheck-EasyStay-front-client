@@ -54,7 +54,8 @@ import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
-import AuthView from "@/views/Mypage/InfoUpdate/AuthView.vue";
+import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
+import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
@@ -348,15 +349,20 @@ const router = createRouter({
       name: "SuggestionsListView",
       component: SuggestionsListView,
     },
-    { 
-      path: "/users/mypage/auth",
-      name: "AuthView",
-      component: AuthView,
+    {
+      path: "/users/mypage/pwAuth",
+      name: "PwAuthView",
+      component: PwAuthView,
     },
     {
       path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
+    },
+    {
+      path: "/users/mypage/infoAuth",
+      name: "InfoAuthView",
+      component: InfoAuthView,
     },
   ],
 });

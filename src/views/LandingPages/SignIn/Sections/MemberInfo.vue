@@ -155,7 +155,7 @@ const updateEmailSuffix = () => {
   loginStore.signUpformData.email = email; // 이메일 값 저장
 };
 
-
+// 이메일 합치기
 const createEmail = () => {
   const emailPrefix = loginStore.signUpformData.emailPrefix || '';
   const emailSuffix = loginStore.signUpformData.emailSuffix || '';
@@ -170,35 +170,47 @@ const createEmail = () => {
 };
 
 // 이메일 중복 체크
-const checkDuplicateId = async () => {
-  const email = `${loginStore.signUpformData.emailPrefix}@${selectedDomain.value === 'etc' ? loginStore.signUpformData.emailSuffix : selectedDomain.value}`;
+const emailCheckResult = ref('');
 
-  // 이메일 중복 체크 액션 호출
-  const isDuplicated = await loginStore.checkEmailIsDuplicated(email);
-  if (isDuplicated) {
-    alert('사용 가능한 이메일입니다.');
-  } else {
-    alert('이미 사용 중인 이메일입니다.');
+const checkDuplicateId = async () => {
+  const email = createEmail();
+  console.log('Checking email:', email); // 추가
+
+  try {
+    const isAvailable = await loginStore.checkEmailDuplicate(email);
+    emailCheckResult.value = isAvailable ? '사용 가능한 이메일입니다.' : '이미 사용 중인 이메일입니다.';
+  } catch (error) {
+    emailCheckResult.value = '중복 체크 중 오류가 발생했습니다.';
+    console.error(error.message);
   }
 };
 
+
 // 비밀번호 유효성 검사
-const password = ref("");
-const passwordError = ref(false);
+const passwordErrorMessage = ref("");
 
-const isPasswordValid = computed(() => {
-  // 비밀번호 유효성 검사: 최소 8자, 최대 16자, 대문자, 숫자 포함
-  const minLength = password.value.length >= 8;
-  const maxLength = password.value.length <= 16;
-  const hasUpperCase = /[A-Z]/.test(password.value);
-  const hasNumber = /\d/.test(password.value);
+const validatePassword = () => {
+  const passwordValue = loginStore.signUpformData.password || "";
 
-  return minLength && maxLength && hasUpperCase && hasNumber;
-});
-// 비밀번호 입력 시 오류 여부 업데이트
-watch(password, (newVal) => {
-  passwordError.value = !isPasswordValid.value;
-});
+  const minLength = passwordValue.length >= 8;
+  const maxLength = passwordValue.length <= 16;
+  const hasUpperCase = /[A-Z]/.test(passwordValue);
+  const hasNumber = /\d/.test(passwordValue);
+
+  if (!minLength || !maxLength) {
+    passwordErrorMessage.value = "비밀번호는 8자 이상, 16자 이하이어야 합니다.";
+  } else if (!hasUpperCase) {
+    passwordErrorMessage.value = "비밀번호에는 대문자가 포함되어야 합니다.";
+  } else if (!hasNumber) {
+    passwordErrorMessage.value = "비밀번호에는 숫자가 포함되어야 합니다.";
+  } else {
+    passwordErrorMessage.value = "";
+  }
+};
+
+// 비밀번호 입력 시 유효성 검사
+watch(() => loginStore.signUpformData.password, validatePassword);
+
 
 </script>
 
@@ -284,24 +296,23 @@ watch(password, (newVal) => {
                 중복 체크
               </button>
             </div>
+            <div class="mt-2 text-danger text-start">{{ emailCheckResult }}</div>
           </td>
         </tr>
-
 
         <!-- 비밀번호 -->
         <tr>
           <td class="fw-bold fs-8">비밀번호</td>
           <td>
             <div class="d-flex flex-column align-items-start col-5">
-              <MaterialInput v-model="password" required class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
-              <div v-if="passwordError" class="text-danger small mt-1">
-                비밀번호는 최소 8자 이상, 최대 16자 이하와 대문자와 숫자를 포함해야 합니다.
+              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0"
+                id="password" :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              <div v-if="passwordErrorMessage" class="text-danger small mt-1">
+                {{ passwordErrorMessage }}
               </div>
             </div>
           </td>
         </tr>
-
 
 
         <!-- 성함 -->
@@ -399,8 +410,6 @@ watch(password, (newVal) => {
             </div>
           </td>
         </tr>
-
-
 
       </tbody>
     </table>

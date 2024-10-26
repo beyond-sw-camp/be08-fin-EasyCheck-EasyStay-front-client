@@ -179,28 +179,12 @@ export const userLoginStore = defineStore("userStore", {
 
       try {
         const response = await apiClient.post("/users", requestData);
-        if (response.status === 201) {
-          router.push("/joinComplete");
+        if (response.status === 200) {
+          return true;
         }
       } catch (error) {
         console.error("회원가입 실패:", error);
         alert("회원가입에 실패했습니다. 다시 시도해주세요.");
-      }
-    },
-
-    // 이메일 중복 체크
-    async checkEmailIsDuplicated(email) {
-      try {
-        const response = await apiClient.post("/users/check-email", { email });
-        if (response.status === 200) {
-          return true; // 중복되지 않음
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 409) {
-          return false; // 중복됨
-        }
-        console.error("이메일 중복 체크 오류:", error);
-        throw error;
       }
     },
 
@@ -234,14 +218,28 @@ export const userLoginStore = defineStore("userStore", {
           currentPassword,
           newPassword,
         });
-        this.userData = response.data; // 성공적으로 변경된 사용자 데이터 처리
+        this.userData = response.data;
         console.log("비밀번호 변경 성공:", this.userData);
-        // 추가적인 성공 처리 (예: 사용자에게 알림, 화면 전환 등)
       } catch (error) {
         console.error("비밀번호 변경 오류:", error);
-        // 에러 처리: 사용자에게 오류 메시지 표시 등
         this.error =
           error.response?.data?.message || "비밀번호 변경에 실패했습니다.";
+      }
+    },
+
+    async checkEmailDuplicate(email) {
+      try {
+        const response = await apiClient.patch("users/check-duplicate", {
+          email,
+        });
+        return response.status === 200; // 이메일 사용 가능
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          return false; // 이메일 중복
+        }
+        throw new Error(
+          error.response?.data?.message || "이메일 중복 확인 실패"
+        );
       }
     },
   },
