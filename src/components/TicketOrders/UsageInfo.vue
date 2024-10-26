@@ -29,7 +29,9 @@
         />
         <label for="terms1" class="form-check-label">
           (필수) 개인정보 수집 및 이용동의
-          <a @click.prevent="$emit('openModal', '필수')">전문보기</a>
+          <a class="text-line" @click.prevent="$emit('openModal', '필수')"
+            >전문보기</a
+          >
         </label>
       </div>
       <div class="form-check">
@@ -42,7 +44,9 @@
         />
         <label for="terms2" class="form-check-label">
           (선택) 개인정보 수집 및 이용동의
-          <a @click.prevent="$emit('openModal', '선택')">전문보기</a>
+          <a class="text-line" @click.prevent="$emit('openModal', '선택')"
+            >전문보기</a
+          >
         </label>
       </div>
     </div>
@@ -109,5 +113,8 @@ const props = defineProps({
   font-size: 0.9rem;
   line-height: 1.5;
   margin-bottom: 0;
+}
+.text-line {
+  text-decoration: underline;
 }
 </style>

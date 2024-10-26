@@ -1,5 +1,4 @@
 <template>
-  <navbar-default />
   <section class="py-6">
     <div class="container">
       <h3>디럭스</h3>
@@ -16,7 +15,6 @@
 </template>
 
 <script setup>
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import RoomImage from "./Sections/RoomImage.vue";
 import RoomTypeNavs from "./Sections/RoomTypeNavs.vue";
 import RoomInfo from "./Sections/RoomInfo.vue";

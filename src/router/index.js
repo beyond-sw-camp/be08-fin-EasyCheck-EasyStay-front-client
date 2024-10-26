@@ -26,16 +26,19 @@ import ElTypography from "../layouts/sections/elements/typography/TypographyView
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
+import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
+import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
 import RoomDetailView from "@/views/Rooms/RoomDetailView.vue";
 import ReservationView from "@/views/Reservation/ReservationView.vue";
+import ReservationResultView from "@/views/Reservation/ReservationResultView.vue";
 
 import ReservationPage from "@/views/Payment/ReservationPage.vue";
 
 import SignUpView from "@/views/LandingPages/SignIn/SignUp/SignUpView.vue";
 import JoinCompleteView from "@/views/LandingPages/SignIn/SignUp/JoinCompleteView.vue";
-import MemberAuthView from "@/views/LandingPages/SignIn/Member/MemberAuthView.vue";
 import MemberView from "@/views/LandingPages/SignIn/Member/MemberView.vue";
 import FindIdAuthenticationView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdAuthenticationView.vue";
 import FindIdView from "@/views/LandingPages/SignIn/Member/FindMemberID/FindIdView.vue";
@@ -51,6 +54,8 @@ import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
+import AuthView from "@/views/Mypage/InfoUpdate/AuthView.vue";
+
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
@@ -83,6 +88,11 @@ const router = createRouter({
       path: "/users/login",
       name: "login",
       component: SignInBasicView,
+    },
+    {
+      path: "/",
+      name: "logout",
+      component: PresentationView,
     },
     {
       path: "/sections/page-sections/page-headers",
@@ -197,9 +207,22 @@ const router = createRouter({
       }),
     },
     {
-      path: "/ticket-order/:themeParkId",
+      path: "/themepark/:themeParkId/tickets",
+      name: "TicketSelection",
+      component: TicketSelectionView,
+      props: true,
+    },
+    {
+      path: "/ticketorder",
       name: "TicketOrderView",
       component: TicketOrderView,
+      props: true,
+    },
+    {
+      path: "/usageguide/:guidePageName",
+      name: "UsageGuide",
+      component: UsageGuideWrapper,
+      props: true,
     },
     {
       path: "/room/:roomId",
@@ -215,11 +238,6 @@ const router = createRouter({
       path: "/users/signUp",
       name: "MemberSignUp",
       component: SignUpView,
-    },
-    {
-      path: "/users/memberAuthentication",
-      name: "MemberAuthentication",
-      component: MemberAuthView,
     },
     {
       path: "/users/member/info",
@@ -267,6 +285,11 @@ const router = createRouter({
       component: ReservationPage,
     },
     {
+      path: "/reservation/result",
+      name: "ReservationResult",
+      component: ReservationResultView,
+    },
+    {
       path: "/users/mypage",
       name: "Mypage",
       component: MypageView,
@@ -302,6 +325,20 @@ const router = createRouter({
       component: PaymentPage,
     },
     {
+      path: "/users/mypage",
+      component: MypageView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem("accessToken");
+        console.log("token:", token);
+        if (token) {
+          next();
+        } else {
+          alert("로그인이 필요합니다.");
+          next({ path: "/users/login" });
+        }
+      },
+    },
+    {
       path: "/noticesListView",
       name: "noticesListView",
       component: NoticesListView,
@@ -310,6 +347,11 @@ const router = createRouter({
       path: "/suggestionsListView",
       name: "SuggestionsListView",
       component: SuggestionsListView,
+    },
+    { 
+      path: "/users/mypage/auth",
+      name: "AuthView",
+      component: AuthView,
     },
     {
       path: "/noticesListView/:id",
