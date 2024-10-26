@@ -98,6 +98,7 @@ watch(
             <RouterLink class="navbar-brand" :class="[
                 isScrolled ? 'text-white font-weight-bolder ms-sm-3' : 'text-dark font-weight-bolder ms-sm-3'
             ]" :to="{ name: 'presentation' }" rel="tooltip" title="Designed and Coded by EasyCheck">
+                <img src="@/src/img/logos/logo-ct-dark.png" alt="Logo" class="navbar-logo me-2" />
                 EasyStay
             </RouterLink>
             <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
@@ -171,6 +172,12 @@ watch(
 .bg-transparent-black {
     background: rgba(0, 0, 0, 0.6) !important;
     backdrop-filter: blur(5px) !important;
+}
+
+.navbar-logo {
+    width: 30px;
+    /* 로고 이미지 크기 설정 */
+    height: auto;
 }
 
 .navbar-brand {
