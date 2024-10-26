@@ -128,7 +128,7 @@ watch(
                     </li>
                     <li v-else class="nav-item mx-2">
                         <RouterLink :to="{ name: 'login' }" role="button"
-                            class="nav-link ps-2 me-4 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+                            class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
                             <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">login</i>
                             Sign In / Sign Up
                         </RouterLink>
@@ -173,6 +173,12 @@ watch(
     backdrop-filter: blur(5px) !important;
 }
 
+.navbar-brand,
+.nav-link,
+.reservation-btn {
+    font-size: 1rem !important;
+}
+
 .navbar .nav-link:hover {
     opacity: 0.7;
 }
@@ -180,20 +186,28 @@ watch(
 .reservation-btn {
     background-color: black !important;
     color: white !important;
-    border-radius: 50px;
+    border-radius: 100px !important;
     padding: 10px 20px;
     display: flex;
     align-items: center;
-    font-weight: bold;
-    font-size: 14px;
 }
 
-.reservation-btn i {
-    font-size: 18px;
+.btn {
+    font-weight: 0 !important;
 }
 
 .reservation-btn:hover {
     background-color: rgba(0, 0, 0, 0.8) !important;
     color: white !important;
+}
+
+.navbar-toggler {
+    border: none !important;
+}
+
+.navbar-toggler .navbar-toggler-bar {
+    width: 30px !important;
+    height: 1.5px !important;
+    background: white !important;
 }
 </style>
