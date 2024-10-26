@@ -7,10 +7,6 @@
 
     <product-info
       class="mb-4"
-      :adultTicketId="adultTicketId"
-      :childTicketId="childTicketId"
-      :accommodationId="accommodationId"
-      :themeParkId="themeParkId"
       v-model:adultCount="adultCount"
       v-model:childCount="childCount"
     />
@@ -67,14 +63,12 @@ import PrivacyAgreementModal from "@/components/TicketOrders/PrivacyAgreementMod
 const router = useRouter();
 
 // pinia 스토어
-const ticketStore = useTicketStore();
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 
 // pinia 스토어 state, getters
 const { themeParkId } = storeToRefs(themeParkStore);
 const { accommodationId } = storeToRefs(accommodationStore);
-const { adultTicketId, childTicketId } = storeToRefs(ticketStore);
 
 const buyerName = ref("");
 const buyerPhone = ref("");

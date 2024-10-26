@@ -7,6 +7,8 @@ export const useTicketStore = defineStore("ticketStore", {
     tickets: [],
     adultTicket: null,
     childTicket: null,
+
+    childTicketAmount: 1,
   }),
 
   getters: {
