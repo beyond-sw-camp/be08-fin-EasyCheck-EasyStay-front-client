@@ -312,7 +312,7 @@ const router = createRouter({
       component: SuggestionsListView,
     },
     {
-      path: "/noticesListView/noticeDetail",
+      path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
     },

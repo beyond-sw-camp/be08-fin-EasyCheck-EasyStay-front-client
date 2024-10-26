@@ -5,26 +5,13 @@
     <div class="notice-header mb-4">
       <h1 class="display-4 font-weight-bold">{{ notice.title }}</h1>
       <small class="text-muted">
-        <i class="fas fa-map-marker-alt"></i> {{ notice.location }} |
-        {{ formatDate(notice.date) }}
+        <i class="fas fa-map-marker-alt"></i>
+        {{ notice.accommodationName }}
       </small>
     </div>
     <hr class="my-4" />
     <div class="notice-image mb-4">
       <img
-        v-if="notice.id === 1"
-        src="@/assets/img/006.png"
-        alt="Notice Image"
-        class="img-fluid rounded"
-      />
-      <img
-        v-else-if="notice.id === 2"
-        src="@/assets/img/006.png"
-        alt="Notice Image"
-        class="img-fluid rounded"
-      />
-      <img
-        v-else-if="notice.id === 3"
         src="@/assets/img/006.png"
         alt="Notice Image"
         class="img-fluid rounded"
@@ -38,7 +25,6 @@
         목록으로 돌아가기
       </button>
     </div>
-
     <div class="related-notices mt-4">
       <h5>관련 공지사항</h5>
       <ul class="list-unstyled">
@@ -59,92 +45,54 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeMount, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useNoticeStore } from "@/stores/notice";
 
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+import { storeToRefs } from "pinia";
 
-// 이미지를 동적으로 불러오기 위한 함수
-// const getImagePath = (imageName) => {
-//   return new URL(`@/assets/img/${imageName}`, import.meta.url).href;
-// };
-const notice = ref({
-  title: "",
-  content: "",
-  date: "",
-  location: "",
-  image: "", // imageUrl에서 image로 변경
-});
+const noticeStore = useNoticeStore();
 const route = useRoute();
-const router = useRouter();
+const { notice } = storeToRefs(noticeStore);
 
-const fetchNoticeDetail = () => {
+console.log("공지사항 : ", notice.value);
+
+onBeforeMount(() => {
   const noticeId = route.params.id;
+  console.log("Before Mount - ID: ", noticeId);
+});
 
-  // 예시 데이터
-  const exampleNotices = {
-    1: {
-      id: 1,
-      title: "서울리조트 휴관 안내",
-      content:
-        "서울리조트가 일정 기간 동안 휴관합니다. 불편을 끼쳐드려 죄송합니다.",
-      date: "2024-10-20",
-      location: "서울리조트",
-      image: "004.png",
-    },
-    2: {
-      id: 2,
-      title: "서울리조트 리모델링 공지",
-      content:
-        "서울리조트가 새롭게 변신합니다! 더 나은 서비스와 환경을 제공하기 위해 리모델링을 진행합니다.",
-      date: "2024-10-21",
-      location: "서울리조트",
-      image: "003.png",
-    },
-    3: {
-      id: 3,
-      title: "부산 해운대 맛집 소개",
-      content: "부산 해운대의 전통 국밥 맛집을 소개합니다. 놓치지 마세요!",
-      date: "2024-10-18",
-      location: "부산 해운대",
-      image: "006.png",
-    },
-  };
-
-  //   const related = [
-  //     {
-  //       id: 1,
-  //       title: "서울리조트 휴관 안내",
-  //       date: "2024-10-20",
-  //       image: "004.png",
-  //     },
-  //     {
-  //       id: 2,
-  //       title: "서울리조트 리모델링 공지",
-  //       date: "2024-10-21",
-  //       image: "003.png",
-  //     },
-  //     {
-  //       id: 3,
-  //       title: "부산 해운대 맛집 소개",
-  //       date: "2024-10-18",
-  //       image: "006.png",
-  //     },
-  //   ];
-
-  notice.value = exampleNotices[noticeId] || {};
-};
-
+// onMounted(() => {
+//   console.log("컴포넌트가 마운트되었습니다.");
+// });
+// onMounted(async () => {
+//   try {
+//     console.log("onMounted 호출됨");
+//     await noticeStore.fetchNotices();
+//     console.log("공지사항 데이터 불러옴");
+//   } catch (error) {
+//     console.error("오류 발생:", error);
+//   }
+// });
+onMounted(async () => {
+  try {
+    console.log("실행이 되나");
+    const noticeId = route.params.id;
+    console.log("아이디 출력 : ", noticeId);
+    // await noticeStore.fetchNoticeById(noticeId);
+    await noticeStore.fetchNotices(); // 공지사항 목록 불러오기
+    noticeStore.notice = noticeStore.getNoticeById(noticeId); // ID에 맞는 공지사항 데이터 가져오기
+    if (!noticeStore.notice) {
+      console.error("해당 ID의 공지사항을 찾을 수 없습니다.");
+    }
+  } catch (error) {
+    console.error("공지를 불러오는 중 오류 발생:", error);
+  }
+});
 const goBack = () => {
-  router.push("/noticesListView");
-};
-
-onMounted(fetchNoticeDetail);
-
-const formatDate = (date) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(date).toLocaleDateString(undefined, options);
+  route.push("/noticesListView");
 };
 </script>
 
