@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 // 1번
 import axios from "axios";
-// import apiClient from "@/api";
-// import axios from "axios";
 
 export const useNoticeStore = defineStore("notice", {
   state: () => ({
