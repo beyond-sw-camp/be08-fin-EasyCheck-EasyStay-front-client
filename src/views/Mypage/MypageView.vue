@@ -64,8 +64,8 @@ import easystayImage from '@/assets/img/easystay.png';
                 </div>
                 <div class="row mt-3 justify-content-center">
                   <div class="d-flex justify-content-center w-50">
-                    <RouterLink to="/users/infoUpdate" class="mx-3">회원 정보 수정 ></RouterLink>
-                    <RouterLink to="/users/mypage/auth" class="mx-3">비밀번호 변경 > </RouterLink>
+                    <RouterLink to="/users/mypage/infoAuth" class="mx-3">회원 정보 수정 ></RouterLink>
+                    <RouterLink to="/users/mypage/pwAuth" class="mx-3">비밀번호 변경 > </RouterLink>
                     <RouterLink to="/users/resign" class="mx-3">회원 탈퇴 ></RouterLink>
                   </div>
                 </div>

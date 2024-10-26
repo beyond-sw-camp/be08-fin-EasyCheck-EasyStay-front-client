@@ -293,8 +293,8 @@ watch(password, (newVal) => {
           <td class="fw-bold fs-8">비밀번호</td>
           <td>
             <div class="d-flex flex-column align-items-start col-5">
-              <MaterialInput v-model="password" required class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0"
+                id="password" :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
               <div v-if="passwordError" class="text-danger small mt-1">
                 비밀번호는 최소 8자 이상, 최대 16자 이하와 대문자와 숫자를 포함해야 합니다.
               </div>
@@ -399,8 +399,6 @@ watch(password, (newVal) => {
             </div>
           </td>
         </tr>
-
-
 
       </tbody>
     </table>

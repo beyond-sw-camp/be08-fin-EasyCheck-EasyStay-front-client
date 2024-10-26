@@ -10,6 +10,7 @@ import MaterialInput from "@/components/MaterialInput.vue";
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
 import MaterialButton from "@/components/MaterialButton.vue";
+import router from "@/router";
 
 const userInfo = ref({
   email: '',
@@ -18,19 +19,30 @@ const userInfo = ref({
   phone: '',
   addr: '',
   addr_detail: '',
+  roadAddress: '',
+  jibunAddress: '',
+  detailAddress: ''
 });
-const error = ref(null);
 
-// Initialize MaterialInput on mount
+const loginStore = userLoginStore();
+const mypage = mypageStore();
+const error = ref(null);
+const success = ref(null);
+
+// 사용자 정보 불러오기
+const loadUserData = async () => {
+  try {
+    await loginStore.getUserData(); // 로그인 스토어의 사용자 정보 가져오기
+    userInfo.value = { ...loginStore.userData }; // 데이터를 복사
+  } catch (error) {
+    error.value = error.message;
+    console.error("사용자 정보 로드 오류:", error.message);
+  }
+};
+
 onMounted(async () => {
   setMaterialInput();
-  try {
-    const response = await apiClient.get("/users/info");
-    console.log(response.data);
-    userInfo.value = response.data;
-  } catch (error) {
-    console.error("사용자 정보 로드 오류:", error.response?.data?.message || "정보를 가져오는 데 실패했습니다.");
-  }
+  await loadUserData();
 });
 
 // 약관 동의
@@ -88,16 +100,40 @@ const detailAddress = ref('');
 const searchZipCode = () => {
   new daum.Postcode({
     oncomplete: function (data) {
-      postcode.value = data.zonecode; // 올바른 키를 사용
-      roadAddress.value = data.roadAddress; // 도로명주소
-      jibunAddress.value = data.jibunAddress; // 지번주소
-      detailAddress.value = ''; // 상세주소 초기화
+      postcode.value = data.zonecode; // 우편번호
+      userInfo.value.roadAddress = data.roadAddress; // 도로명주소
+      userInfo.value.jibunAddress = data.jibunAddress; // 지번주소
+      userInfo.value.detailAddress = ''; // 상세주소 초기화
     },
   }).open();
 };
 
-const mypage = mypageStore();
 
+const emit = defineEmits(['update']);
+
+// 개인정보 수정 메서드
+const updateUserData = async () => {
+  try {
+    await mypage.updateUserData(
+      userInfo.value.email,
+      userInfo.value.phone,
+      userInfo.value.roadAddress,
+      userInfo.value.detailAddress
+    );
+    success.value = "정보 수정 성공";
+    emit('update');
+  } catch (err) {
+    error.value = err.message;
+  }
+};
+
+const handleButtonClick = () => {
+  updateUserData();
+};
+
+function goToMain() {
+  router.push('/');
+}
 
 </script>
 
@@ -141,7 +177,7 @@ const mypage = mypageStore();
           <td>
             <div class="d-flex align-items-center col-5">
               <!-- 통신사 -->
-              <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 120px;">
+              <select id="carrier" class="form-select me-2" v-model="userInfo.selectedCarrier" style="width: 120px;">
                 <option value="" disabled selected>통신사 선택</option>
                 <option v-for="carrier in carrierOptions" :key="carrier.value" :value="carrier.value">
                   {{ carrier.text }}
@@ -149,16 +185,17 @@ const mypage = mypageStore();
               </select>
 
               <!-- 전화번호 -->
-              <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix" style="width: 80px;">
+              <select id="phonePrefix" class="form-select me-2" v-model="userInfo.selectedPhonePrefix"
+                style="width: 80px;">
                 <option v-for="input in phoneFields.inputs" :key="input.id" :value="input.text">
                   {{ input.text }}
                 </option>
               </select>
 
-              <MaterialInput class="input-group-outline mb-0 me-2" id="phoneMiddle" type="text" maxlength="4"
-                style="width: 60px;" />
-              <MaterialInput class="input-group-outline mb-0" id="phoneSuffix" type="text" maxlength="4"
-                style="width: 60px;" />
+              <MaterialInput v-model="userInfo.phoneMiddle" class="input-group-outline mb-0 me-2" id="phoneMiddle"
+                type="text" maxlength="4" style="width: 60px;" />
+              <MaterialInput v-model="userInfo.phoneSuffix" class="input-group-outline mb-0" id="phoneSuffix"
+                type="text" maxlength="4" style="width: 60px;" />
             </div>
           </td>
         </tr>
@@ -173,9 +210,27 @@ const mypage = mypageStore();
               <button type="button" class="btn btn-light mb-0" @click="searchZipCode">주소 검색</button>
             </div>
             <div class="mt-2 col-5">
-              <MaterialInput v-model="roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
-              <MaterialInput v-model="jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
-              <MaterialInput v-model="detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
+              <MaterialInput v-model="userInfo.roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
+              <MaterialInput v-model="userInfo.jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
+              <MaterialInput v-model="userInfo.detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="fw-bold fs-8">마케팅 수신 동의 여부</td>
+          <td>
+            <div class="d-flex align-items-stretch col-4">
+              <label class="me-2">
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="Y"
+                  class="form-check-input" />
+                예
+              </label>
+              <label>
+                <input type="radio" v-model="loginStore.signUpformData.marketingConsent" value="N"
+                  class="form-check-input" />
+                아니요
+              </label>
             </div>
           </td>
         </tr>
@@ -184,7 +239,15 @@ const mypage = mypageStore();
     </table>
 
     <hr style="border-top: 2px solid #ccc;" />
-
+    <!-- 버튼 -->
+    <div class="text-center mt-4 mb-5">
+      <MaterialButton @click="goToMain" class="btn btn-light">
+        취소
+      </MaterialButton>
+      <MaterialButton @click="handleButtonClick" class="btn btn-dark ms-2">
+        다음
+      </MaterialButton>
+    </div>
   </div>
 </template>
 

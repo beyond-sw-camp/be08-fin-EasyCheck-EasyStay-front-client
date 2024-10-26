@@ -179,7 +179,7 @@ export const userLoginStore = defineStore("userStore", {
 
       try {
         const response = await apiClient.post("/users", requestData);
-        if (response.status === 201) {
+        if (response.status === 200) {
           router.push("/joinComplete");
         }
       } catch (error) {
