@@ -27,18 +27,15 @@ export const userLoginStore = defineStore("userStore", {
     // 일반회원 - 회원가입
     signUpformData: {
       emailPrefix: "",
-      emialSuffix: "",
+      emailSuffix: "",
       password: "",
       name: "",
       verificationCode: "",
       marketingConsent: "N",
     },
 
-    guestLoginForm: {
-      guestName: "",
-      guestPhone: "",
-      verificationCode: "",
-    },
+    // 인증 여부 저장 상태
+    isAuthenticated: false,
 
     // 마이페이지에서 유저 정보 가져오기
     userInfo: {},
@@ -64,6 +61,7 @@ export const userLoginStore = defineStore("userStore", {
     async login(loginData) {
       try {
         const response = await apiClient.post("/users/login", loginData);
+        console.log(response.data);
 
         if (response && response.data) {
           localStorage.setItem("accessToken", response.data.accessToken);
@@ -144,11 +142,14 @@ export const userLoginStore = defineStore("userStore", {
         });
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
+          this.isAuthenticated = true;
+          return true;
         }
       } catch (error) {
         console.error("Error in verifyCode:", error.message);
         alert("인증에 실패했습니다. 확인 후 다시 시도해주세요.");
       }
+      return false;
     },
 
     // 일반회원 - 회원가입
@@ -156,8 +157,8 @@ export const userLoginStore = defineStore("userStore", {
       const addr = `${this.roadAddress} ${this.detailAddress}`;
       const addrDetail = this.jibunAddress;
 
-      const emailPrefix = this.emailPrefix;
-      const emailSuffix = this.emialSuffix;
+      const emailPrefix = this.signUpformData.emailPrefix;
+      const emailSuffix = this.signUpformData.emailSuffix;
 
       // 전화번호 구성
       const phonePrefix = this.selectedPhonePrefix;
@@ -178,28 +179,12 @@ export const userLoginStore = defineStore("userStore", {
 
       try {
         const response = await apiClient.post("/users", requestData);
-        if (response.status === 201) {
-          router.push("/joinComplete");
+        if (response.status === 200) {
+          return true;
         }
       } catch (error) {
         console.error("회원가입 실패:", error);
         alert("회원가입에 실패했습니다. 다시 시도해주세요.");
-      }
-    },
-
-    // 이메일 중복 체크
-    async checkEmailIsDuplicated(email) {
-      try {
-        const response = await apiClient.post("/users/check-email", { email });
-        if (response.status === 200) {
-          return true; // 중복되지 않음
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 409) {
-          return false; // 중복됨
-        }
-        console.error("이메일 중복 체크 오류:", error);
-        throw error;
       }
     },
 
@@ -233,14 +218,28 @@ export const userLoginStore = defineStore("userStore", {
           currentPassword,
           newPassword,
         });
-        this.userData = response.data; // 성공적으로 변경된 사용자 데이터 처리
+        this.userData = response.data;
         console.log("비밀번호 변경 성공:", this.userData);
-        // 추가적인 성공 처리 (예: 사용자에게 알림, 화면 전환 등)
       } catch (error) {
         console.error("비밀번호 변경 오류:", error);
-        // 에러 처리: 사용자에게 오류 메시지 표시 등
         this.error =
           error.response?.data?.message || "비밀번호 변경에 실패했습니다.";
+      }
+    },
+
+    async checkEmailDuplicate(email) {
+      try {
+        const response = await apiClient.patch("users/check-duplicate", {
+          email,
+        });
+        return response.status === 200; // 이메일 사용 가능
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          return false; // 이메일 중복
+        }
+        throw new Error(
+          error.response?.data?.message || "이메일 중복 확인 실패"
+        );
       }
     },
   },

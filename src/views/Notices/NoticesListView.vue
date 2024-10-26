@@ -13,16 +13,11 @@
       <!-- 지점 선택 -->
       <div class="mb-4">
         <label for="resort-select" class="form-label">지점 선택</label>
-        <select
-          id="resort-select"
-          v-model="selectedBranch"
-          @change="fetchNotices"
-          class="form-select"
-        >
+        <select id="resort-select" v-model="query.branch" class="form-select">
           <option
             v-for="branch in accommodations"
             :key="branch.id"
-            :value="branch.id"
+            :value="branch.name"
           >
             {{ branch.name }}
           </option>
@@ -33,10 +28,9 @@
       <div class="mb-4 input-group">
         <input
           type="text"
-          v-model="searchQuery"
+          v-model="query.content"
           placeholder="검색어 입력..."
           class="form-control search-input"
-          @input="filterNotices"
         />
         <button class="btn btn-warning search-btn" @click="filterNotices">
           검색
@@ -45,7 +39,7 @@
 
       <!-- 공지사항 총 개수 -->
       <div class="mb-3">
-        <p>Total notices: {{ filteredNotices.length }}</p>
+        <!-- <p>Total notices: {{ notices?.length }}</p> -->
       </div>
 
       <!-- 공지사항 리스트 -->
@@ -59,9 +53,7 @@
         >
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
-          <small class="text-muted">{{
-            formatDate(notice.created_date)
-          }}</small>
+          <p>{{ notice.accommodationName }}</p>
         </div>
       </div>
       <div v-else>
@@ -72,58 +64,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useNoticeStore } from "@/stores/notice";
 
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-// import { useAccommodationStore } from "@/stores/accommodationStore";
-// const accommodationStore = useAccommodationStore(); // Store 가져오기
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
+
 const noticeStore = useNoticeStore();
 
-const goToNoticeDetail = (id) => {
-  router.push({ name: "NoticeDetail", params: { id } });
-};
-
-const selectedBranch = ref(null);
-const filteredNotices = ref([]);
-const searchQuery = ref("");
-const accommodations = ref([]);
-
-const fetchNotices = async () => {
-  if (!selectedBranch.value) {
-    return; // selectedBranch가 null인 경우 함수 종료
-  }
-  await noticeStore.fetchNotices(selectedBranch.value); // 리조트 ID를 이용해 공지사항을 가져옴
-  filteredNotices.value = noticeStore.notices;
-  console.log("필터 정보 : ", filteredNotices.value); // 가져온 공지사항을 필터 리스트에 저장
-};
-
-const filterNotices = () => {
-  const query = searchQuery.value.toLowerCase();
-  filteredNotices.value = noticeStore.notices.filter(
-    (notice) =>
-      notice.title.toLowerCase().includes(query) ||
-      notice.content.toLowerCase().includes(query)
-  );
-};
-
-const formatDate = (date) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(date).toLocaleDateString(undefined, options);
-};
+// 여기서 state 꺼내올 수 있음
+// getters도 filteredNotices 이런식으로 받아올 수 있음
+const { accommodations, query, filteredNotices } = storeToRefs(noticeStore);
 
 onMounted(async () => {
-  await noticeStore.fetchAccommodations(); // 지점 목록 API 호출
-  accommodations.value = noticeStore.accommodations; // API 응답 데이터를 accommodations에 저장
-  if (accommodations.value.length > 0) {
-    selectedBranch.value = accommodations.value[1].id; // 두 번째 지점의 ID를 기본 선택
-    await fetchNotices(); // 초기 공지사항 로드
-  }
+  // 지점 목록 조회하는 함수 호출 actions에서
+  await noticeStore.fetchNotices();
+  // 공지사항 조회하는 함수 호출 actions에서
+  await noticeStore.fetchAccommodations();
 });
+
+const goToNoticeDetail = (id) => {
+  console.log("전달된 공지사항 ID: ", id); // 전달된 ID를 확인
+  router.push({ name: "NoticeDetail", params: { id } });
+  console.log("라우팅 완료"); // 라우팅 시도 후 로그
+};
 </script>
 
 <style lang="scss" scoped>

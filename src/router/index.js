@@ -54,6 +54,9 @@ import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
+import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
+import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
+
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
@@ -334,7 +337,7 @@ const router = createRouter({
           alert("로그인이 필요합니다.");
           next({ path: "/users/login" });
         }
-      }
+      },
     },
     {
       path: "/noticesListView",
@@ -347,9 +350,19 @@ const router = createRouter({
       component: SuggestionsListView,
     },
     {
-      path: "/noticesListView/noticeDetail",
+      path: "/users/mypage/pwAuth",
+      name: "PwAuthView",
+      component: PwAuthView,
+    },
+    {
+      path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
+    },
+    {
+      path: "/users/mypage/infoAuth",
+      name: "InfoAuthView",
+      component: InfoAuthView,
     },
   ],
 });
