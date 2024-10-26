@@ -232,10 +232,10 @@ export const userLoginStore = defineStore("userStore", {
         const response = await apiClient.patch("users/check-duplicate", {
           email,
         });
-        return response.status === 200; // 이메일 사용 가능
+        return response.status === 200;
       } catch (error) {
         if (error.response && error.response.status === 409) {
-          return false; // 이메일 중복
+          return false;
         }
         throw new Error(
           error.response?.data?.message || "이메일 중복 확인 실패"
