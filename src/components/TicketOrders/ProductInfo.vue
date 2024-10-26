@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoaded" class="card p-4 mb-5">
+  <div class="card p-4 mb-5">
     <h4 class="mb-3">구매상품 정보</h4>
     <div class="table-responsive">
       <table class="table table-bordered">
@@ -7,7 +7,7 @@
           <tr>
             <td class="label-cell">지점</td>
             <td class="content-cell">
-              <span>{{ themePark?.data?.name || "알 수 없음" }}</span>
+              <span>{{ themePark?.name || "알 수 없음" }}</span>
             </td>
           </tr>
           <tr>
@@ -107,59 +107,24 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from "vue";
-import { useTicketStore } from "@/stores/ticketStore";
-import dayjs from "dayjs";
+import { computed, ref } from "vue";
 import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
+
+import { useTicketStore } from "@/stores/ticketStore";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 
+// pinia 스토어
 const ticketStore = useTicketStore();
-const { adultTicket, childTicket } = storeToRefs(ticketStore);
 const themeParkStore = useThemeParkStore();
 
+// pinia state, getters
 const { themePark } = storeToRefs(themeParkStore);
-
-const props = defineProps({
-  adultTicketId: {
-    type: String,
-    required: true,
-  },
-  childTicketId: {
-    type: String,
-    required: true,
-  },
-  themeParkId: {
-    type: Number,
-    required: true,
-  },
-});
-
-const isLoaded = ref(false);
+const { adultTicket, childTicket } = storeToRefs(ticketStore);
 
 const formatDate = (date) => {
   return date ? dayjs(date).format("YYYY-MM-DD") : "알 수 없음";
 };
-
-onMounted(async () => {
-  try {
-    if (props.adultTicketId) {
-      await ticketStore.fetchAdultTicket(Number(props.adultTicketId));
-    }
-
-    if (props.childTicketId) {
-      await ticketStore.fetchChildTicket(Number(props.childTicketId));
-    }
-    console.log(props.themeParkId);
-
-    if (props.themeParkId) {
-      await themeParkStore.fetchThemeParkById(Number(props.themeParkId));
-    }
-
-    isLoaded.value = true;
-  } catch (error) {
-    console.error("데이터 로드 중 오류 발생:", error);
-  }
-});
 
 const localAdultCount = ref(0);
 const localChildCount = ref(0);
