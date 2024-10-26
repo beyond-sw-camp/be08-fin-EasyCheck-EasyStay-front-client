@@ -355,7 +355,7 @@ const router = createRouter({
       component: PwAuthView,
     },
     {
-      path: "/noticesListView/noticeDetail",
+      path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
     },

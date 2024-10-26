@@ -88,7 +88,9 @@ onMounted(async () => {
 });
 
 const goToNoticeDetail = (id) => {
+  console.log("전달된 공지사항 ID: ", id); // 전달된 ID를 확인
   router.push({ name: "NoticeDetail", params: { id } });
+  console.log("라우팅 완료"); // 라우팅 시도 후 로그
 };
 </script>
 
