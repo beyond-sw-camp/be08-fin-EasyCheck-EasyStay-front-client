@@ -1,10 +1,13 @@
 import { defineStore } from "pinia";
 // 1번
 import axios from "axios";
+// import apiClient from "@/api";
+// import axios from "axios";
 
 export const useNoticeStore = defineStore("notice", {
   state: () => ({
     notices: [],
+    notice: null,
     accommodations: [], // 리조트 정보를 저장할 배열
     loading: false,
     error: null,
@@ -35,6 +38,9 @@ export const useNoticeStore = defineStore("notice", {
           return branchMatch && searchMatch;
         }) || []
       );
+    },
+    getNoticeById: (state) => (id) => {
+      return state.notices.find((notice) => notice.id === Number(id));
     },
   },
   actions: {
@@ -71,6 +77,22 @@ export const useNoticeStore = defineStore("notice", {
       } catch (err) {
         this.error = err.message;
         console.log("Error response:", err.response);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchNoticeById(id) {
+      console.log("요청한 ID:", id);
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await axios.get(`/api/v1/notices-reply/${id}`);
+        this.notice = response.data; // 가져온 데이터를 state에 저장
+        console.log("데이터 확인 : ", response);
+      } catch (err) {
+        this.error = err.message;
+        console.error("Error fetching notice:", err);
       } finally {
         this.loading = false;
       }

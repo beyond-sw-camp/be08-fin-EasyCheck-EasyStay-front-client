@@ -348,13 +348,13 @@ const router = createRouter({
       name: "SuggestionsListView",
       component: SuggestionsListView,
     },
-    {
+    { 
       path: "/users/mypage/auth",
       name: "AuthView",
       component: AuthView,
     },
     {
-      path: "/noticesListView/noticeDetail",
+      path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
     },
