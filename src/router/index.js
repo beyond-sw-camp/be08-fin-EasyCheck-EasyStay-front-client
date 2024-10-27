@@ -47,6 +47,7 @@ import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwVi
 import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
 
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
+import CorporateJoinCompleteView from "@/views/LandingPages/SignIn/Corporate/CorporateJoinCompleteView.vue";
 
 import MypageView from "@/views/Mypage/MypageView.vue";
 import InfoUpdateView from "@/views/Mypage/InfoUpdate/InfoUpdateView.vue";
@@ -375,6 +376,11 @@ const router = createRouter({
       path: "/users/themeparkReservationLists",
       name: "ThemeparkReservationList",
       component: ThemeparkReservationList,
+    },
+    {
+      path: "/users/corporateJoinComplete",
+      name: "CorporateJoinCompleteView",
+      component: CorporateJoinCompleteView,
     },
   ],
 });
