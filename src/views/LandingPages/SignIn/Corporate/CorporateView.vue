@@ -1,8 +1,8 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { onMounted } from "vue";
-import { RouterLink } from 'vue-router';
-
+import { onMounted, ref } from "vue";
+import { RouterLink, useRouter } from 'vue-router';
+import { userLoginStore } from "@/stores/loginStore";
 // example components
 import Header from "@/examples/Header.vue";
 
@@ -18,6 +18,33 @@ import CorporateInfo from "../Sections/CorporateInfo.vue";
 onMounted(() => {
   setMaterialInput();
 });
+
+const loginStore = userLoginStore();
+const router = useRouter();
+
+const handleSubmit = async () => {
+  if (!loginStore.isAuthenticated) {
+    alert("휴대폰 인증이 필요합니다.");
+    return;
+  }
+
+  try {
+    const corporateData = {
+      emailPrefix: loginStore.signUpformData.emailPrefix,
+      emailSuffix: loginStore.signUpformData.emailSuffix,
+      name: loginStore.signUpformData.name,
+      phone: `${loginStore.selectedPhonePrefix}${loginStore.phoneMiddle}${loginStore.phoneSuffix}`,
+    };
+
+    // 회원가입 호출
+    await loginStore.registerCorporateUser(corporateData);
+
+    // 성공적으로 가입 후 페이지 이동
+    router.push('/users/corporateJoinComplete');
+  } catch (error) {
+    alert(error.message); // 오류 메시지 출력
+  }
+};
 
 </script>
 
@@ -53,7 +80,7 @@ onMounted(() => {
             </MaterialButton>
           </RouterLink>
           <RouterLink to="/users/corporateJoinComplete">
-            <MaterialButton class="btn btn-primary ms-2">
+            <MaterialButton class="btn btn-primary ms-2" @click="handleSubmit">
               신청 완료
             </MaterialButton>
           </RouterLink>

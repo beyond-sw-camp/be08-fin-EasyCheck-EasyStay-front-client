@@ -53,6 +53,10 @@ export const userLoginStore = defineStore("userStore", {
         state.consentItems2.every((item) => item.checked)
       );
     },
+
+    setAuthenticated(state, status) {
+      state.isAuthenticated = status;
+    },
   },
 
   actions: {
@@ -142,6 +146,11 @@ export const userLoginStore = defineStore("userStore", {
       }
     },
 
+    setVerificationCode(code) {
+      this.verificationCode = code;
+      console.log("Verification code set to:", this.verificationCode);
+    },
+
     // 인증번호 확인
     async verifyCode(phone, verificationCode) {
       console.log("Phone Number:", phone);
@@ -155,6 +164,7 @@ export const userLoginStore = defineStore("userStore", {
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
           this.isAuthenticated = true;
+          localStorage.setItem("isAuthenticated", "true");
           return true;
         }
       } catch (error) {
@@ -191,6 +201,35 @@ export const userLoginStore = defineStore("userStore", {
 
       try {
         const response = await apiClient.post("/users", requestData);
+        if (response.status === 200) {
+          return true;
+        }
+      } catch (error) {
+        console.error("회원가입 실패:", error);
+        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+
+    // 법인회원 - 회원가입
+    async registerCorporateUser() {
+      const emailPrefix = this.signUpformData.emailPrefix;
+      const emailSuffix = this.signUpformData.emailSuffix;
+
+      // 전화번호 구성
+      const phonePrefix = this.selectedPhonePrefix;
+      const phoneMiddle = this.phoneMiddle;
+      const phoneSuffix = this.phoneSuffix;
+
+      const requestData = {
+        email: `${emailPrefix}@${emailSuffix}`,
+        name: this.signUpformData.name,
+        phone: `${phonePrefix}${phoneMiddle}${phoneSuffix}`,
+      };
+
+      console.log(requestData);
+
+      try {
+        const response = await apiClient.post("/corp-users", requestData);
         if (response.status === 200) {
           return true;
         }

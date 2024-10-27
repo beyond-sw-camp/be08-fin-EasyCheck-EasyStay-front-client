@@ -45,7 +45,6 @@ const isAllChecked = computed(() => {
 const selectedPhonePrefix = ref('010');
 const phoneMiddle = ref('');
 const phoneSuffix = ref('');
-
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
@@ -65,27 +64,28 @@ const carrierOptions = ref([
   { value: 'carrier6', text: 'LGU+알뜰폰' },
 ]);
 
-
+// 인증번호 요청
 // 인증번호 클릭 시 아래로
 const isVerificationRequested = ref('false');
 
-// 휴대폰 인증
 const authenticatePhone = async () => {
   // 약관 동의 여부 체크
   if (!isAllChecked.value) {
     alert("모든 약관에 동의해야 인증번호를 요청할 수 있습니다.");
-    return;
+    return; // 약관 동의가 안 되면 요청하지 않음
   }
 
   isVerificationRequested.value = true;
+
+  // 상태 업데이트
   loginStore.setPhoneNumbers(selectedPhonePrefix.value, phoneMiddle.value, phoneSuffix.value);
 
   try {
     await loginStore.handlePhoneAuthentication();
-    alert("인증번호 요청이 성공적으로 전송되었습니다.");
+    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
-    alert("인증번호 요청 중 오류가 발생했습니다.");
+    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
   }
 };
 
@@ -95,7 +95,7 @@ const verificationCode = ref('');
 const requestVerification = async () => {
   const phoneNumber = `${selectedPhonePrefix.value}${phoneMiddle.value}${phoneSuffix.value}`;
   console.log('Phone Number: ', phoneNumber);
-  console.log('Entered verification code: ', verificationCode.value);
+  console.log('Entered verification code: ', loginStore.verificationCode); // 스토어의 값 사용
 
   try {
     const message = await loginStore.verifyCode(phoneNumber, loginStore.verificationCode);
@@ -105,6 +105,42 @@ const requestVerification = async () => {
   }
 };
 
+
+const selectedDomain = ref('');
+const isCustomDomain = ref(false);
+
+const onDomainChange = () => {
+  if (selectedDomain.value === 'etc') {
+    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
+  } else {
+    isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
+    loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
+  }
+};
+
+const updateEmailSuffix = () => {
+  if (selectedDomain !== 'etc') {
+    loginStore.signUpformData.emailSuffix = selectedDomain;
+  }
+
+  const email = createEmail(); // 이메일 생성
+  console.log('Generated Email:', email);
+  loginStore.signUpformData.email = email; // 이메일 값 저장
+};
+
+// 이메일 합치기
+const createEmail = () => {
+  const emailPrefix = loginStore.signUpformData.emailPrefix || '';
+  const emailSuffix = loginStore.signUpformData.emailSuffix || '';
+
+  // prefix와 suffix가 비어있는 경우에 대해 처리
+  if (!emailPrefix || !emailSuffix) {
+    console.error('이메일 구성 오류: prefix 또는 suffix가 비어있습니다.');
+    return '이메일을 제대로 입력하세요'; // 오류 메시지
+  }
+
+  return `${emailPrefix}@${emailSuffix}`;
+};
 </script>
 
 <template>
@@ -169,13 +205,13 @@ const requestVerification = async () => {
           </td>
         </tr>
 
-        <!-- 아이디 -->
+        <!-- 이름 -->
         <tr>
-          <td class="fw-bold fs-8">이름</td>
+          <td class="fw-bold fs-8">성함</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="username" :label="{ text: '이름', class: 'form-label' }"
-                type="text" />
+              <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0" id="name"
+                :label="{ text: '성함', class: 'form-label' }" type="text" />
             </div>
           </td>
         </tr>
@@ -228,17 +264,18 @@ const requestVerification = async () => {
           </tr>
         </transition>
 
+        <!-- 이메일 -->
         <tr>
           <td class="fw-bold fs-8 col-1">이메일</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="emailPrefix"
-                :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
+              <MaterialInput v-model="loginStore.signUpformData.emailPrefix" required class="input-group-outline mb-0"
+                id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
               <span class="mx-1">@</span>
 
               <template v-if="isCustomDomain">
-                <MaterialInput class="input-group-outline mb-0 ms-2" id="emailSuffix" type="text" style="flex: 1;"
-                  placeholder="도메인 입력" />
+                <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
+                  id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
               </template>
 
               <template v-else>
