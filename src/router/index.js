@@ -63,6 +63,7 @@ import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
+import EventsListView from "@/views/Events/EventsListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -352,14 +353,19 @@ const router = createRouter({
       component: SuggestionsListView,
     },
     {
-      path: "/users/mypage/pwAuth",
-      name: "PwAuthView",
-      component: PwAuthView,
-    },
-    {
       path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
+    },
+    {
+      path: "/eventsListView",
+      name: "eventsListView",
+      component: EventsListView,
+    },
+    {
+      path: "/users/mypage/pwAuth",
+      name: "PwAuthView",
+      component: PwAuthView,
     },
     {
       path: "/users/mypage/infoAuth",
