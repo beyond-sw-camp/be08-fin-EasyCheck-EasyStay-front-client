@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
 import router from "@/router";
+import { mypageStore } from "./mypageStore";
 
 export const userLoginStore = defineStore("userStore", {
   state: () => ({
@@ -13,7 +14,10 @@ export const userLoginStore = defineStore("userStore", {
     jibunAddress: "",
     detailAddress: "",
 
-    userData: "",
+    userData: {
+      name: "",
+      email: "",
+    },
 
     // 로그인 상태 저장
     isLoggedIn: false,
@@ -57,8 +61,9 @@ export const userLoginStore = defineStore("userStore", {
       this.isLoggedIn = status;
     },
 
-    // 일반회원 - 로그인
     async login(loginData) {
+      const mypageStoreInstance = mypageStore();
+
       try {
         const response = await apiClient.post("/users/login", loginData);
         console.log(response.data);
@@ -68,19 +73,26 @@ export const userLoginStore = defineStore("userStore", {
           this.setLoginStatus(true);
           console.log("로그인 성공, 저장된 토큰:", response.data.accessToken);
 
-          // 로그인 후 사용자 정보 가져오기
-          await this.getUserData();
-          router.push("/");
+          // 사용자 ID를 로그인 스토어에 저장
+          this.userData.id = response.data.userId;
 
+          // 사용자 정보 가져오기
+          if (localStorage.getItem("accessToken")) {
+            await this.getUserData(); // 로그인 스토어에서 사용자 정보 가져오기
+            mypageStoreInstance.userData.id = this.userData.id;
+            mypageStoreInstance.userData.name = this.userData.name;
+            mypageStoreInstance.userData.email = this.userData.email;
+          }
+
+          // 메인 페이지로 이동
+          router.push("/");
           return response.data;
         } else {
-          throw new Error(
-            "Unexpected response format: " + JSON.stringify(response)
-          );
+          throw new Error("Unexpected response format");
         }
       } catch (error) {
         console.error("로그인 실패:", error);
-        throw new Error(error.response?.data?.message || "로그인 실패");
+        alert(error.message || "로그인 실패");
       }
     },
 
@@ -191,14 +203,15 @@ export const userLoginStore = defineStore("userStore", {
     // 사용자 정보 가져오기
     async getUserData() {
       try {
-        const response = await apiClient.get("/users/info");
-        this.userData = response.data;
+        const response = await apiClient.get("/users/info"); // API 호출
+        if (response.data) {
+          this.userData.id = response.data.id;
+          this.userData.name = response.data.name;
+          this.userData.email = response.data.email;
+        }
       } catch (error) {
-        this.error =
-          error.response?.data?.message ||
-          "사용자 정보를 가져오는 데 실패했습니다.";
-        console.error("사용자 정보 요청 오류:", this.error);
-        throw error;
+        console.error("사용자 정보 가져오기 실패:", error);
+        throw error; // 오류를 다시 던짐
       }
     },
 

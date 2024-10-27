@@ -4,7 +4,10 @@ import { userLoginStore } from "@/stores/loginStore";
 
 export const mypageStore = defineStore("mypageStore", {
   state: () => ({
-    userData: {},
+    userData: {
+      name: "",
+      email: "",
+    },
 
     changePW: {
       email: "",
@@ -51,6 +54,21 @@ export const mypageStore = defineStore("mypageStore", {
         return response.data;
       } catch (error) {
         throw new Error(error.response?.data?.message || "정보 수정 실패");
+      }
+    },
+
+    // 회원 탈퇴
+    async deactivateUserAction() {
+      if (!this.userData.id) {
+        throw new Error("사용자 ID가 없습니다.");
+      }
+
+      try {
+        await apiClient.delete("/users");
+        this.userData = {};
+      } catch (error) {
+        console.error("탈퇴 실패:", error);
+        throw error;
       }
     },
   },
