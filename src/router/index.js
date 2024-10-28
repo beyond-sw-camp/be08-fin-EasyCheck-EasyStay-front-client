@@ -357,7 +357,7 @@ const router = createRouter({
     },
     {
       path: "/eventsListView",
-      name: "eventsListView",
+      name: "EventsListView",
       component: EventsListView,
     },
     {
