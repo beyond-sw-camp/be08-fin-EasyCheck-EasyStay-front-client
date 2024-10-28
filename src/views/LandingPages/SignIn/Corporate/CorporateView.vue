@@ -3,13 +3,9 @@
 import { onMounted, ref } from "vue";
 import { RouterLink, useRouter } from 'vue-router';
 import { userLoginStore } from "@/stores/loginStore";
-// example components
+
 import Header from "@/examples/Header.vue";
-
-// Vue Material Kit 2 components
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
@@ -23,28 +19,22 @@ const loginStore = userLoginStore();
 const router = useRouter();
 
 const handleSubmit = async () => {
-  if (!loginStore.isAuthenticated) {
-    alert("휴대폰 인증이 필요합니다.");
-    return;
-  }
-
   try {
     const corporateData = {
-      emailPrefix: loginStore.signUpformData.emailPrefix,
-      emailSuffix: loginStore.signUpformData.emailSuffix,
       name: loginStore.signUpformData.name,
       phone: `${loginStore.selectedPhonePrefix}${loginStore.phoneMiddle}${loginStore.phoneSuffix}`,
+      email: `${loginStore.signUpformData.emailPrefix}@${loginStore.signUpformData.emailSuffix}`,
     };
 
     // 회원가입 호출
-    await loginStore.registerCorporateUser(corporateData);
-
-    // 성공적으로 가입 후 페이지 이동
-    router.push('/users/corporateJoinComplete');
+    const success = await loginStore.registerCorporateUser(corporateData);
+    if (success) {
+      router.push('/users/corporateJoinComplete');
+    }
   } catch (error) {
-    alert(error.message); // 오류 메시지 출력
-  }
-};
+    alert("회원가입 중 오류 발생: " + error.message);
+  };
+}
 
 </script>
 

@@ -161,20 +161,25 @@ export const userLoginStore = defineStore("userStore", {
           phone,
           code: verificationCode,
         });
+
+        console.log("인증 요청 데이터:", phone);
+        console.log("인증 요청 데이터", verificationCode);
+
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
           this.isAuthenticated = true;
-          localStorage.setItem("isAuthenticated", "true");
+          console.log("인증 후 isAuthenticated:", this.isAuthenticated);
           return true;
         }
       } catch (error) {
         console.error("Error in verifyCode:", error.message);
         alert("인증에 실패했습니다. 확인 후 다시 시도해주세요.");
       }
+
       return false;
     },
 
-    // 일반회원 - 회원가입
+    // 회원가입 - 일반회원
     async registerUser() {
       const addr = `${this.roadAddress} ${this.detailAddress}`;
       const addrDetail = this.jibunAddress;
@@ -197,20 +202,35 @@ export const userLoginStore = defineStore("userStore", {
         marketingConsent: this.signUpformData.marketingConsent,
       };
 
-      console.log(requestData);
+      console.log("회원가입 요청 데이터:", requestData);
+
+      if (!this.isAuthenticated) {
+        alert("휴대폰 인증이 필요합니다.");
+        return false;
+      }
+
+      console.log("회원가입 시 isAuthenticated:", this.isAuthenticated);
 
       try {
         const response = await apiClient.post("/users", requestData);
-        if (response.status === 200) {
+        console.log("API 응답:", response);
+        if (response.status === 201) {
           return true;
+        } else {
+          alert("회원가입에 실패했습니다. 다시 시도해주세요.");
         }
       } catch (error) {
-        console.error("회원가입 실패:", error);
+        console.error(
+          "회원가입 실패:",
+          error.response ? error.response.data : error.message
+        );
         alert("회원가입에 실패했습니다. 다시 시도해주세요.");
       }
+
+      return false;
     },
 
-    // 법인회원 - 회원가입
+    // 회원가입 - 법인회원
     async registerCorporateUser() {
       const emailPrefix = this.signUpformData.emailPrefix;
       const emailSuffix = this.signUpformData.emailSuffix;
@@ -221,20 +241,29 @@ export const userLoginStore = defineStore("userStore", {
       const phoneSuffix = this.phoneSuffix;
 
       const requestData = {
-        email: `${emailPrefix}@${emailSuffix}`,
         name: this.signUpformData.name,
         phone: `${phonePrefix}${phoneMiddle}${phoneSuffix}`,
+        email: `${emailPrefix}@${emailSuffix}`,
       };
 
-      console.log(requestData);
+      console.log("회원가입 요청 데이터:", requestData); // 요청 데이터 로그 추가
 
+      // 인증이 실패한 경우 처리
+      if (!this.isAuthenticated) {
+        alert("휴대폰 인증이 필요합니다.");
+        return false;
+      }
+
+      // 회원가입 요청
       try {
         const response = await apiClient.post("/corp-users", requestData);
-        if (response.status === 200) {
+        if (response.status === 201) {
+          alert("회원가입 성공!");
           return true;
         }
       } catch (error) {
-        console.error("회원가입 실패:", error);
+        console.log(error);
+        console.error("회원가입 실패:", error.message, error.response?.data);
         alert("회원가입에 실패했습니다. 다시 시도해주세요.");
       }
     },
@@ -250,7 +279,7 @@ export const userLoginStore = defineStore("userStore", {
         }
       } catch (error) {
         console.error("사용자 정보 가져오기 실패:", error);
-        throw error; // 오류를 다시 던짐
+        throw error;
       }
     },
 
@@ -279,6 +308,7 @@ export const userLoginStore = defineStore("userStore", {
       }
     },
 
+    // 이메일 중복 체크
     async checkEmailDuplicate(email) {
       try {
         const response = await apiClient.patch("users/check-duplicate", {
