@@ -28,8 +28,9 @@
           </div>
         </div>
       </div>
-
-      <button class="btn-list" @click="goBack">목록으로 돌아가기</button>
+      <div class="event-actions my-4">
+        <button class="btn-list" @click="goBack">목록으로 돌아가기</button>
+      </div>
     </div>
   </section>
 </template>
@@ -38,17 +39,19 @@
 import { onMounted, ref } from "vue";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-import { useRoute } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useEventStore } from "@/stores/eventStore";
 import { storeToRefs } from "pinia";
 
 const eventStore = useEventStore();
 const { allEvents } = storeToRefs(eventStore);
+const router = useRouter();
 const route = useRoute();
 
 const event = ref(null);
 
 onMounted(async () => {
+  window.scrollTo(0, 0); // 페이지 로드 시 맨 위로 스크롤
   const eventId = route.params.id;
   console.log("아이디 출력 : ", eventId);
 
@@ -72,7 +75,7 @@ onMounted(async () => {
 });
 
 const goBack = () => {
-  route.push("/eventsListView");
+  router.push("/eventsListView");
 };
 </script>
 
