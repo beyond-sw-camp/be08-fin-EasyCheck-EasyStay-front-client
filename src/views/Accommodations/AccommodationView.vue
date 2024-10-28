@@ -19,7 +19,7 @@ import { useRoute } from "vue-router";
 import { useRoomStore } from "@/stores/roomStore.js";
 import { useEventStore } from "@/stores/eventStore.js";
 import { useAccommodationStore } from "@/stores/accommodationStore.js";
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 
 const route = useRoute();
 
@@ -27,13 +27,15 @@ const roomStore = useRoomStore();
 const eventStore = useEventStore();
 const accommodationStore = useAccommodationStore();
 
+const accommodationId = computed(() => route.params.accommodationId);
+
 onMounted(async () => {
   // 숙박시설에 존재하는 객실 조회
-  await roomStore.fetchAccommodationRooms(route.params.accommodationId);
+  await roomStore.fetchRoomTypesByAccommodationId(accommodationId.value);
   // 숙박시설에 해당하는 이벤트 조회
-  await eventStore.fetchAccommodationEvents(route.params.accommodationId);
+  await eventStore.fetchAccommodationEvents(accommodationId.value);
   // 숙박시설 단일 조회
-  await accommodationStore.fetchAccommodationById(route.params.accommodationId);
+  await accommodationStore.fetchAccommodationById(accommodationId.value);
 });
 </script>
 

@@ -4,9 +4,7 @@
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4">
         <div class="col" :key="event.eventId" v-for="event in events">
-          <router-link :to="{ path: /event/`${event.eventId}` }">
-            <info-card :info="event" />
-          </router-link>
+          <info-card :info="event" />
         </div>
       </div>
     </div>

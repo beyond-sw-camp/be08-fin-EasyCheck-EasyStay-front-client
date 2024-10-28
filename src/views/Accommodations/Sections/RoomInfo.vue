@@ -26,7 +26,7 @@ import InfoCard from "@/components/Cards/Room/InfoCard.vue";
 
 const roomStore = useRoomStore();
 
-const { compactRoomList: rooms } = storeToRefs(roomStore);
+const { compactRoomTypeList: rooms } = storeToRefs(roomStore);
 </script>
 
 <style lang="scss" scoped>
