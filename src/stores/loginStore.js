@@ -64,7 +64,16 @@ export const userLoginStore = defineStore("userStore", {
     async setLoginStatus(status) {
       this.isLoggedIn = status;
     },
-
+    
+    checkLogin() {
+      if (localStorage.getItem("accessToken")) {
+        this.isLoggedIn = true;
+      } else {
+        this.isLoggedIn = false;
+      }
+    },
+    
+    // 일반회원 - 로그인
     async login(loginData) {
       const mypageStoreInstance = mypageStore();
 
