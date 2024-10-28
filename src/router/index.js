@@ -67,6 +67,7 @@ import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
 import EventsListView from "@/views/Events/EventsListView.vue";
+import EventDetail from "@/views/Events/EventDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -379,6 +380,11 @@ const router = createRouter({
       path: "/eventsListView",
       name: "eventsListView",
       component: EventsListView,
+    },
+    {
+      path: "/eventsListView/:id",
+      name: "EventDetail",
+      component: EventDetail,
     },
     {
       path: "/users/mypage/pwAuth",

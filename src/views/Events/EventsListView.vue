@@ -55,6 +55,8 @@
           v-for="(event, index) in paginatedEvents"
           :key="index"
           class="event-card"
+          @click="goToEventDetail(event.id)"
+          style="cursor: pointer"
         >
           <img
             :src="event.images"
@@ -64,7 +66,6 @@
           <div class="event-info">
             <h3>{{ event.eventName }}</h3>
             <p>{{ event.startDate }} - {{ event.endDate }}</p>
-            <p>{{ event.detail }}</p>
           </div>
         </div>
       </div>
@@ -95,12 +96,15 @@
 <script setup>
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 
 import { ref, onMounted, computed } from "vue";
 import { useEventStore } from "@/stores/eventStore";
 
 const eventStore = useEventStore();
+
+const router = useRouter();
 
 // 여기서 state 꺼내올 수 있음
 // getters도 filteredNotices 이런식으로 받아올 수 있음
@@ -194,6 +198,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // 초기 슬라이드 보여주기
   showSlide(currentSlide);
 });
+
+const goToEventDetail = (id) => {
+  console.log("전달된 공지사항 ID: ", id); // 전달된 ID를 확인
+  router.push({ name: "EventDetail", params: { id } });
+  console.log("라우팅 완료"); // 라우팅 시도 후 로그
+};
 </script>
 
 <style lang="scss" scoped>
