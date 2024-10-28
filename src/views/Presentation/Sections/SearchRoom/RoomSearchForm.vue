@@ -1,6 +1,6 @@
 <!-- RoomSearchForm.vue -->
 <template>
-    <div class="card p-4">
+    <div class="card py-4 px-6">
         <form class="row g-3 align-items-center">
             <div class="col-md-4">
                 <label for="resortSelect" class="form-label">방문리조트 선택</label>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="col-md-4">
-                <button type="button" @click="searchRooms" class="btn btn-primary w-100">
+                <button type="button" @click="searchRooms" class="btn btn-black w-100">
                     객실 검색
                 </button>
             </div>
@@ -61,3 +61,12 @@ const searchRooms = () => {
     emit("search", { resort: resort.value, checkInDate: checkInDate.value, checkOutDate: checkOutDate.value, roomCount: roomCount.value });
 };
 </script>
+
+<style scoped>
+.btn {
+    border-radius: 0;
+    /* border: 1px solid; */
+    font-size: 14px;
+    box-shadow: none;
+}
+</style>
