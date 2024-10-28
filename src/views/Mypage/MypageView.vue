@@ -2,8 +2,8 @@
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
-import apiClient from "@/api";
 import { userLoginStore } from "@/stores/loginStore";
+import { mypageStore } from "@/stores/mypageStore";
 
 // example components
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
@@ -19,15 +19,17 @@ const router = useRouter();
 onMounted(async () => {
   setMaterialInput();
 
-  // 사용자 정보 가져오기
   const token = localStorage.getItem("accessToken");
   console.log("token: ", token);
 
   if (token) {
     try {
-      await userStore.getUserData();
+      await userStore.getUserData(); // 인스턴스에서 메소드 호출
+      // mypageStore의 userData 업데이트
+      mypageStore.userData.id = userStore.userData.id;
+      mypageStore.userData.name = userStore.userData.name;
+      mypageStore.userData.email = userStore.userData.email;
     } catch (err) {
-      error.value = "사용자 정보를 가져오는 데 실패했습니다.";
       console.error("API 오류:", err);
     }
   } else {
@@ -35,6 +37,7 @@ onMounted(async () => {
     router.push("/users/login");
   }
 });
+
 
 import easystayImage from '@/assets/img/easystay.png';
 </script>

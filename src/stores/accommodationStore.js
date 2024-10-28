@@ -14,6 +14,14 @@ export const useAccommodationStore = defineStore("accommodationStore", {
   },
 
   actions: {
+    resetAccommodations() {
+      this.accommodations = [];
+    },
+
+    resetAccommodation() {
+      this.accommodation = null;
+    },
+
     // 시설 생성 API 호출
     async createAccommodation(formData) {
       try {

@@ -5,7 +5,13 @@
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4">
         <div class="col" :key="room.roomId" v-for="room in rooms">
-          <info-card :info="room" />
+          <router-link
+            :to="{
+              path: `/room/${room.roomId}`,
+            }"
+          >
+            <info-card :info="room" />
+          </router-link>
         </div>
       </div>
     </div>
@@ -13,30 +19,14 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
+import { useRoomStore } from "@/stores/roomStore.js";
+
 import InfoCard from "@/components/Cards/Room/InfoCard.vue";
 
-const rooms = [
-  {
-    roomId: 0,
-    title: "디럭스",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room1.JPG",
-  },
-  {
-    roomId: 1,
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room4.JPG",
-    title: "스위트",
-  },
-  {
-    roomId: 2,
-    title: "패밀리",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room2.JPG",
-  },
-  {
-    roomId: 3,
-    title: "프레지덴셜",
-    imgUrl: "https://beyond-easycheck.s3.amazonaws.com/room/room3.jpg",
-  },
-];
+const roomStore = useRoomStore();
+
+const { compactRoomTypeList: rooms } = storeToRefs(roomStore);
 </script>
 
 <style lang="scss" scoped>

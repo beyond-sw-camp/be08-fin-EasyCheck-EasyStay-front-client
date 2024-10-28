@@ -9,53 +9,79 @@ const accommodationStore = useAccommodationStore();
 const router = useRouter();
 
 const fetchAccommodations = async () => {
-    try {
-        await accommodationStore.fetchAccommodations();
-        accommodations.value = accommodationStore.allAccommodations;
+  try {
+    await accommodationStore.fetchAccommodations();
+    accommodations.value = accommodationStore.allAccommodations;
 
-        console.log("Accommodations:", accommodations.value);
-    } catch (error) {
-        console.error("Failed to fetch accommodations:", error);
-    }
+    console.log("Accommodations:", accommodations.value);
+  } catch (error) {
+    console.error("Failed to fetch accommodations:", error);
+  }
 };
 
 const fetchAccommodationById = async (id) => {
-    console.log("Fetching accommodation by ID:", id);
+  console.log("Fetching accommodation by ID:", id);
 
-    try {
-        await accommodationStore.fetchAccommodationById(id);
-        router.push({ name: "Accommodation", params: { id } });
-    } catch (error) {
-        console.error("Failed to fetch accommodation by ID:", error);
-    }
+  try {
+    await accommodationStore.fetchAccommodationById(id);
+    router.push({ name: "Accommodation", params: { id } });
+  } catch (error) {
+    console.error("Failed to fetch accommodation by ID:", error);
+  }
 };
 
 onMounted(() => {
-    fetchAccommodations();
+  fetchAccommodations();
 });
 </script>
 
 <template>
-    <section class="mb-5 pb-5">
-        <div class="container mt-sm-5 mt-3">
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="position-sticky pb-lg-5 pb-3 mt-lg-0 mt-5 ps-2" style="top: 100px">
-                        <h3>Accommodation</h3>
-                        <h6 class="text-secondary font-weight-normal pe-3">
-                            숙소 목록을 확인하세요.
-                        </h6>
-                    </div>
-                </div>
-                <div class="col-lg-9">
-                    <div class="row">
-                        <div class="col-md-4" v-for="accommodation in accommodations" :key="accommodation.id">
-                            <ExampleCard :image="accommodation.thumbnailUrls[0]" :title="accommodation.name"
-                                @click="fetchAccommodationById(accommodation.id)" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <section class="mb-5 pb-5">
+    <div class="container mt-sm-5 mt-3">
+      <div class="row">
+        <div class="col-lg-3">
+          <div
+            class="position-sticky pb-lg-5 pb-3 mt-lg-0 mt-5 ps-2"
+            style="top: 100px"
+          >
+            <h3>Accommodation</h3>
+            <h6 class="text-secondary font-weight-normal pe-3">
+              숙소 목록을 확인하세요.
+            </h6>
+          </div>
         </div>
-    </section>
+        <div class="col-lg-9">
+          <div class="row">
+            <div
+              class="col-md-4"
+              v-for="accommodation in accommodations"
+              :key="accommodation.id"
+            >
+              <ExampleCard
+                :image="accommodation.thumbnailUrls[0]"
+                :title="accommodation.name"
+                @click="fetchAccommodationById(accommodation.id)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="row">
+        <div
+          class="col-md-4"
+          v-for="accommodation in accommodations"
+          :key="accommodation.id"
+        >
+          <ExampleCard
+            :accommodationId="accommodation.id"
+            :image="accommodation.thumbnailUrls[0]"
+            :title="accommodation.name"
+            :route="'Accommodation'"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
 </template>

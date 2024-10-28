@@ -55,22 +55,23 @@ const clickDate = (e) => {
       start: selectedDate,
       end: selectedDate,
     };
-    reservationStore.setCheckIn(selectedDate);
-    reservationStore.setCheckOut(selectedDate);
+
+    reservationStore.setCheckinDate(selectedDate);
+    reservationStore.setCheckoutDate(selectedDate);
   } else if (selectMode.value === DATE_SELECTION_MODE.END) {
     if (selectedDate.getTime() < currentStartDate.getTime()) {
       attrs[0].dates = {
         start: selectedDate,
         end: currentStartDate,
       };
-      reservationStore.setCheckIn(selectedDate);
-      reservationStore.setCheckOut(currentStartDate);
+      reservationStore.setCheckinDate(selectedDate);
+      reservationStore.setCheckoutDate(currentStartDate);
     } else {
       attrs[0].dates = {
         ...attrs[0].dates,
         end: selectedDate,
       };
-      reservationStore.setCheckOut(selectedDate);
+      reservationStore.setCheckoutDate(selectedDate);
     }
   }
 

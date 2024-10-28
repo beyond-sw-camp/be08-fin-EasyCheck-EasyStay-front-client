@@ -49,6 +49,7 @@ import FindPwView from "@/views/LandingPages/SignIn/Member/FindMemberPW/FindPwVi
 import PwComplete from "@/views/LandingPages/SignIn/Member/FindMemberPW/PwComplete.vue";
 
 import CorporateView from "@/views/LandingPages/SignIn/Corporate/CorporateView.vue";
+import CorporateJoinCompleteView from "@/views/LandingPages/SignIn/Corporate/CorporateJoinCompleteView.vue";
 
 import MypageView from "@/views/Mypage/MypageView.vue";
 import InfoUpdateView from "@/views/Mypage/InfoUpdate/InfoUpdateView.vue";
@@ -195,14 +196,11 @@ const router = createRouter({
       name: "el-typography",
       component: ElTypography,
     },
+    // 숙박시설 디테일 페이지
     {
-      path: "/accommodation",
+      path: "/accommodation/:accommodationId",
       name: "Accommodation",
       component: AccommodationView,
-      props: (route) => ({
-        // queryParam이 지정되지 않는다면 기본값으로 들어가게 설정
-        accommodationId: route.query.accommodationId || 1,
-      }),
     },
     // 테마파크 라우팅
     {
@@ -249,7 +247,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/room/:roomId",
+      path: "/room/:roomTypeId",
       name: "Room",
       component: RoomDetailView,
     },
@@ -401,6 +399,11 @@ const router = createRouter({
       path: "/users/themeparkReservationLists",
       name: "ThemeparkReservationList",
       component: ThemeparkReservationList,
+    },
+    {
+      path: "/users/corporateJoinComplete",
+      name: "CorporateJoinCompleteView",
+      component: CorporateJoinCompleteView,
     },
   ],
 });

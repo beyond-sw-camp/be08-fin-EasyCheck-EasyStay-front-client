@@ -12,13 +12,14 @@
           {{ selectedMonth }}
         </button>
         <ul class="dropdown-menu" :class="{ show: isDropdownOpen }">
-          <li v-for="month in availableMonths" :key="month">
-            <a
-              class="dropdown-item"
-              href="#"
-              @click.prevent="selectMonth(month)"
-              >{{ month }}</a
-            >
+          <li
+            v-for="month in availableMonths"
+            :key="month"
+            class="dropdown-item"
+            href="#"
+            @click.prevent="selectMonth(month)"
+          >
+            {{ month }}
           </li>
         </ul>
       </div>
@@ -30,21 +31,14 @@
           <tr>
             <th>구분</th>
             <th>일반요금</th>
-            <th colspan="2">객실이용요금</th>
-          </tr>
-          <tr>
-            <th></th>
-            <th></th>
-            <th>무기명</th>
-            <th>기명</th>
+            <th>법인 회원요금</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="rate in roomRates" :key="rate.id">
-            <td>{{ rate.type }}</td>
-            <td>{{ formatPrice(rate.normalPrice) }}</td>
-            <td>{{ formatPrice(rate.unnamedPrice) }}</td>
-            <td>{{ formatPrice(rate.namedPrice) }}</td>
+            <td>{{ rate.seasonName }}</td>
+            <td>{{ formatPrice(rate.normalRate) }}</td>
+            <td>{{ formatPrice(rate.corpRate) }}</td>
           </tr>
         </tbody>
       </table>
@@ -52,19 +46,11 @@
     <div class="mt-3 small">
       <p><strong>요금 구분</strong></p>
       <ul>
-        <li>일반요금 : 비회원 대상</li>
+        <li>일반요금 : 일반회원 대상</li>
         <li>
-          객실이용요금 : 한화리조트 회원권을 소지하고 계신 개인,법인회원 대상
+          객실이용요금 : EasyStay 회원권을 소지하고 계신 개인,법인회원 대상
         </li>
       </ul>
-      <p>
-        프렌즈 고객 요금은 로그인 후 객실예약 화면에서 별도 조회가
-        가능합니다.(일반요금 대비 20~40% 할인 적용)
-      </p>
-      <p>
-        자세한 시즌 일정은 로그인 후 확인 가능합니다.<br />(홈페이지 >
-        회원로그인 > 분양회원추첨접수 > 추첨접수안내 > 추첨예약 일정)
-      </p>
     </div>
   </section>
   <section class="late-checkout-fees mt-5">
@@ -112,14 +98,8 @@
       </ul>
       <p><strong>요일기준</strong></p>
       <ul>
-        <li>
-          주중: 일 ~ 목 (한화리조트 제주, 거제 벨버디어, 르 씨엘 멤버스: 월 ~
-          목)
-        </li>
-        <li>
-          주말: 금, 토 (한화리조트 제주, 거제 벨버디어, 르 씨엘 멤버스: 금, 토,
-          일)
-        </li>
+        <li>주중: 일 ~ 목</li>
+        <li>주말: 금, 토</li>
         <li>연휴: 공휴일 당일 및 전일</li>
         <li>성수기: 여름 및 겨울 성수기 기간 별도 안내</li>
       </ul>
@@ -128,84 +108,28 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useRoomStore } from "@/stores/roomStore";
+
+const roomStore = useRoomStore();
+const { roomRates, currentRoomId } = storeToRefs(roomStore);
 
 const isDropdownOpen = ref(false);
-const selectedMonth = ref("2024년 03월");
-const availableMonths = ["2024년 03월", "2024년 04월", "2024년 05월"];
+const currentYear = new Date().getFullYear();
 
-const roomRates = ref([
-  {
-    id: 1,
-    type: "가을 비수기 준주말",
-    normalPrice: 475000,
-    unnamedPrice: 223000,
-    namedPrice: 213000,
-  },
-  {
-    id: 2,
-    type: "가을 비수기 일요일",
-    normalPrice: 473000,
-    unnamedPrice: 222000,
-    namedPrice: 212000,
-  },
-  {
-    id: 3,
-    type: "가을 비수기 월요일",
-    normalPrice: 425000,
-    unnamedPrice: 199000,
-    namedPrice: 189000,
-  },
-  {
-    id: 4,
-    type: "가을 비수기 화요일",
-    normalPrice: 410000,
-    unnamedPrice: 192000,
-    namedPrice: 182000,
-  },
-  {
-    id: 5,
-    type: "가을 비수기 수요일",
-    normalPrice: 410000,
-    unnamedPrice: 192000,
-    namedPrice: 182000,
-  },
-  {
-    id: 6,
-    type: "가을 비수기 목요일",
-    normalPrice: 425000,
-    unnamedPrice: 199000,
-    namedPrice: 189000,
-  },
-  {
-    id: 7,
-    type: "가을 성수기 주말",
-    normalPrice: 538000,
-    unnamedPrice: 240000,
-    namedPrice: 230000,
-  },
-  {
-    id: 8,
-    type: "가을 성수기 연휴",
-    normalPrice: 665000,
-    unnamedPrice: 251000,
-    namedPrice: 241000,
-  },
-  {
-    id: 9,
-    type: "가을 극성수기 연휴",
-    normalPrice: 728000,
-    unnamedPrice: 276000,
-    namedPrice: 266000,
-  },
-  {
-    id: 10,
-    type: "가을 준성수기B 연휴",
-    normalPrice: 593000,
-    unnamedPrice: 222000,
-    namedPrice: 212000,
-  },
-]);
+// 월 선택지 생성
+const availableMonths = computed(() => {
+  const months = ["전체"];
+  for (let i = 1; i <= 12; i++) {
+    const monthStr = i < 10 ? `0${i}` : `${i}`;
+    months.push(`${currentYear}년 ${monthStr}월`);
+  }
+  return months;
+});
+
+// 현재 월을 기본값으로 설정
+const selectedMonth = ref("전체");
 
 const feeData = ref([
   {
@@ -241,9 +165,21 @@ const selectMonth = (month) => {
   isDropdownOpen.value = false;
 };
 
-const search = () => {
-  console.log(`Searching for rates in ${selectedMonth.value}`);
-  // Here you would typically fetch new data based on the selected month
+const convertToLocalDate = (monthStr) => {
+  if (monthStr === "전체") return null;
+
+  const [year, month] = monthStr
+    .replace(/[년월\s]/g, "")
+    .match(/(\d{4})(\d{2})/)
+    .slice(1);
+  return `${year}-${month}-01`;
+};
+
+const search = async () => {
+  const localDateStr = convertToLocalDate(selectedMonth.value);
+
+  // 여기서 서버 통신 로직 구현
+  await roomStore.fetchRoomRates(currentRoomId.value, localDateStr);
 };
 
 const formatPrice = (price) => {

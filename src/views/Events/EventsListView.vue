@@ -1,18 +1,30 @@
 <template>
-  <navbar-default />
+  <div class="position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <NavbarDefault :sticky="true" />
+      </div>
+    </div>
+  </div>
   <Header />
-  <section class="py-6">
+  <section class="py-10">
     <div class="container">
-      <h3>Events</h3>
+      <h2>Events</h2>
       <div class="banner-slider">
         <div class="slide">
           <img src="@/assets/img/이벤트배너 1.png" alt="Banner 1" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 4.png" alt="Banner 2" />
+          <img src="@/assets/img/이벤트배너 2.png" alt="Banner 2" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 2.png" alt="Banner 3" />
+          <img src="@/assets/img/이벤트배너 3.png" alt="Banner 3" />
+        </div>
+        <div class="slide">
+          <img src="@/assets/img/이벤트배너 4.png" alt="Banner 3" />
+        </div>
+        <div class="slide">
+          <img src="@/assets/img/이벤트배너 5.png" alt="Banner 3" />
         </div>
         <!-- 추가적인 배너 이미지를 여기다 넣을 수 있습니다 -->
 
@@ -20,115 +32,61 @@
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
       </div>
-      <!-- 지점 선택  -->
+      <!-- 지점 선택 -->
       <div class="branch-selection">
-        <select>
-          <option value="1">Seoul Branch</option>
-          <option value="2">Busan Branch</option>
-          <option value="3">Jeju Branch</option>
+        <select id="resort-select" v-model="query.branch">
+          <option
+            v-for="branch in accommodations"
+            :key="branch.id"
+            :value="branch.name"
+          >
+            {{ branch.name }}
+          </option>
         </select>
       </div>
-      <!-- 총 이벤트 건수  -->
-      <div class="event-count">
-        <h2>10 Events</h2>
-        <p>in 서울 지점</p>
-      </div>
 
-      <!-- 이벤트 사진과 내용 -->
-      <div class="event-list">
-        <div class="event-card">
-          <img
-            src="@/assets/img/003.png"
-            alt="Event 1 Image"
-            class="event-image"
-          />
-          <div class="event-info">
-            <h3>Luxury Gala Dinner</h3>
-            <p>2024.12.25 - 2024.12.30</p>
-            <p>
-              Join us for an unforgettable experience at our exclusive gala
-              dinner.
-            </p>
-          </div>
-        </div>
-        <div class="event-card">
-          <img
-            src="@/assets/img/006.png"
-            alt="Event 2 Image"
-            class="event-image"
-          />
-          <div class="event-info">
-            <h3>Holiday Brunch</h3>
-            <p>2024.12.15 - 2024.12.20</p>
-            <p>Enjoy a festive brunch with special holiday-themed dishes.</p>
-          </div>
-        </div>
-        <div class="event-card">
-          <img
-            src="@/assets/img/004.png"
-            alt="Event 3 Image"
-            class="event-image"
-          />
-          <div class="event-info">
-            <h3>Winter Wonderland</h3>
-            <p>2024.11.30 - 2024.12.05</p>
-            <p>
-              Experience the magic of winter with live entertainment and
-              activities.
-            </p>
-          </div>
-        </div>
+      <!-- 공지사항 총 개수 -->
+      <div class="mb-3">
+        <p>총 {{ events.length }}건</p>
       </div>
       <!-- 이벤트 사진과 내용 -->
       <div class="event-list">
-        <div class="event-card">
+        <div
+          v-for="(event, index) in paginatedEvents"
+          :key="index"
+          class="event-card"
+        >
           <img
-            src="@/assets/img/003.png"
-            alt="Event 1 Image"
+            :src="event.images"
+            :alt="`Event ${index + 1} Image`"
             class="event-image"
           />
           <div class="event-info">
-            <h3>Luxury Gala Dinner</h3>
-            <p>2024.12.25 - 2024.12.30</p>
-            <p>
-              Join us for an unforgettable experience at our exclusive gala
-              dinner.
-            </p>
-          </div>
-        </div>
-        <div class="event-card">
-          <img
-            src="@/assets/img/003.png"
-            alt="Event 2 Image"
-            class="event-image"
-          />
-          <div class="event-info">
-            <h3>Holiday Brunch</h3>
-            <p>2024.12.15 - 2024.12.20</p>
-            <p>Enjoy a festive brunch with special holiday-themed dishes.</p>
-          </div>
-        </div>
-        <div class="event-card">
-          <img
-            src="@/assets/img/003.png"
-            alt="Event 3 Image"
-            class="event-image"
-          />
-          <div class="event-info">
-            <h3>Winter Wonderland</h3>
-            <p>2024.11.30 - 2024.12.05</p>
-            <p>
-              Experience the magic of winter with live entertainment and
-              activities.
-            </p>
+            <h3>{{ event.eventName }}</h3>
+            <p>{{ event.startDate }} - {{ event.endDate }}</p>
+            <p>{{ event.detail }}</p>
           </div>
         </div>
       </div>
       <!-- 페이지네이션 버튼 -->
       <div class="pagination">
-        <button id="prevPage" class="page-btn">이전</button>
-        <span id="pageNumbers" class="page-numbers"></span>
-        <button id="nextPage" class="page-btn">다음</button>
+        <button
+          id="prevPage"
+          class="page-btn"
+          @click="prevPage"
+          :disabled="currentPage === 1"
+        >
+          이전
+        </button>
+        <span id="pageNumbers">{{ currentPage }} / {{ totalPages }}</span>
+        <button
+          id="nextPage"
+          class="page-btn"
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+        >
+          다음
+        </button>
       </div>
     </div>
   </section>
@@ -137,6 +95,73 @@
 <script setup>
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
+import { storeToRefs } from "pinia";
+
+import { ref, onMounted, computed } from "vue";
+import { useEventStore } from "@/stores/eventStore";
+
+const eventStore = useEventStore();
+
+// 여기서 state 꺼내올 수 있음
+// getters도 filteredNotices 이런식으로 받아올 수 있음
+const { accommodations, query, filteredEvents } = storeToRefs(eventStore);
+const { allEvents } = storeToRefs(eventStore); // allEvents를 가져옴
+
+// setup에서 events 데이터를 사용
+const events = ref([]);
+
+// 현재 페이지와 페이지당 이벤트 개수
+const currentPage = ref(1);
+const eventsPerPage = 3; // 페이지당 6개의 이벤트
+
+onMounted(async () => {
+  console.log("호출");
+  window.scrollTo(0, 0); // 페이지 로드 시 맨 위로 스크롤
+  // 지점 목록 조회하는 함수 호출 actions에서
+  await eventStore.fetchEvents();
+  events.value = allEvents.value; // allEvents를 events에 할당
+  console.log("이벤트 목록:", eventStore.allEvents);
+
+  // 공지사항 조회하는 함수 호출 actions에서
+  await eventStore.fetchAccommodations();
+});
+
+// 선택한 지점에 맞는 이벤트 필터링
+// const filteredEvents = computed(() => {
+//   const events = allEvents.value.filter((event) => {
+//     console.log(`Filtering: ${event.branchName} === ${query.branch}`);
+//     return event.branchName === query.branch;
+//   });
+//   console.log("Filtered Events:", events);
+//   return events;
+// });
+
+// 페이지에 맞는 이벤트 계산
+const paginatedEvents = computed(() => {
+  const start = (currentPage.value - 1) * eventsPerPage;
+  const end = start + eventsPerPage;
+  return filteredEvents.value.slice(start, end);
+});
+
+// 총 페이지 수 계산
+const totalPages = computed(() => {
+  return Math.ceil(allEvents.value.length / eventsPerPage);
+});
+
+// 이전 페이지로 이동
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+// 다음 페이지로 이동
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   let currentSlide = 0;
   const slides = document.querySelectorAll(".slide");
@@ -194,8 +219,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 .event-list {
   display: flex;
+  flex-wrap: wrap; /* 한 줄에 다 들어가지 않을 때 자동으로 다음 줄로 넘어가게 함 */
   justify-content: space-between; /* 카드 간격 조절 */
   gap: 20px; /* 카드 사이에 간격 추가 */
+}
+
+.event-list::after {
+  content: "";
+  flex: auto; /* 빈 공간을 채워줌으로써 마지막 줄의 카드를 가운데로 정렬 */
 }
 
 .event-card {
@@ -204,6 +235,12 @@ document.addEventListener("DOMContentLoaded", () => {
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
+  width: calc(33.333% - 20px); /* 3개의 카드가 한 줄에 들어가도록 설정 */
+  max-width: 400px; /* 최대 너비를 제한해서 크기를 조절 */
+  height: 450px; /* 카드의 고정된 높이 */
+  display: flex;
+  flex-direction: column; /* 내용을 세로로 정렬 */
+  justify-content: space-between;
 }
 
 .event-card:hover {
@@ -219,10 +256,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 .event-info {
   padding: 20px;
+  flex-grow: 1; /* 카드의 나머지 공간을 채움 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 제목과 내용이 카드 상단에서 바로 이어지도록 */
 }
 
 .event-info h3 {
   font-size: 24px;
+  margin-top: 10px;
   color: #333;
 }
 
