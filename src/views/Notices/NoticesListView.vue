@@ -1,5 +1,7 @@
 <template>
-  <navbar-default />
+  <div class="col-12">
+    <NavbarDefault :sticky="true" />
+  </div>
   <Header />
   <section class="py-6">
     <div class="container">
