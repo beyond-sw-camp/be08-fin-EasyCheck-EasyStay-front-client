@@ -4,28 +4,38 @@
 
 <script>
 import apiClient from "@/api";
+import { userLoginStore } from "@/stores/loginStore"; // loginStore의 경로에 맞게 수정
 
-export function processPayment(reservationId, totalPrice, paymentMethod) {
+export async function processPayment(reservationId, totalPrice, paymentMethod) {
   const { IMP } = window;
   IMP.init("imp18668427");
 
+  const userStore = userLoginStore(); // Pinia store 인스턴스 가져오기
+
+  // 로그인한 사용자 정보 가져오기
+  await userStore.getUserData(); // 필요한 경우 로그인한 사용자 정보를 새로 가져오기
+
+  const userData = userStore.userData; // 로그인한 사용자 정보
+
   IMP.request_pay(
     {
-      pg: "html5_inicis", // 결제 서비스 제공사 (예: html5_inicis, kcp, kakao 등)
-      pay_method: paymentMethod, // 선택한 결제 방법 (card 또는 vbank)
+      pg: "html5_inicis", // 결제 서비스 제공사
+      pay_method: paymentMethod, // 선택한 결제 방법
       merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
       name: `EasyStay 결제`,
       amount: totalPrice,
-      buyer_email: "bo9701@naver.com",
-      buyer_name: "테스터",
-      buyer_tel: "010-5182-6177",
-      buyer_addr: "인천광역시 남동구 서창동",
-      buyer_postcode: "07222",
 
-      // 가상계좌를 선택한 경우, 입금 기한 및 필수 정보 추가
+      // 로그인한 사용자 정보로 업데이트된 결제 정보
+      buyer_email: userData.email || "이메일 정보 없음",
+      buyer_name: userData.name || "이름 정보 없음",
+      buyer_tel: userData.phone || "전화번호 정보 없음",
+      buyer_addr: userData.addr || "주소 정보 없음",
+      buyer_postcode: userData.postcode || "우편번호 정보 없음",
+
+      // 가상계좌 선택 시 추가 정보
       vbank_due: paymentMethod === "vbank" ? getVbankDueDate() : undefined,
-      bank: paymentMethod === "vbank" ? "우리은행" : undefined, // 은행 정보 추가 (예시)
-      accountHolder: paymentMethod === "vbank" ? "테스터" : undefined, // 가상계좌 입금자명 추가 (예시)
+      bank: paymentMethod === "vbank" ? "우리은행" : undefined,
+      accountHolder: paymentMethod === "vbank" ? userData.name || "이름 정보 없음" : undefined,
     },
     async (rsp) => {
       if (rsp.success) {
@@ -37,14 +47,13 @@ export function processPayment(reservationId, totalPrice, paymentMethod) {
           await apiClient.post("/payment", {
             impUid: rsp.imp_uid,
             reservationId: reservationId,
-            method: paymentMethod, // 선택한 결제 방법
+            method: paymentMethod,
             amount: totalPrice,
             paymentDate: new Date().toISOString(),
             completionStatus: "COMPLETE",
-            // 가상계좌 추가 필드들
             depositDeadline: paymentMethod === "vbank" ? getVbankDueDate() : null,
             bank: paymentMethod === "vbank" ? "우리은행" : null,
-            accountHolder: paymentMethod === "vbank" ? "테스터" : null,
+            accountHolder: paymentMethod === "vbank" ? userData.name || "이름 정보 없음" : null,
           });
           alert("결제 내역이 데이터베이스에 저장되었습니다.");
         } catch (error) {
@@ -58,7 +67,7 @@ export function processPayment(reservationId, totalPrice, paymentMethod) {
         // 결제가 실패한 경우 예약 상태를 CANCELED로 업데이트
         try {
           await apiClient.put(`/reservation-room/${reservationId}`, {
-            reservationStatus: "CANCELED", // 예약 상태를 CANCELED로 변경
+            reservationStatus: "CANCELED",
           });
           alert("예약 상태가 CANCELED로 업데이트되었습니다.");
         } catch (error) {

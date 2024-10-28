@@ -22,13 +22,15 @@ onMounted(() => {
 // 라우터
 const router = useRouter();
 
-function goToMain() {
-  router.push('/');
+function handleUpdateComplete() {
+  router.push('/users/updateComplete');
 }
 
-function updateComplete() {
-  router.push('/users/pwUpdate');
-}
+// update 이벤트 수신 처리
+const handleUpdate = () => {
+  // 정보를 성공적으로 수정한 후의 처리 로직
+  handleUpdateComplete();
+};
 
 </script>
 
@@ -54,17 +56,8 @@ function updateComplete() {
           </div>
         </div>
 
-        <MemberInfoUpdate />
+        <MemberInfoUpdate @update="handleUpdate" />
 
-        <!-- 버튼 -->
-        <div class="text-center mt-4 mb-5">
-          <MaterialButton @click="goToMain" class="btn btn-light">
-            취소
-          </MaterialButton>
-          <MaterialButton @click="updateComplete" class="btn btn-dark ms-2">
-            다음
-          </MaterialButton>
-        </div>
       </div>
     </div>
   </Header>

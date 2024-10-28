@@ -64,8 +64,8 @@ import easystayImage from '@/assets/img/easystay.png';
                 </div>
                 <div class="row mt-3 justify-content-center">
                   <div class="d-flex justify-content-center w-50">
-                    <RouterLink to="/users/infoUpdate" class="mx-3">회원 정보 수정 ></RouterLink>
-                    <RouterLink to="/users/mypage/auth" class="mx-3">비밀번호 변경 > </RouterLink>
+                    <RouterLink to="/users/mypage/infoAuth" class="mx-3">회원 정보 수정 ></RouterLink>
+                    <RouterLink to="/users/mypage/pwAuth" class="mx-3">비밀번호 변경 > </RouterLink>
                     <RouterLink to="/users/resign" class="mx-3">회원 탈퇴 ></RouterLink>
                   </div>
                 </div>
@@ -78,13 +78,13 @@ import easystayImage from '@/assets/img/easystay.png';
           <div class="bg-white p-4 min-vh-15 mt-3">
             <div class="d-flex justify-content-center">
               <div class="text-center mx-5">
-                <RouterLink to="users/roomReservations">
+                <RouterLink to="/users/roomReservationLists">
                   <span class="material-icons" style="font-size: 70px;">description</span>
                   <div class="mt-2">객실 예약 내역</div>
                 </RouterLink>
               </div>
               <div class="text-center mx-5">
-                <RouterLink to="users/attractionReservations">
+                <RouterLink to="/users/themeparkReservationLists">
                   <span class="material-icons" style="font-size: 70px;">attractions</span>
                   <div class="mt-2">테마파크 예약 내역</div>
                 </RouterLink>

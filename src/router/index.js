@@ -56,12 +56,16 @@ import InfoCompleteView from "@/views/Mypage/InfoUpdate/InfoCompleteView.vue";
 import PwUpdateView from "@/views/Mypage/InfoUpdate/PwUpdateView.vue";
 import ResignView from "@/views/Mypage/Resign/ResignView.vue";
 import ResignCompleteView from "@/views/Mypage/Resign/ResignCompleteView.vue";
-import AuthView from "@/views/Mypage/InfoUpdate/AuthView.vue";
+import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
+import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
+import RoomReservationList from "@/views/Mypage/RoomReservationList/RoomReservationList.vue";
+import ThemeparkReservationList from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationList.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
+import EventsListView from "@/views/Events/EventsListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -369,14 +373,34 @@ const router = createRouter({
       component: SuggestionsListView,
     },
     {
-      path: "/users/mypage/auth",
-      name: "AuthView",
-      component: AuthView,
-    },
-    {
-      path: "/noticesListView/noticeDetail",
+      path: "/noticesListView/:id",
       name: "NoticeDetail",
       component: NoticeDetail,
+    },
+    {
+      path: "/eventsListView",
+      name: "eventsListView",
+      component: EventsListView,
+    },
+    {
+      path: "/users/mypage/pwAuth",
+      name: "PwAuthView",
+      component: PwAuthView,
+    },
+    {
+      path: "/users/mypage/infoAuth",
+      name: "InfoAuthView",
+      component: InfoAuthView,
+    },
+    {
+      path: "/users/roomReservationLists",
+      name: "RoomReservationList",
+      component: RoomReservationList,
+    },
+    {
+      path: "/users/themeparkReservationLists",
+      name: "ThemeparkReservationList",
+      component: ThemeparkReservationList,
     },
   ],
 });
