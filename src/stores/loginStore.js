@@ -258,7 +258,6 @@ export const userLoginStore = defineStore("userStore", {
       try {
         const response = await apiClient.post("/corp-users", requestData);
         if (response.status === 201) {
-          alert("회원가입 성공!");
           return true;
         }
       } catch (error) {
