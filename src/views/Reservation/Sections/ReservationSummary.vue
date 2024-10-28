@@ -1,3 +1,26 @@
+<script setup>
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const {
+  checkinMonth,
+  checkinDayKo,
+  checkinDate,
+  checkoutMonth,
+  checkoutDayKo,
+  checkoutDate,
+  stayDuration,
+  roomCount,
+} = storeToRefs(reservationStore);
+
+const onClickSearch = async () => {
+  reservationStore.fetchReservationAvailableRooms();
+  reservationStore.setShowRoomSelectionGrid(true);
+};
+</script>
+
 <template>
   <div class="reservation-summary card">
     <div class="card-body">
@@ -5,15 +28,15 @@
         class="date-range d-flex justify-content-between align-items-center mb-3"
       >
         <div class="date-box text-center">
-          <h3 class="mb-0">21</h3>
-          <small>9월 토요일</small>
+          <h3 class="mb-0">{{ checkinDate }}</h3>
+          <small>{{ checkinMonth }}월 {{ checkinDayKo }}</small>
         </div>
         <div class="nights d-flex flex-column align-items-center">
-          <span class="badge bg-transparent">1박</span>
+          <span class="badge bg-transparent">{{ stayDuration }}박</span>
         </div>
         <div class="date-box text-center">
-          <h3 class="mb-0">22</h3>
-          <small>9월 일요일</small>
+          <h3 class="mb-0">{{ checkoutDate }}</h3>
+          <small>{{ checkoutMonth }}월 {{ checkoutDayKo }}</small>
         </div>
       </div>
       <div
@@ -24,7 +47,7 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="decrementRoom"
+            @click="reservationStore.decreaseRoomCount"
           >
             -
           </button>
@@ -32,30 +55,18 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="incrementRoom"
+            @click="reservationStore.increaseRoomCount"
           >
             +
           </button>
         </div>
       </div>
-      <button class="btn btn-danger w-100">객실 검색</button>
+      <button class="btn btn-danger w-100" @click="onClickSearch">
+        객실 검색
+      </button>
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from "vue";
-
-const roomCount = ref(1);
-
-const decrementRoom = () => {
-  if (roomCount.value > 1) roomCount.value--;
-};
-
-const incrementRoom = () => {
-  roomCount.value++;
-};
-</script>
 
 <style scoped lang="scss">
 @import "@/assets/scss/material-kit/custom/_variables.scss";

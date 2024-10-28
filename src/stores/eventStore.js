@@ -10,9 +10,46 @@ export const useEventStore = defineStore("eventStore", {
   getters: {
     allEvents: (state) => state.events,
     eventById: (state) => state.event,
+    compactEventList: (state) =>
+      state.events.map((event) => ({
+        eventId: event.eventId,
+        imgUrl: event.images[0] || null,
+      })),
   },
 
   actions: {
+    // 숙박시설에 존재하는 객실 모두 불러오기
+    async fetchAccommodationEvents(accommodationId) {
+      try {
+        console.log(
+          `[eventStore] fetchAccommodationEvents accommodationId = ${accommodationId}`
+        );
+
+        const response = await apiClient.get(`/events`, {
+          params: {
+            accommodationId,
+          },
+        });
+        console.log(response);
+
+        this.events = response.data;
+      } catch (error) {
+        this.events = [];
+        console.log(error);
+        console.error("Failed to fetch accommodations:", error);
+      }
+    },
+
+    // 특정 시설 조회 API 호출
+    async fetchEventById(eventId) {
+      try {
+        const response = await apiClient.get(`/events/${eventId}`);
+        this.event = response.data;
+      } catch (error) {
+        this.event = null;
+        console.log(error);
+      }
+    },
     // 이벤트 생성 API 호출
     async createEvent(eventCreateRequest, imageFiles) {
       const formData = new FormData();
@@ -34,19 +71,11 @@ export const useEventStore = defineStore("eventStore", {
       }
     },
 
-    // 이벤트 단일 조회 API 호출
-    async fetchEventById(id) {
-      try {
-        const response = await apiClient.get(`/events/${id}`);
-        this.event = response.data;
-      } catch (error) {
-        console.error(`Failed to fetch event with id ${id}:`, error);
-      }
-    },
-
     // 모든 이벤트 조회 API 호출
     async fetchEvents(accommodationId = null) {
-      let queryParams = accommodationId ? `?accommodationId=${accommodationId}` : "";
+      let queryParams = accommodationId
+        ? `?accommodationId=${accommodationId}`
+        : "";
       try {
         const response = await apiClient.get(`/events${queryParams}`);
         this.events = response.data;
@@ -76,7 +105,10 @@ export const useEventStore = defineStore("eventStore", {
           },
         });
       } catch (error) {
-        console.error(`Failed to update event image with id ${imageId}:`, error);
+        console.error(
+          `Failed to update event image with id ${imageId}:`,
+          error
+        );
       }
     },
 

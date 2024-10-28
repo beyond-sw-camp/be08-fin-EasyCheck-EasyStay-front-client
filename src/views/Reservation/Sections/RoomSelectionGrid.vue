@@ -52,36 +52,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import RoomTypeNavs from "@/views/Rooms/Sections/RoomTypeNavs.vue";
 
-const rooms = ref([
-  {
-    id: 1,
-    name: "디럭스 패밀리 with Pokemon",
-    image: "https://beyond-easycheck.s3.amazonaws.com/room/room2.JPG",
-    description:
-      "귀여운 포켓몬들을 만날 수 있는 패밀리 투인 타입으로 구성된 테마 객실입니다.",
-    standardOccupancy: 3,
-    maxOccupancy: 3,
-    originalPrice: 530000,
-    discountedPrice: 457000,
-    isSelected: false,
-  },
-  {
-    id: 2,
-    name: "슈페리어 스위트 with Tempur",
-    image: "https://beyond-easycheck.s3.amazonaws.com/room/room2.JPG",
-    description:
-      "테미크 프리미엄 메모리스 브랜드 템퍼 토퍼베드가 비치되어, 편안한 휴식과 숙면에 최적화 된 객실입니다.",
-    standardOccupancy: 4,
-    maxOccupancy: 4,
-    originalPrice: 601000,
-    discountedPrice: 546000,
-    isSelected: false,
-  },
-  // 추가 객실 데이터...
-]);
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const { availableRoomList } = storeToRefs(reservationStore);
+
+console.log(availableRoomList);
+
+const rooms = availableRoomList;
 
 const toggleRoomSelection = (room) => {
   room.isSelected = !room.isSelected;

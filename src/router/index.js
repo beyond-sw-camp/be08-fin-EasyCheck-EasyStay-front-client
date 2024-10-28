@@ -193,14 +193,11 @@ const router = createRouter({
       name: "el-typography",
       component: ElTypography,
     },
+    // 숙박시설 디테일 페이지
     {
-      path: "/accommodation",
+      path: "/accommodation/:accommodationId",
       name: "Accommodation",
       component: AccommodationView,
-      props: (route) => ({
-        // queryParam이 지정되지 않는다면 기본값으로 들어가게 설정
-        accommodationId: route.query.accommodationId || 1,
-      }),
     },
     {
       path: "/themepark/:themeparkId",
@@ -229,7 +226,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/room/:roomId",
+      path: "/room/:roomTypeId",
       name: "Room",
       component: RoomDetailView,
     },

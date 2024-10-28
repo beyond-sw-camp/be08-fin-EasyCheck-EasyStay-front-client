@@ -10,9 +10,18 @@ export const useAccommodationStore = defineStore("accommodationStore", {
   getters: {
     allAccommodations: (state) => state.accommodations,
     accommodationById: (state) => state.accommodation,
+    thumbnailUrls: (state) => state.accommodation?.thumbnailUrls || [],
   },
 
   actions: {
+    resetAccommodations() {
+      this.accommodations = [];
+    },
+
+    resetAccommodation() {
+      this.accommodation = null;
+    },
+
     // 시설 생성 API 호출
     async createAccommodation(formData) {
       try {

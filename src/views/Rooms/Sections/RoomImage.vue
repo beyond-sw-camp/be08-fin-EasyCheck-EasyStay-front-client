@@ -27,23 +27,22 @@
 
 <script setup>
 import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useRoomStore } from "@/stores/roomStore";
 
-const imgUrls = [
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation1.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation2.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation3.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation4.jpg",
-  "https://beyond-easycheck.s3.amazonaws.com/accommodation/acoommodation5.jpg",
-];
+const roomStore = useRoomStore();
+
+const { thumbnailUrls: imgUrls } = storeToRefs(roomStore);
 
 const activeIndex = ref(0);
 
 const nextSlide = () => {
-  activeIndex.value = (activeIndex.value + 1) % imgUrls.length;
+  activeIndex.value = (activeIndex.value + 1) % imgUrls.value.length;
 };
 
 const prevSlide = () => {
-  activeIndex.value = (activeIndex.value - 1 + imgUrls.length) % imgUrls.length;
+  activeIndex.value =
+    (activeIndex.value - 1 + imgUrls.value.length) % imgUrls.value.length;
 };
 </script>
 
