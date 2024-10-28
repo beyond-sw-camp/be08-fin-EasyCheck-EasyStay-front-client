@@ -1,3 +1,28 @@
+<script setup>
+import { ref, onMounted, onUnmounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const { roomCount, stayDuration, accommodationName } =
+  storeToRefs(reservationStore);
+
+const isMobileView = ref(window.innerWidth < 768);
+
+const checkMobileView = () => {
+  isMobileView.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+  window.addEventListener("resize", checkMobileView);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobileView);
+});
+</script>
+
 <template>
   <nav
     class="navbar navbar-expand-lg navbar-dark fixed-top py-2"
@@ -15,7 +40,7 @@
               <span class="navbar-text me-2 text-light" v-if="isMobileView"
                 >지점</span
               >
-              <h6 class="mb-0">롯데리조트속초</h6>
+              <h6 class="mb-0">{{ accommodationName }}</h6>
               <i
                 class="bi bi-pencil-square text-secondary ms-2"
                 v-if="!isMobileView"
@@ -32,7 +57,8 @@
               >
               <h6 class="mb-0">
                 2024.10.18
-                <span class="badge rounded-pill">1박</span> 2024.10.19
+                <span class="badge rounded-pill">{{ stayDuration }}박</span>
+                2024.10.19
               </h6>
               <i
                 class="bi bi-pencil-square text-secondary ms-2"
@@ -48,7 +74,7 @@
               <span class="navbar-text me-2 text-light" v-if="isMobileView"
                 >객실 수</span
               >
-              <h6 class="mb-0">1실</h6>
+              <h6 class="mb-0">{{ roomCount }}실</h6>
               <i
                 class="bi bi-pencil-square text-secondary ms-2"
                 v-if="!isMobileView"
@@ -73,24 +99,6 @@
     </div>
   </nav>
 </template>
-
-<script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-
-const isMobileView = ref(window.innerWidth < 768);
-
-const checkMobileView = () => {
-  isMobileView.value = window.innerWidth < 768;
-};
-
-onMounted(() => {
-  window.addEventListener("resize", checkMobileView);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", checkMobileView);
-});
-</script>
 
 <style lang="scss" scoped>
 .navbar {
