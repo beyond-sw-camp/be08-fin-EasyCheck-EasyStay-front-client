@@ -39,23 +39,12 @@
                 <div class="quantity-group">
                   <label class="quantity-label">대인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementAdult"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementAdult">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="adultCount"
-                      class="form-control quantity-input"
-                      v-model="localAdultCount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementAdult"
-                    >
+                    <input type="number" id="adultCount" class="form-control quantity-input" v-model="adultTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementAdult">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -67,23 +56,12 @@
                 <div class="quantity-group">
                   <label class="quantity-label">소인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementChild"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementChild">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="childCount"
-                      class="form-control quantity-input"
-                      v-model="localChildCount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementChild"
-                    >
+                    <input type="number" id="childCount" class="form-control quantity-input" v-model="childTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementChild">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -97,7 +75,7 @@
           <tr>
             <td class="label-cell">총 금액 (VAT 포함)</td>
             <td class="content-cell total-price">
-              <strong class="total-amount">{{ formattedTotalPrice }}</strong>
+              <strong class="total-amount">{{ totalPrice }}</strong>
             </td>
           </tr>
         </tbody>
@@ -107,7 +85,6 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
 
@@ -120,30 +97,21 @@ const themeParkStore = useThemeParkStore();
 
 // pinia state, getters
 const { themePark } = storeToRefs(themeParkStore);
-const { adultTicket, childTicket } = storeToRefs(ticketStore);
+const { adultTicket, childTicket, totalPrice, adultTicketAmount, childTicketAmount } = storeToRefs(ticketStore);
 
 const formatDate = (date) => {
   return date ? dayjs(date).format("YYYY-MM-DD") : "알 수 없음";
 };
 
-const localAdultCount = ref(0);
-const localChildCount = ref(0);
-
-const incrementAdult = () => localAdultCount.value++;
+const incrementAdult = () => adultTicketAmount.value++;
 const decrementAdult = () => {
-  if (localAdultCount.value > 0) localAdultCount.value--;
+  if (adultTicketAmount.value > 0) adultTicketAmount.value--;
 };
 
-const incrementChild = () => localChildCount.value++;
+const incrementChild = () => childTicketAmount.value++;
 const decrementChild = () => {
-  if (localChildCount.value > 0) localChildCount.value--;
+  if (childTicketAmount.value > 0) childTicketAmount.value--;
 };
-
-const formattedTotalPrice = computed(() => {
-  const adultTotal = localAdultCount.value * (adultTicket.value?.price || 0);
-  const childTotal = localChildCount.value * (childTicket.value?.price || 0);
-  return `₩ ${(adultTotal + childTotal).toLocaleString()}`;
-});
 </script>
 
 <style scoped>

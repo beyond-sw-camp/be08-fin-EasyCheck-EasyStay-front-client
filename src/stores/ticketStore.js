@@ -8,10 +8,28 @@ export const useTicketStore = defineStore("ticketStore", {
     adultTicket: null,
     childTicket: null,
 
-    childTicketAmount: 1,
+    childTicketAmount: 0,
+    adultTicketAmount: 1,
   }),
 
   getters: {
+    totalPrice: (state) =>
+      state.adultTicket?.price * state.adultTicketAmount +
+      state.childTicket?.price * state.childTicketAmount,
+
+    totalPriceFormatted: (state) => {
+      const totalPrice =
+        state.adultTicket?.price * state.adultTicketAmount +
+        state.childTicket?.price * state.childTicketAmount;
+
+      if (!totalPrice || isNaN(totalPrice)) return "0원";
+
+      return new Intl.NumberFormat("ko-KR", {
+        style: "currency",
+        currency: "KRW",
+      }).format(totalPrice);
+    },
+
     groupedTickets: (state) => {
       if (!state.tickets || !Array.isArray(state.tickets)) {
         return [];
