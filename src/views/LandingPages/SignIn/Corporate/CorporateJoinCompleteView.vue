@@ -20,10 +20,6 @@ function goToMain() {
   router.push('/');
 }
 
-function goToLogin() {
-  router.push('/users/login');
-}
-
 </script>
 
 <template>
@@ -43,11 +39,11 @@ function goToLogin() {
           <div class="col-12">
             <div class="text-black shadow-succes py-3 mb-5 text-center line">
               <span class="material-icons mb-2" style="font-size: 100px; color: steelblue">deck</span>
-              <h3 class="font-weight-bolder mb-0 mt-4">EASY STAY<br>비밀번호 변경 완료</h3>
+              <h3 class="font-weight-bolder mb-0 mt-4">EASY STAY<br>회원권 상담 신청 완료</h3>
               <div class="mt-3"></div>
               <div class="row mt-3 justify-content-center mb-3">
                 EasyStay와 함께 편안한 휴식과 특별한 순간이 기다리고 있습니다. <br>
-                회원으로 다양한 혜택을 누려보세요!
+                상담권 신청을 위해 곧 연락드리겠습니다. <br> 다양한 혜택을 기대해주세요!
               </div>
             </div>
           </div>
@@ -57,9 +53,6 @@ function goToLogin() {
         <div class="text-center mt-4">
           <MaterialButton @click="goToMain" class="btn btn-light">
             홈으로
-          </MaterialButton>
-          <MaterialButton @click="goToLogin" class="btn btn-dark ms-2">
-            로그인
           </MaterialButton>
         </div>
       </div>

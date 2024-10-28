@@ -91,10 +91,10 @@ const authenticatePhone = async () => {
 
   try {
     await loginStore.handlePhoneAuthentication();
-    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
+    alert("인증번호 요청이 성공적으로 전송되었습니다.");
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
-    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
+    alert("인증번호 요청 중 오류가 발생했습니다.");
   }
 };
 
