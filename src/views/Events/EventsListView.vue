@@ -1,7 +1,13 @@
 <template>
-  <navbar-default />
+  <div class="position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <NavbarDefault :sticky="true" />
+      </div>
+    </div>
+  </div>
   <Header />
-  <section class="py-6">
+  <section class="py-10">
     <div class="container">
       <h3>Events</h3>
       <div class="banner-slider">
@@ -9,10 +15,16 @@
           <img src="@/assets/img/이벤트배너 1.png" alt="Banner 1" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 4.png" alt="Banner 2" />
+          <img src="@/assets/img/이벤트배너 2.png" alt="Banner 2" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 2.png" alt="Banner 3" />
+          <img src="@/assets/img/이벤트배너 3.png" alt="Banner 3" />
+        </div>
+        <div class="slide">
+          <img src="@/assets/img/이벤트배너 4.png" alt="Banner 3" />
+        </div>
+        <div class="slide">
+          <img src="@/assets/img/이벤트배너 5.png" alt="Banner 3" />
         </div>
         <!-- 추가적인 배너 이미지를 여기다 넣을 수 있습니다 -->
 
