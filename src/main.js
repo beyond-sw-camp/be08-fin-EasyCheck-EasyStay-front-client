@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import vClickOutside from "v-click-outside";
+import router from "./router";
 
 // Nucleo Icons
 import "./assets/css/nucleo-icons.css";

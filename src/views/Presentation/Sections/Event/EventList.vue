@@ -1,18 +1,34 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import apiClient from "@/api";
+import { useEventStore } from "@/stores/eventStore";
+import { useRouter } from "vue-router";
 import ExampleCard from "../../Components/ExampleCard.vue";
 
 const events = ref([]);
+const eventStore = useEventStore();
+const router = useRouter();
 
 const fetchEvents = async () => {
     try {
-        const response = await apiClient.get('/events');
-        events.value = response.data;
+        await eventStore.fetchEvents();
+        events.value = eventStore.allEvents;
+
+        console.log("Events:", events.value);
     } catch (error) {
         console.error("Failed to fetch events:", error);
     }
 };
+
+const fetchEventById = async (id) => {
+    console.log("Fetching event by ID:", id);
+
+    try {
+        await eventStore.fetchEventById(id);
+        router.push({ name: "Event", params: { id } });
+    } catch (error) {
+        console.error("Failed to fetch event by ID:", error);
+    }
+}
 
 onMounted(() => {
     fetchEvents();
@@ -20,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <section class="mb-5 pb-5">
+    <section class="mt-5 pt-5 mb-5 pb-5">
         <div class="container mt-sm-5 mt-3">
             <div class="row">
                 <div class="col-lg-3">
@@ -34,7 +50,8 @@ onMounted(() => {
                 <div class="col-lg-9">
                     <div class="row">
                         <div class="col-md-4" v-for="event in events" :key="event.id">
-                            <ExampleCard :image="event.images" :title="event.eventName" :route="''" />
+                            <ExampleCard :image="event.images" :title="event.eventName"
+                                @click="fetchEventById(event.id)" />
                         </div>
                     </div>
                 </div>

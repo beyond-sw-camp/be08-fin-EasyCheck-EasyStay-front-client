@@ -1,16 +1,32 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import apiClient from "@/api";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useRouter } from "vue-router";
 import ExampleCard from "../../Components/ExampleCard.vue";
 
 const accommodations = ref([]);
+const accommodationStore = useAccommodationStore();
+const router = useRouter();
 
 const fetchAccommodations = async () => {
   try {
-    const response = await apiClient.get("/accommodations");
-    accommodations.value = response.data;
+    await accommodationStore.fetchAccommodations();
+    accommodations.value = accommodationStore.allAccommodations;
+
+    console.log("Accommodations:", accommodations.value);
   } catch (error) {
     console.error("Failed to fetch accommodations:", error);
+  }
+};
+
+const fetchAccommodationById = async (id) => {
+  console.log("Fetching accommodation by ID:", id);
+
+  try {
+    await accommodationStore.fetchAccommodationById(id);
+    router.push({ name: "Accommodation", params: { id } });
+  } catch (error) {
+    console.error("Failed to fetch accommodation by ID:", error);
   }
 };
 
@@ -42,13 +58,28 @@ onMounted(() => {
               :key="accommodation.id"
             >
               <ExampleCard
-                :accommodationId="accommodation.id"
                 :image="accommodation.thumbnailUrls[0]"
                 :title="accommodation.name"
-                :route="'Accommodation'"
+                @click="fetchAccommodationById(accommodation.id)"
               />
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="row">
+        <div
+          class="col-md-4"
+          v-for="accommodation in accommodations"
+          :key="accommodation.id"
+        >
+          <ExampleCard
+            :accommodationId="accommodation.id"
+            :image="accommodation.thumbnailUrls[0]"
+            :title="accommodation.name"
+            :route="'Accommodation'"
+          />
         </div>
       </div>
     </div>

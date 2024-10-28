@@ -30,15 +30,10 @@ function goToMain() {
   router.push('/');
 }
 
-// 회원가입
 const registerUser = async () => {
-  try {
-    const success = await loginStore.registerUser();
-    if (success) {
-      router.push('/joinComplete');
-    }
-  } catch (error) {
-    console.error("회원가입 처리 중 오류 발생:", error.message);
+  const success = await loginStore.registerUser();
+  if (success) {
+    router.push('/joinComplete');
   }
 };
 

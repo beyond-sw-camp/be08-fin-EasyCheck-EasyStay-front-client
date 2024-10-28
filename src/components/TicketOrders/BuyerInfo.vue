@@ -12,8 +12,8 @@
                 class="input-group-outline"
                 placeholder="구매자 이름"
                 size="lg"
-                :value="buyerName"
-                @input="$emit('update:buyerName', $event)"
+                v-model="buyerName"
+                :readonly="isLoggedIn"
               />
             </div>
           </div>
@@ -25,21 +25,21 @@
                 class="input-group-outline"
                 placeholder="휴대전화 번호"
                 size="lg"
-                :value="buyerPhone"
-                @input="$emit('update:buyerPhone', $event)"
+                v-model="buyerPhone"
+                :readonly="isLoggedIn"
               />
             </div>
           </div>
 
           <div class="form-group email-group">
-            <label for="buyerEmail">이메일 (선택)</label>
+            <label for="buyerEmail">이메일</label>
             <div class="input-group input-lg d-flex align-items-center">
               <MaterialInput
                 class="input-group-outline"
                 placeholder="이메일 아이디"
                 size="lg"
-                :value="buyerEmail"
-                @input="$emit('update:buyerEmail', $event)"
+                v-model="buyerEmail"
+                :readonly="isLoggedIn"
                 style="flex: 1"
               />
               <span class="input-group-add mx-1">@</span>
@@ -47,8 +47,8 @@
                 class="input-group-outline"
                 placeholder="이메일 도메인"
                 size="lg"
-                :value="buyerEmailDomain"
-                @input="$emit('update:buyerEmailDomain', $event)"
+                v-model="buyerEmailDomain"
+                :readonly="isLoggedIn"
                 style="flex: 1"
               />
             </div>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits, ref, watch } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 
 const props = defineProps({
@@ -68,6 +68,27 @@ const props = defineProps({
   buyerPhone: String,
   buyerEmail: String,
   buyerEmailDomain: String,
+  isLoggedIn: Boolean,
+});
+
+const emit = defineEmits();
+
+const buyerName = ref(props.buyerName);
+const buyerPhone = ref(props.buyerPhone);
+const buyerEmail = ref(props.buyerEmail);
+const buyerEmailDomain = ref(props.buyerEmailDomain);
+
+watch(buyerName, (newValue) => {
+  emit("update:buyerName", newValue);
+});
+watch(buyerPhone, (newValue) => {
+  emit("update:buyerPhone", newValue);
+});
+watch(buyerEmail, (newValue) => {
+  emit("update:buyerEmail", newValue);
+});
+watch(buyerEmailDomain, (newValue) => {
+  emit("update:buyerEmailDomain", newValue);
 });
 </script>
 

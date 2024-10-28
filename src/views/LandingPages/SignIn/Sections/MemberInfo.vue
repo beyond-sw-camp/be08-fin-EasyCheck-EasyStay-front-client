@@ -132,47 +132,85 @@ const searchZipCode = () => {
     },
   }).open();
 };
+
 const selectedDomain = ref('');
+const isCustomDomain = ref(false);
+
+const onDomainChange = () => {
+  if (selectedDomain.value === 'etc') {
+    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
+  } else {
+    isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
+    loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
+  }
+};
 
 const updateEmailSuffix = () => {
   if (selectedDomain !== 'etc') {
     loginStore.signUpformData.emailSuffix = selectedDomain;
-  } else {
-    // 기타 선택 시, 입력된 값을 이메일 suffix로 설정
-    loginStore.signUpformData.emailSuffix = loginStore.signUpformData.emailSuffix;
-  };
-}
+  }
+
+  const email = createEmail(); // 이메일 생성
+  console.log('Generated Email:', email);
+  loginStore.signUpformData.email = email; // 이메일 값 저장
+};
+
+// 이메일 합치기
+const createEmail = () => {
+  const emailPrefix = loginStore.signUpformData.emailPrefix || '';
+  const emailSuffix = loginStore.signUpformData.emailSuffix || '';
+
+  // prefix와 suffix가 비어있는 경우에 대해 처리
+  if (!emailPrefix || !emailSuffix) {
+    console.error('이메일 구성 오류: prefix 또는 suffix가 비어있습니다.');
+    return '이메일을 제대로 입력하세요'; // 오류 메시지
+  }
+
+  return `${emailPrefix}@${emailSuffix}`;
+};
 
 // 이메일 중복 체크
-const checkDuplicateId = async () => {
-  const email = `${loginStore.signUpformData.emailPrefix}@${selectedDomain.value === 'etc' ? loginStore.signUpformData.emailSuffix : selectedDomain.value}`;
+const emailCheckResult = ref('');
 
-  // 이메일 중복 체크 액션 호출
-  const isDuplicated = await loginStore.checkEmailIsDuplicated(email);
-  if (isDuplicated) {
-    alert('사용 가능한 이메일입니다.');
-  } else {
-    alert('이미 사용 중인 이메일입니다.');
+const checkDuplicateId = async () => {
+  const email = createEmail();
+  console.log('Checking email:', email); // 추가
+
+  try {
+    const isAvailable = await loginStore.checkEmailDuplicate(email);
+    emailCheckResult.value = isAvailable ? '사용 가능한 이메일입니다.' : '이미 사용 중인 이메일입니다.';
+  } catch (error) {
+    emailCheckResult.value = '중복 체크 중 오류가 발생했습니다.';
+    console.error(error.message);
   }
 };
 
+
 // 비밀번호 유효성 검사
-const password = ref("");
-const passwordError = ref(false);
+const passwordErrorMessage = ref("");
 
-const isPasswordValid = computed(() => {
-  // 비밀번호 유효성 검사: 최소 8자, 최대 16자, 대문자, 숫자 포함
-  const minLength = password.value.length >= 8;
-  const maxLength = password.value.length <= 16;
-  const hasUpperCase = /[A-Z]/.test(password.value);
-  const hasNumber = /\d/.test(password.value);
+const validatePassword = () => {
+  const passwordValue = loginStore.signUpformData.password || "";
 
-  return minLength && maxLength && hasUpperCase && hasNumber;
-});
-// 비밀번호 입력 시 오류 여부 업데이트
-watch(password, (newVal) => {
-  passwordError.value = !isPasswordValid.value;
-});
+  const minLength = passwordValue.length >= 8;
+  const maxLength = passwordValue.length <= 16;
+  const hasUpperCase = /[A-Z]/.test(passwordValue);
+  const hasNumber = /\d/.test(passwordValue);
+
+  if (!minLength || !maxLength) {
+    passwordErrorMessage.value = "비밀번호는 8자 이상, 16자 이하이어야 합니다.";
+  } else if (!hasUpperCase) {
+    passwordErrorMessage.value = "비밀번호에는 대문자가 포함되어야 합니다.";
+  } else if (!hasNumber) {
+    passwordErrorMessage.value = "비밀번호에는 숫자가 포함되어야 합니다.";
+  } else {
+    passwordErrorMessage.value = "";
+  }
+};
+
+// 비밀번호 입력 시 유효성 검사
+watch(() => loginStore.signUpformData.password, validatePassword);
+
 
 </script>
 
@@ -239,13 +277,13 @@ watch(password, (newVal) => {
                 id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
               <span class="mx-1">@</span>
 
-              <template v-if="selectedDomain === 'etc'">
+              <template v-if="isCustomDomain">
                 <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
                   id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
               </template>
 
               <template v-else>
-                <select v-model="selectedDomain" class="form-select ms-2" @change="updateEmailSuffix" style="flex: 1;">
+                <select v-model="selectedDomain" class="form-select ms-2" @change="onDomainChange" style="flex: 1;">
                   <option value="" disabled selected>도메인 선택</option>
                   <option value="gmail.com">gmail.com</option>
                   <option value="naver.com">naver.com</option>
@@ -258,6 +296,7 @@ watch(password, (newVal) => {
                 중복 체크
               </button>
             </div>
+            <div class="mt-2 text-danger text-start">{{ emailCheckResult }}</div>
           </td>
         </tr>
 
@@ -266,15 +305,14 @@ watch(password, (newVal) => {
           <td class="fw-bold fs-8">비밀번호</td>
           <td>
             <div class="d-flex flex-column align-items-start col-5">
-              <MaterialInput v-model="password" required class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
-              <div v-if="passwordError" class="text-danger small mt-1">
-                비밀번호는 최소 8자 이상, 최대 16자 이하와 대문자와 숫자를 포함해야 합니다.
+              <MaterialInput v-model="loginStore.signUpformData.password" required class="input-group-outline mb-0"
+                id="password" :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
+              <div v-if="passwordErrorMessage" class="text-danger small mt-1">
+                {{ passwordErrorMessage }}
               </div>
             </div>
           </td>
         </tr>
-
 
 
         <!-- 성함 -->
@@ -327,7 +365,7 @@ watch(password, (newVal) => {
           <tr v-if="isVerificationRequested">
             <td class="fw-bold fs-8">인증번호</td>
             <td>
-              <div class="d-flex align-items-center justify-content-center col-5">
+              <div class="d-flex align-items-center justify-content-start col-5">
                 <MaterialInput class="input-group-outline mb-0" v-model="loginStore.verificationCode" type="text"
                   placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
                 <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
@@ -335,6 +373,7 @@ watch(password, (newVal) => {
             </td>
           </tr>
         </transition>
+
 
         <!-- 주소 -->
         <tr>
@@ -371,8 +410,6 @@ watch(password, (newVal) => {
             </div>
           </td>
         </tr>
-
-
 
       </tbody>
     </table>

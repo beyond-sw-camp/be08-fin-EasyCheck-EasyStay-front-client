@@ -16,41 +16,38 @@ import MaterialButton from "@/components/MaterialButton.vue";
 
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
+
 onMounted(() => {
   setMaterialInput();
 });
 
 // 회원 로그인
 const router = useRouter();
-const userLogin = userLoginStore();
+const loginStore = userLoginStore();
 
 const email = ref('');
 const password = ref('');
 const status = ref('');
 const role = ref('');
 
-async function login() {
+// 일반회원 로그인
+function login() {
   const formData = {
     email: email.value,
     password: password.value,
-    status: status.value,
-    role: role.value
   };
 
-  try {
-    const response = await userLogin.login(formData);
-    console.log("응답 데이터:", response);
-
-    if (response) {
-      // router.push('/'); // 로그인 성공 후 메인 페이지로 이동
-      router.go(-1);
+  loginStore.login(formData)
+    .then(response => {
+      console.log("응답 데이터:", response);
+      loginStore.setLoginStatus(true); // 로그인 상태 설정
+      router.go(-1); // 이전 페이지로 이동
       console.log("Success Login");
-    }
-  } catch (error) {
-    console.log("Login Fail: ", error);
-  }
+    })
+    .catch(error => {
+      console.log("Login Fail: ", error);
+    });
 }
-
 </script>
 
 <template>
@@ -108,105 +105,6 @@ async function login() {
                   </p>
 
                 </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- 비회원 로그인 -->
-          <div class="col-lg-4 col-md-8 col-12 mx-lg-8">
-            <div class="card z-index-0 fadeIn3 fadeInBottom">
-              <div class="card-body">
-                <h4 class="text-center mb-4">비회원 로그인</h4>
-                <form role="form" class="text-start">
-
-                  <MaterialInput id="value" class="input-group-outline my-3"
-                    :label="{ text: '성함', class: 'form-label' }" type="text" />
-                  <div class="input-group d-flex justify-content-center align-items-center">
-                    <div class="row w-100 g-0">
-                      <div class="col">
-                        <MaterialInput id="value" class="input-group-outline"
-                          :label="{ text: '휴대폰 번호 (\'-\' 제외)', class: 'form-label' }" type="text"
-                          style="width: 100%; margin-right: 0;" />
-                      </div>
-                      <div class="col-auto">
-                        <div class="input-group-append">
-                          <MaterialButton class="btn btn-black text-white"
-                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;" type="button">
-                            인증번호 전송
-                          </MaterialButton>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="input-group d-flex justify-content-center align-items-center">
-                    <div class="row w-100 g-0">
-                      <div class="col">
-                        <MaterialInput id="value" class="input-group-outline"
-                          :label="{ text: '인증번호', class: 'form-label' }" type="text"
-                          style="width: 100%; margin-right: 0;" />
-                      </div>
-                      <div class="col-auto">
-                        <div class="input-group-append">
-                          <MaterialButton class="btn btn-black text-whtie"
-                            style="border-top-left-radius: 0; border-bottom-left-radius: 0;" type="button">
-                            인증번호 확인
-                          </MaterialButton>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 개인정보 약관안내 -->
-                  <div class="form-check mb-3 d-flex align-items-center">
-                    <MaterialButton class="custom-btn me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                      개인정보 약관안내
-                    </MaterialButton>
-                    <input class="form-check-input me-2" type="checkbox" id="privacyConsent" />
-                    <label class="form-check-label" for="privacyConsent">개인정보 이용에 동의합니다.</label>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                      aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">
-                              Your modal title
-                            </h5>
-                            <MaterialButton color="none" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            </MaterialButton>
-                          </div>
-                          <div class="modal-body">
-                            Society has put up so many boundaries, so many limitations on
-                            what’s right and wrong that it’s almost impossible to get a pure
-                            thought out.
-                            <br /><br />
-                            It’s like a little kid, a little boy, looking at colors, and no
-                            one told him what colors are good, before somebody tells you you
-                            shouldn’t like pink because that’s for girls, or you’d instantly
-                            become a gay two-year-old.
-                          </div>
-                          <div class="modal-footer justify-content-between">
-                            <MaterialButton variant="gradient" color="dark" data-bs-dismiss="modal">
-                              Close
-                            </MaterialButton>
-                            <MaterialButton variant="gradient" color="success" class="mb-0">
-                              Save changes
-                            </MaterialButton>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="text-center">
-                    <MaterialButton class="my-4 mb-2" variant="gradient" color="dark" fullWidth>Sign in
-                    </MaterialButton>
-                  </div>
-
-                </form>
-
               </div>
             </div>
           </div>
