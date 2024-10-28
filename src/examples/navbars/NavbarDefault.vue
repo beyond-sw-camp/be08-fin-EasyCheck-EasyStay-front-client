@@ -4,12 +4,6 @@ import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
 import { userLoginStore } from "@/stores/loginStore.js";
 
-// 네비게이션 토글 상태
-const isNavOpen = ref(false);
-const toggleNav = () => {
-    isNavOpen.value = !isNavOpen.value;
-};
-
 const props = defineProps({
     transparent: {
         type: Boolean,
@@ -148,7 +142,7 @@ watch(
                     </li>
                     <!-- 네비게이션 토글 버튼 -->
                     <li class="nav-item mx-2">
-                        <button class="navbar-toggler d-lg-block" type="button" @click="toggleNav">
+                        <button class="navbar-toggler d-lg-block" type="button">
                             <span class="navbar-toggler-icon mt-2">
                                 <span class="navbar-toggler-bar bar1"></span>
                                 <span class="navbar-toggler-bar bar2"></span>
