@@ -14,19 +14,7 @@
       :themeParkName="themeParkName"
     />
 
-    <BuyerInfo
-      class="mb-4"
-      v-model:buyerName="buyerName"
-      v-model:buyerPhone="buyerPhone"
-      v-model:buyerEmail="buyerEmail"
-      v-model:buyerEmailDomain="buyerEmailDomain"
-    />
-
-    <UsageInfo
-      class="mb-4"
-      v-model:termsChecked1="termsChecked1"
-      v-model:termsChecked2="termsChecked2"
-    />
+    <PurchaseForm class="mb-4" v-model="formData" />
 
     <PrivacyAgreementModal
       v-if="isModalOpen"
@@ -53,17 +41,16 @@ import { useRoute, useRouter } from "vue-router";
 import { useThemeParkStore } from "@/stores/themeParkStore";
 import { useTicketStore } from "@/stores/ticketStore";
 import ProductInfo from "@/components/TicketOrders/ProductInfo.vue";
-import BuyerInfo from "@/components/TicketOrders/BuyerInfo.vue";
-import UsageInfo from "@/components/TicketOrders/UsageInfo.vue";
+import PurchaseForm from "@/components/TicketOrders/PurchaseForm.vue";
 import PrivacyAgreementModal from "@/components/TicketOrders/PrivacyAgreementModal.vue";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
-const parseSafeJSON = (jsonString) => {
+const parseSafeJSON = (jsonString, fallback = {}) => {
   try {
-    return JSON.parse(jsonString);
+    return JSON.parse(jsonString) || fallback;
   } catch (e) {
     console.error("Failed to parse JSON:", e);
-    return null;
+    return fallback;
   }
 };
 
@@ -72,19 +59,22 @@ const router = useRouter();
 const themeParkStore = useThemeParkStore();
 const ticketStore = useTicketStore();
 
-const adultTicket = ref(parseSafeJSON(route.params.adultTicket) || {});
-const childTicket = ref(parseSafeJSON(route.params.childTicket) || {});
+const adultTicket = ref(parseSafeJSON(route.params.adultTicket));
+const childTicket = ref(parseSafeJSON(route.params.childTicket));
 const themeParkName = themeParkStore.currentThemePark?.name || "";
 
-const buyerName = ref("");
-const buyerPhone = ref("");
-const buyerEmail = ref("");
-const buyerEmailDomain = ref("");
-const termsChecked1 = ref(false);
-const termsChecked2 = ref(false);
+const formData = ref({
+  buyerName: "",
+  buyerPhone: "",
+  buyerEmail: "",
+  buyerEmailDomain: "",
+  termsChecked1: false,
+  termsChecked2: false,
+});
 
 const isFormValid = computed(() => {
-  return buyerName.value && buyerPhone.value && termsChecked1.value;
+  const { buyerName, buyerPhone, termsChecked1 } = formData.value;
+  return buyerName && buyerPhone && termsChecked1;
 });
 
 const handleCancel = () => {
@@ -95,7 +85,8 @@ const handleSubmit = async () => {
   if (isFormValid.value) {
     try {
       const reservationId = `RES${new Date().getTime()}`;
-      const totalPrice = adultTicket.value.price + childTicket.value.price;
+      const totalPrice =
+        (adultTicket.value.price || 0) + (childTicket.value.price || 0);
       router.push({
         name: "TicketPayment",
         params: { reservationId, totalPrice },
@@ -108,7 +99,6 @@ const handleSubmit = async () => {
   }
 };
 </script>
-
 
 <style scoped>
 .order-summary {

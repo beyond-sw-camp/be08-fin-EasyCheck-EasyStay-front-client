@@ -5,6 +5,7 @@ export const useThemeParkStore = defineStore("themeparkStore", {
   state: () => ({
     themeParks: [],
     currentThemePark: null,
+    themeParkName: "",
   }),
 
   getters: {
@@ -21,6 +22,7 @@ export const useThemeParkStore = defineStore("themeparkStore", {
         this.themeParks = response.data.data;
         if (this.themeParks.length > 0) {
           this.currentThemePark = this.themeParks[0];
+          this.themeParkName = this.themeParks[0].name;
         }
       } catch (error) {
         console.error("Failed to fetch theme parks:", error);
@@ -33,6 +35,7 @@ export const useThemeParkStore = defineStore("themeparkStore", {
           `/accommodations/${accommodationId}/parks/${parkId}`
         );
         this.currentThemePark = response.data;
+        this.themeParkName = response.data.name;
       } catch (error) {
         console.error(`Failed to fetch theme park with id ${parkId}:`, error);
       }
@@ -41,18 +44,13 @@ export const useThemeParkStore = defineStore("themeparkStore", {
     setCurrentThemeParkById(parkId) {
       const numericParkId = Number(parkId);
 
-      console.log("Received parkId:", numericParkId);
-      console.log(
-        "Available themeParks:",
-        this.themeParks.map((park) => park.id)
-      );
-
       const park = this.themeParks.find(
         (park) => Number(park.id) === numericParkId
       );
 
       if (park) {
         this.currentThemePark = park;
+        this.themeParkName = park.name;
       } else {
         console.error(`Invalid theme park id: ${numericParkId}`);
       }

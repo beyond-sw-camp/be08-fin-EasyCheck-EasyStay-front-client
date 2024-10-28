@@ -73,6 +73,7 @@ const groupedTickets = ref([]);
 const router = useRouter();
 const ticketStore = useTicketStore();
 const themeParkStore = useThemeParkStore();
+const themeParkName = ref(themeParkStore.themeParkName);
 const isLoggedIn = ref(false);
 
 onMounted(async () => {
