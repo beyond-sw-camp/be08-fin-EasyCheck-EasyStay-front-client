@@ -4,16 +4,18 @@
       <div class="col">
         <div class="nav-wrapper position-relative w-lg-50 w-sm-75 end-0">
           <ul class="nav nav-pills nav-fill" role="tablist" ref="navPillsRef">
-            <li class="nav-item pe-3" v-for="(tab, index) in tabs" :key="index">
+            <li
+              class="nav-item pe-3"
+              v-for="(tab, index) in roomTabs"
+              :key="index"
+            >
               <a
                 class="nav-link mb-0 px-0"
                 :class="{ active: activeTabIndex === index }"
                 data-bs-toggle="tab"
-                :href="tab.href"
                 role="tab"
-                :aria-controls="tab.controls"
                 :aria-selected="activeTabIndex === index"
-                @click="setActiveTab(index)"
+                @click="setActiveTab(index, tab.roomId)"
               >
                 {{ tab.label }}
               </a>
@@ -26,13 +28,13 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 import { ref, onMounted, computed, watch } from "vue";
+import { useRoomStore } from "@/stores/roomStore";
 
-const tabs = [
-  { label: "원룸", href: "#profile-tabs-simple", controls: "profile" },
-  { label: "투룸", href: "#dashboard-tabs-simple", controls: "dashboard" },
-  { label: "원룸", href: "#profile-tabs-simple", controls: "profile" },
-];
+const roomStore = useRoomStore();
+
+const { roomTabs } = storeToRefs(roomStore);
 
 const navPillsRef = ref(null);
 const activeTabIndex = ref(0);
@@ -58,8 +60,9 @@ const updateMovingTabPosition = () => {
   };
 };
 
-const setActiveTab = (index) => {
+const setActiveTab = (index, roomId) => {
   activeTabIndex.value = index;
+  roomStore.selectCurrentRoom(roomId);
 };
 
 watch(activeTabIndex, updateMovingTabPosition);
