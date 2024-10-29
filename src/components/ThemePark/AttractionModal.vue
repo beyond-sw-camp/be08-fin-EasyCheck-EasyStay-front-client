@@ -4,18 +4,15 @@
       <button class="close-button" @click="handleClose">X</button>
       <h2>{{ attraction.name }}</h2>
       <img
-        v-if="attraction.imageUrls && attraction.imageUrls.length > 0"
-        :src="attraction.imageUrls[0]"
+        v-if="attraction.imageUrl"
+        :src="attraction.imageUrl"
         alt="Attraction Image"
         class="modal-image"
       />
       <p class="modal-description">{{ attraction.introduction }}</p>
       <h3>이용 기준</h3>
       <ul class="standard-use-list">
-        <li
-          v-for="(item, index) in formattedStandardUse"
-          :key="index"
-        >
+        <li v-for="(item, index) in formattedStandardUse" :key="index">
           {{ item }}
         </li>
       </ul>

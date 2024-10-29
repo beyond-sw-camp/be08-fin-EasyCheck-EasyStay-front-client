@@ -1,5 +1,7 @@
 <template>
-  <navbar-default />
+  <div class="col-12">
+    <NavbarDefault :sticky="true" />
+  </div>
   <Header />
   <section class="py-6">
     <div class="container">
@@ -39,9 +41,8 @@
 
       <!-- 공지사항 총 개수 -->
       <div class="mb-3">
-        <!-- <p>Total notices: {{ notices?.length }}</p> -->
+        <p>Total notices: {{ notices.length }}</p>
       </div>
-
       <!-- 공지사항 리스트 -->
       <div v-if="filteredNotices.length > 0" class="notice-list">
         <div
@@ -78,7 +79,8 @@ const noticeStore = useNoticeStore();
 
 // 여기서 state 꺼내올 수 있음
 // getters도 filteredNotices 이런식으로 받아올 수 있음
-const { accommodations, query, filteredNotices } = storeToRefs(noticeStore);
+const { accommodations, query, filteredNotices, notices } =
+  storeToRefs(noticeStore);
 
 onMounted(async () => {
   // 지점 목록 조회하는 함수 호출 actions에서

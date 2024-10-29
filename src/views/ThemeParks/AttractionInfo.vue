@@ -65,6 +65,9 @@ const router = useRouter();
 const selectedAttraction = ref(null);
 const showModal = ref(false);
 
+console.log("attractionInfo");
+console.log(props.currentThemePark);
+
 onMounted(() => {
   fetchAttractions();
 });
@@ -83,6 +86,16 @@ const fetchAttractions = () => {
 };
 
 const attractions = computed(() => attractionStore.attractions);
+
+watch(
+  () => props.themeParkId,
+  async (newThemeParkId) => {
+    if (newThemeParkId) {
+      await fetchAttractions();
+    }
+  },
+  { immediate: true }
+);
 
 const openModal = (attraction) => {
   selectedAttraction.value = attraction;

@@ -31,11 +31,17 @@ function goToMain() {
 }
 
 const registerUser = async () => {
-  const success = await loginStore.registerUser();
-  if (success) {
-    router.push('/joinComplete');
+  try {
+    const success = await loginStore.registerUser();
+    if (success) {
+      router.push('/joinComplete');
+    }
+  } catch (error) {
+    console.error("회원가입 중 오류 발생:", error);
+    alert("회원가입 중 오류가 발생했습니다.");
   }
 };
+
 
 </script>
 
