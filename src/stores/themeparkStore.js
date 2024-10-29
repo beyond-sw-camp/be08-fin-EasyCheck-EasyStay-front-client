@@ -4,13 +4,13 @@ import apiClient from "@/api";
 export const useThemeParkStore = defineStore("themeparkStore", {
   state: () => ({
     themeParks: [],
-    currentThemePark: null,
-    themeParkName: "",
+    themePark: null,
   }),
 
   getters: {
     allThemeParks: (state) => state.themeParks,
     currentThemeParkDetails: (state) => state.currentThemePark,
+    themeParkId: (state) => state.themePark.id,
   },
 
   actions: {
@@ -20,9 +20,11 @@ export const useThemeParkStore = defineStore("themeparkStore", {
           `/accommodations/${accommodationId}/parks`
         );
         this.themeParks = response.data.data;
+
         if (this.themeParks.length > 0) {
-          this.currentThemePark = this.themeParks[0];
-          this.themeParkName = this.themeParks[0].name;
+          this.themePark = this.themeParks[0];
+        } else {
+          this.themePark = null;
         }
       } catch (error) {
         console.error("Failed to fetch theme parks:", error);
@@ -31,34 +33,38 @@ export const useThemeParkStore = defineStore("themeparkStore", {
 
     async fetchThemeParkById(accommodationId, parkId) {
       try {
+        // Debug 로그 추가
+        console.log(
+          "fetchThemeParkById 호출: accommodationId =",
+          accommodationId,
+          "parkId =",
+          parkId
+        );
+
+        if (!accommodationId || !parkId) {
+          throw new Error(
+            `Invalid parameters: accommodationId = ${accommodationId}, parkId = ${parkId}`
+          );
+        }
+
+        console.log(
+          "API 호출: /accommodations/",
+          accommodationId,
+          "/parks/",
+          parkId
+        );
+
         const response = await apiClient.get(
           `/accommodations/${accommodationId}/parks/${parkId}`
         );
-        this.currentThemePark = response.data;
-        this.themeParkName = response.data.name;
+        console.log(response.data);
+
+        this.themePark = response.data.data;
       } catch (error) {
-        console.error(`Failed to fetch theme park with id ${parkId}:`, error);
-      }
-    },
-
-    setCurrentThemeParkById(parkId) {
-      const numericParkId = Number(parkId);
-
-      const park = this.themeParks.find(
-        (park) => Number(park.id) === numericParkId
-      );
-
-      if (park) {
-        this.currentThemePark = park;
-        this.themeParkName = park.name;
-      } else {
-        console.error(`Invalid theme park id: ${numericParkId}`);
-      }
-    },
-
-    ensureCurrentThemePark(parkId) {
-      if (!this.currentThemePark || this.currentThemePark.id !== parkId) {
-        this.setCurrentThemeParkById(parkId);
+        console.error(
+          `Failed to fetch theme park with accommodationId ${accommodationId} and parkId ${parkId}:`,
+          error
+        );
       }
     },
   },

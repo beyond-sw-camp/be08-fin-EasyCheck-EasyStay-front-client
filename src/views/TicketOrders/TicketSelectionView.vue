@@ -1,7 +1,8 @@
 <template>
-  <NavbarDefault :sticky="true" />
   <div class="ticket-selection container my-5">
-    <h2 class="mb-4">{{ themeParkName }} 이용권 선택</h2>
+    <h2 v-if="accommodation" class="mb-4">
+      {{ accommodation.name || "알 수 없음" }} 이용권 선택
+    </h2>
     <div class="ticket-list row">
       <div
         v-for="ticketGroup in groupedTickets"
@@ -18,7 +19,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.adultTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.adultTicket.price) }}원
                   (회원가)
                 </span>
@@ -28,7 +29,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.childTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.childTicket.price) }}원
                   (회원가)
                 </span>
@@ -51,51 +52,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
-import { useThemeParkStore } from "@/stores/themeParkStore";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-import dayjs from "dayjs";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { userLoginStore } from "@/stores/loginStore";
 
-const props = defineProps({
-  themeParkId: {
-    type: [String, Number],
-    required: true,
-  },
-  themeParkName: {
-    type: String,
-    required: true,
-  },
-});
-
-const groupedTickets = ref([]);
+// 라우팅
+const route = useRoute();
 const router = useRouter();
+
+// pinia 스토어
+const authStore = userLoginStore();
 const ticketStore = useTicketStore();
-const themeParkStore = useThemeParkStore();
-const themeParkName = ref(themeParkStore.themeParkName);
-const isLoggedIn = ref(false);
 
+const accmomodationStore = useAccommodationStore();
+
+// pina state, getters
+const { isLoggedIn } = storeToRefs(authStore);
+const { groupedTickets } = storeToRefs(ticketStore);
+const { accommodation } = storeToRefs(accmomodationStore);
+
+const themeParkId = computed(() => route.query.themeParkId);
+
+// 숙박시설, 테마파크, 티켓 정보 조회하기
 onMounted(async () => {
-  const themeParkId = Number(props.themeParkId);
-  await ticketStore.fetchTickets(themeParkId);
-
-  if (ticketStore.tickets && ticketStore.tickets.data) {
-    const today = dayjs();
-    const validTickets = ticketStore.tickets.data.filter((ticket) => {
-      const saleStart = dayjs(ticket.saleStartDate);
-      const saleEnd = dayjs(ticket.saleEndDate);
-      return today.isAfter(saleStart) && today.isBefore(saleEnd);
-    });
-
-    console.log("Valid Tickets:", validTickets);
-
-    groupedTickets.value = ticketStore.groupTicketsByType(validTickets);
-  } else {
-    console.error("Tickets data is missing or invalid.");
-  }
-
-  checkLoginStatus();
+  await ticketStore.fetchTickets(themeParkId.value);
 });
 
 const getDiscountedPrice = (price) => {
@@ -104,29 +87,8 @@ const getDiscountedPrice = (price) => {
 };
 
 const handlePurchase = (ticketGroup) => {
-  const themeParkId = Number(ticketGroup.themeParkId);
-
-  console.log("Attempting to set theme park with ID:", themeParkId);
-
-  themeParkStore.setCurrentThemeParkById(themeParkId);
-
-  if (!isLoggedIn.value) {
-    router.push({ path: "/users/login" });
-  } else {
-    router.push({
-      name: "TicketOrderView",
-      params: {
-        adultTicket: JSON.stringify(ticketGroup.adultTicket),
-        childTicket: JSON.stringify(ticketGroup.childTicket),
-        themeParkId: themeParkId,
-        themeParkName: props.themeParkName,
-      },
-    });
-  }
-};
-
-const checkLoginStatus = () => {
-  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+  ticketStore.selectTicket(ticketGroup);
+  router.replace({ name: "TicketOrder" });
 };
 </script>
 
@@ -144,11 +106,6 @@ const checkLoginStatus = () => {
 
 .ticket-card:hover {
   transform: scale(1.05);
-}
-
-.card-img-top {
-  height: 200px;
-  object-fit: cover;
 }
 
 .card-prices {
