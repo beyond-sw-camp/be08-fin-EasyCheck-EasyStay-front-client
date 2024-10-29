@@ -258,24 +258,24 @@ export const useReservationStore = defineStore("reservationStore", {
             console.log("결제 성공:", rsp);
 
             // 결제 성공 후 결제 내역을 서버에 저장
+            const payRequest = {
+              impUid: rsp.imp_uid,
+              reservationId: this.reservationId,
+              method: this.paymentMethod,
+              amount: this.totalPriceNumber,
+              paymentDate: new Date().toISOString(),
+              completionStatus: "COMPLETE",
+              depositDeadline:
+                this.paymentMethod === "vbank" ? this.getVbankDueDate() : null,
+              bank: this.paymentMethod === "vbank" ? "우리은행" : null,
+              accountHolder:
+                this.paymentMethod === "vbank"
+                  ? userData.name || "이름 정보 없음"
+                  : null,
+            };
+
             try {
-              await apiClient.post("/payment", {
-                impUid: rsp.imp_uid,
-                reservationId: this.reservationId,
-                method: this.paymentMethod,
-                amount: this.totalPriceNumber,
-                paymentDate: new Date().toISOString(),
-                completionStatus: "COMPLETE",
-                depositDeadline:
-                  this.paymentMethod === "vbank"
-                    ? this.getVbankDueDate()
-                    : null,
-                bank: this.paymentMethod === "vbank" ? "우리은행" : null,
-                accountHolder:
-                  this.paymentMethod === "vbank"
-                    ? userData.name || "이름 정보 없음"
-                    : null,
-              });
+              await apiClient.post("/payment", payRequest);
               alert("결제 내역이 데이터베이스에 저장되었습니다.");
               this.isPaymentSuccess = true;
               this.isPaymentFailed = false;
