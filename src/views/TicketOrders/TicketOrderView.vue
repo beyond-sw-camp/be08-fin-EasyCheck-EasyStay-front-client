@@ -1,37 +1,19 @@
 <template>
-  <div class="container py-5 my-5">
+  <div class="container py-5 my-5 mt-8">
     <h2 class="text-left mb-4">입장권 구매</h2>
     <p class="text-left text-muted pb-4">
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
-    <product-info
-      class="mb-4"
-      v-model:adultCount="adultCount"
-      v-model:childCount="childCount"
-    />
+    <product-info class="mb-4" v-model:adultCount="adultCount" v-model:childCount="childCount" />
 
-    <buyer-info
-      class="mb-4"
-      v-model:buyerName="buyerName"
-      v-model:buyerPhone="buyerPhone"
-      v-model:buyerEmail="buyerEmail"
-      v-model:buyerEmailDomain="buyerEmailDomain"
-    />
+    <buyer-info class="mb-4" v-model:buyerName="buyerName" v-model:buyerPhone="buyerPhone"
+      v-model:buyerEmail="buyerEmail" v-model:buyerEmailDomain="buyerEmailDomain" />
 
-    <usage-info
-      class="mb-4"
-      v-model:termsChecked1="termsChecked1"
-      v-model:termsChecked2="termsChecked2"
-      @openModal="handleOpenModal"
-    />
+    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
+      @openModal="handleOpenModal" />
 
-    <privacy-agreement-modal
-      v-if="isModalOpen"
-      :type="modalType"
-      @close="closeModal"
-      @agree="handleAgree"
-    />
+    <privacy-agreement-modal v-if="isModalOpen" :type="modalType" @close="closeModal" @agree="handleAgree" />
 
     <div class="d-flex justify-content-center mt-5">
       <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>

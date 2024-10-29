@@ -11,7 +11,6 @@ import { useRoomStore } from "@/stores/roomStore";
 import easystayImage from '@/assets/img/easystay.png';
 import setMaterialInput from "@/assets/js/material-input";
 
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
@@ -144,14 +143,6 @@ const fetchReservationsWithDetails = async () => {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0 w-100">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-90" loading="lazy" style="padding-top: 80px;">
       <span class="mask bg-white opacity-6"></span>

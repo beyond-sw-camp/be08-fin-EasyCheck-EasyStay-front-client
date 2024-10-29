@@ -4,7 +4,6 @@ import { useRouter } from "vue-router";
 import { mypageStore } from "@/stores/mypageStore";
 
 // example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
@@ -40,14 +39,6 @@ const handleDeactivate = async () => {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-80 custom-login-container" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
