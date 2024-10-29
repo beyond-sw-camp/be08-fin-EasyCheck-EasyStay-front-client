@@ -22,10 +22,9 @@
         <room-selection-grid v-if="showRoomSelectionGrid" />
       </div>
       <div class="mt-4">
-        <reservation-form v-if="showReservationForm" />
-      </div>
-      <div class="mt-4">
-        <reservation-info v-if="showReservationForm" />
+        <reservation-form v-if="showReservationForm">
+          <reservation-info />
+        </reservation-form>
       </div>
     </div>
   </main>
@@ -40,34 +39,14 @@ import RoomSelectionGrid from "./Sections/RoomSelectionGrid.vue";
 import ReservationForm from "./Sections/ReservationForm.vue";
 import ReservationInfo from "./Sections/ReservationInfo.vue";
 
-import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted, watch } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
-const router = useRouter();
 const reservationStore = useReservationStore();
 
-const {
-  showRoomSelectionGrid,
-  showReservationForm,
-  isPaymentSuccess,
-  isPaymentFailed,
-} = storeToRefs(reservationStore);
-
-// 결제 성공시 결과 창으로 이동
-watch(isPaymentSuccess, (isSuccess) => {
-  if (isSuccess) {
-    router.push("/reservation/result");
-  }
-});
-
-// 결제 실패시 메인 화면으로 이동
-watch(isPaymentFailed, (isFailed) => {
-  if (isFailed) {
-    router.push("/");
-  }
-});
+const { showRoomSelectionGrid, showReservationForm } =
+  storeToRefs(reservationStore);
 
 onMounted(async () => {
   // 숙박시설들 불러오기

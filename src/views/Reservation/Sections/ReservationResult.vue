@@ -16,7 +16,7 @@
         <div class="card-body">
           <div class="d-flex justify-content-between mb-3">
             <span>객실 예약</span>
-            <span>24576874</span>
+            <span>{{ reservation?.id }}</span>
           </div>
 
           <div class="table-responsive">
@@ -24,31 +24,46 @@
               <tbody>
                 <tr>
                   <th>투숙 객실</th>
-                  <td>롤린 디럭스 트윈</td>
+                  <td>
+                    {{ reservation?.typeName }} {{ reservation?.roomName }}
+                  </td>
                   <th>객실 수</th>
-                  <td>1실</td>
+                  <td>{{ reservation?.totalRoomCount }}실</td>
                 </tr>
                 <tr>
                   <th>투숙 인원</th>
-                  <td>성인 2명 / 소인 0명</td>
+                  <td>
+                    성인 {{ reservation?.adultCount }}명 / 소인
+                    {{ reservation?.childCount }}명
+                  </td>
                   <th>지점</th>
-                  <td>롯데호텔부여</td>
+                  <td>{{ reservation?.accommodationName }}</td>
                 </tr>
                 <tr>
                   <th>투숙 기간</th>
-                  <td colspan="3">2024.09.21(토) - 2024.09.22(일) 1박</td>
+                  <td colspan="3">
+                    {{ reservation?.checkinDate }} -
+                    {{ reservation?.checkoutDate }}
+                    {{
+                      Math.floor(
+                        (new Date(reservation?.checkoutDate) -
+                          new Date(reservation?.checkinDate)) /
+                          (1000 * 60 * 60 * 24)
+                      )
+                    }}박
+                  </td>
                 </tr>
                 <tr>
                   <th>예약자 이름</th>
-                  <td>김나현</td>
+                  <td>{{ reservation?.userName }}</td>
                   <th>예약자 휴대전화 번호</th>
-                  <td>01054865956</td>
+                  <td>{{ reservation?.userPhone }}</td>
                 </tr>
                 <tr>
                   <th>대표 투숙자 이름</th>
-                  <td>김나현</td>
+                  <td>{{ reservation?.representativeName }}</td>
                   <th>대표 투숙자 휴대전화 번호</th>
-                  <td>01054865956</td>
+                  <td>{{ reservation?.representativePhone }}</td>
                 </tr>
               </tbody>
             </table>
@@ -56,7 +71,9 @@
 
           <div class="d-flex justify-content-between align-items-center mt-3">
             <span class="fw-bold">총 요금<br />(VAT 포함)</span>
-            <span class="text-danger fw-bold fs-4">311,000 원</span>
+            <span class="text-danger fw-bold fs-4"
+              >{{ reservation?.totalPrice }} 원</span
+            >
           </div>
         </div>
       </div>
@@ -64,7 +81,14 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore";
+
+const reservationStore = useReservationStore();
+
+const { reservationResult: reservation } = storeToRefs(reservationStore);
+</script>
 
 <style lang="scss" scoped>
 .reservation-result {

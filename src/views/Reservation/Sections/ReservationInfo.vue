@@ -56,11 +56,23 @@
     </div>
     <div class="agreement-section">
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked1" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked1"
+          @change="
+            (e) => reservationStore.setAgreementChecked1(e.target.checked)
+          "
+        />
         <span>(필수) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked2" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked2"
+          @change="
+            (e) => reservationStore.setAgreementChecked2(e.target.checked)
+          "
+        />
         <span>(필수) 예약 규정 확인 및 동의 전문보기</span>
       </label>
       <label class="agreement-item">
@@ -68,31 +80,19 @@
         <span>(선택) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
     </div>
-    <div class="action-buttons">
-      <button class="cancel-btn" @click="handleCancel">취소</button>
-      <button
-        class="reserve-btn"
-        :disabled="!allAgreementsChecked"
-        @click="handlePay"
-      >
-        결제하기
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import { userLoginStore } from "@/stores/loginStore";
 import { useReservationStore } from "@/stores/reservationStore";
 
-const router = useRouter(); // router 인스턴스 생성
 const userStore = userLoginStore();
 const reservationStore = useReservationStore();
 
-const { userRole } = storeToRefs(userStore);
+const { userRole, agreementChecked1, agreementChecked2 } =
+  storeToRefs(userStore);
 
 const {
   roomCount,
@@ -105,32 +105,6 @@ const {
   formattedCheckinDate,
   formattedCheckoutDate,
 } = storeToRefs(reservationStore);
-
-const agreementChecked1 = ref(false);
-const agreementChecked2 = ref(false);
-const agreementChecked3 = ref(false);
-
-const allAgreementsChecked = computed(
-  () => agreementChecked1.value && agreementChecked2.value
-);
-
-const handleCancel = () => {
-  const isConfirmed = confirm(
-    "지금까지 입력한 내용이 모두 삭제됩니다. 메인페이지로 이동하시겠습니까?"
-  );
-
-  if (isConfirmed) {
-    // 예약 관련 상태 초기화
-    reservationStore.$reset(); // store의 상태를 초기값으로 리셋
-    // 메인 페이지로 이동
-    router.push("/"); // 메인 페이지 경로에 맞게 수정하세요
-  }
-};
-
-const handlePay = async () => {
-  await reservationStore.createReservation();
-  await reservationStore.callImpRequestPay();
-};
 </script>
 
 <style lang="scss" scoped>
@@ -209,37 +183,6 @@ const handlePay = async () => {
 
       input[type="checkbox"] {
         margin-right: 10px;
-      }
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin: 4rem 0;
-
-    button {
-      flex: 1;
-      padding: 15px;
-      font-size: 18px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &.cancel-btn {
-        background-color: #f8f8f8;
-        color: #333;
-        margin-right: 10px;
-      }
-
-      &.reserve-btn {
-        background-color: #e74c3c;
-        color: #fff;
-
-        &:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
       }
     }
   }
