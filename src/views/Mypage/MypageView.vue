@@ -6,7 +6,6 @@ import { userLoginStore } from "@/stores/loginStore";
 import { mypageStore } from "@/stores/mypageStore";
 
 // example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
 // material-input
@@ -43,14 +42,6 @@ import easystayImage from '@/assets/img/easystay.png';
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0 w-100">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-90" loading="lazy" style="padding-top: 80px;">
       <span class="mask bg-white opacity-6"></span>
