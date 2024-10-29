@@ -16,7 +16,9 @@ onMounted(() => {
 <template>
   <div class="position-sticky z-index-sticky top-0">
     <div class="row">
-      <div class="col-12"></div>
+      <div class="col-12">
+        <navbar-default />
+      </div>
     </div>
   </div>
   <router-view />
