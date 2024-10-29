@@ -49,6 +49,10 @@ export const userLoginStore = defineStore("userStore", {
         state.consentItems2.every((item) => item.checked)
       );
     },
+    userRole: (state) =>
+      state.userInfo?.role === "CORP_USER" ? "법인회원" : "일반회원",
+    email: (state) => state.userInfo?.email.split("@")[0], // @ 앞부분 반환
+    domain: (state) => state.userInfo?.email.split("@")[1], // @ 뒷부분 반환
   },
 
   actions: {
@@ -224,6 +228,17 @@ export const userLoginStore = defineStore("userStore", {
         console.error("비밀번호 변경 오류:", error);
         this.error =
           error.response?.data?.message || "비밀번호 변경에 실패했습니다.";
+      }
+    },
+
+    // 유저 정보 불러오기
+    async fetchUserInfo() {
+      try {
+        const response = await apiClient.get("/users/info");
+        this.userInfo = response.data;
+      } catch (err) {
+        this.userInfo = {};
+        console.log(err);
       }
     },
 

@@ -1,6 +1,26 @@
 import apiClient from "@/api";
 import { defineStore } from "pinia";
 
+// 상수 분리
+const DAYS_KO = [
+  "일요일",
+  "월요일",
+  "화요일",
+  "수요일",
+  "목요일",
+  "금요일",
+  "토요일",
+];
+
+// 유틸리티 함수 분리
+const formatDate = (date) => {
+  if (!date) return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export const useReservationStore = defineStore("reservationStore", {
   state: () => ({
     roomCount: 1,
@@ -9,13 +29,26 @@ export const useReservationStore = defineStore("reservationStore", {
     checkOut: null,
     accommodationId: null,
     accommodationName: "",
+    adultCount: 0,
+    childCount: 0,
 
+    // 예약 하기위한 폼 토글
     showReservationForm: false,
+    // 예약 요약 토글
     showReservationInfo: false,
+    // 예약 가능 객실 토글
     showRoomSelectionGrid: false,
-
+    // 숙박시설 리스트
     accommodationList: [],
+    // 체크인 체크아웃 날짜에 예약 가능한 방 정보
     availableRoomList: [],
+    // 객실 예약시 선택한 방 정보
+    selectedRoom: null,
+
+    // 예약 관련 상태 추가
+    reservationStatus: null, // 'pending' | 'success' | 'error' | null
+    reservationError: null,
+    currentReservation: null,
   }),
 
   getters: {
@@ -24,39 +57,68 @@ export const useReservationStore = defineStore("reservationStore", {
         accommodationId: accommodation.id,
         name: accommodation.name,
       })),
+
+    totalPrice: (state) => {
+      const basePrice =
+        state.userInfo?.userRole === "CORP_USER"
+          ? state.selectedRoom?.corpPrice
+          : state.selectedRoom?.normalPrice;
+
+      const price = basePrice * state.roomCount || 0;
+
+      return new Intl.NumberFormat("ko-KR", {
+        style: "currency",
+        currency: "KRW",
+      }).format(price);
+    },
+
+    // 날짜 포맷팅 getter 통합
+    formattedCheckinDate: (state) => formatDate(state.checkIn),
+    formattedCheckoutDate: (state) => formatDate(state.checkOut),
+
+    // 체크인 관련 getter 통합
+    checkinInfo: (state) => ({
+      date: state.checkIn?.getDate(),
+      month: state.checkIn?.getMonth(),
+      dayKo: state.checkIn ? DAYS_KO[state.checkIn.getDay()] : null,
+    }),
+
+    // 체크아웃 관련 getter 통합
+    checkoutInfo: (state) => ({
+      date: state.checkOut?.getDate(),
+      month: state.checkOut?.getMonth(),
+      dayKo: state.checkOut ? DAYS_KO[state.checkOut.getDay()] : null,
+    }),
+
+    // 기존 getter들을 새로운 통합 getter를 사용하도록 수정 (하위 호환성 유지)
     checkinDate: (state) => state.checkIn?.getDate(),
     checkinMonth: (state) => state.checkIn?.getMonth(),
-    checkinDayKo: (state) => {
-      const daysKo = [
-        "일요일",
-        "월요일",
-        "화요일",
-        "수요일",
-        "목요일",
-        "금요일",
-        "토요일",
-      ];
-      return daysKo[state.checkIn?.getDay()];
-    },
+    checkinDayKo: (state) =>
+      state.checkIn ? DAYS_KO[state.checkIn.getDay()] : null,
     checkoutDate: (state) => state.checkOut?.getDate(),
     checkoutMonth: (state) => state.checkOut?.getMonth(),
-    checkoutDayKo: (state) => {
-      const daysKo = [
-        "일요일",
-        "월요일",
-        "화요일",
-        "수요일",
-        "목요일",
-        "금요일",
-        "토요일",
-      ];
-      return daysKo[state.checkOut?.getDay()];
-    },
+    checkoutDayKo: (state) =>
+      state.checkOut ? DAYS_KO[state.checkOut.getDay()] : null,
+
     stayDuration: (state) =>
       Math.floor((state.checkOut - state.checkIn) / (1000 * 60 * 60 * 24)),
+    // 전체 투숙 인원
+    totalGuests: (state) => state.adultCount + state.childCount,
   },
-
   actions: {
+    openReservationForm() {
+      this.showReservationForm = true;
+    },
+    closeReservationForm() {
+      this.showReservationForm = false;
+    },
+    selectReservationRoom(room) {
+      this.selectedRoom = room;
+      this.adultCount = room.standardOccupancy;
+    },
+    resetReservationRoom() {
+      this.selectedRoom = null;
+    },
     setShowRoomSelectionGrid(isOpen) {
       this.showRoomSelectionGrid = isOpen;
     },
@@ -97,6 +159,18 @@ export const useReservationStore = defineStore("reservationStore", {
       this.checkIn = today;
       this.checkOut = tomorrow;
     },
+
+    resetRoomSelection() {
+      this.showRoomSelectionGrid = false;
+      this.availableRoomList = [];
+    },
+
+    resetReservationForm() {
+      this.showReservationForm = false;
+      this.adultCount = 0;
+      this.childCount = 0;
+    },
+
     async fetchAndInitAccommodationNavs() {
       try {
         const response = await apiClient.get("/accommodations");
@@ -110,13 +184,6 @@ export const useReservationStore = defineStore("reservationStore", {
     },
 
     async fetchReservationAvailableRooms() {
-      const formatDate = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-      };
-
       try {
         const response = await apiClient.get("/reservation-room/available", {
           params: {
