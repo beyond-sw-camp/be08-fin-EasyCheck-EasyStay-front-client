@@ -9,33 +9,40 @@
         </div>
         <div class="info-cell">
           <div class="info-label">예약 구분</div>
-          <div class="info-value">개실예약</div>
+          <div class="info-value">객실예약</div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">예약 지점</div>
-          <div class="info-value">롯데리조트속초</div>
+          <div class="info-value">{{ accommodationName }}</div>
         </div>
         <div class="info-cell">
           <div class="info-label">투숙 객실</div>
-          <div class="info-value">호텔 디럭스 더블</div>
+          <div class="info-value">
+            {{ selectedRoom?.roomType }} - {{ selectedRoom?.roomName }}
+          </div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">투숙 기간</div>
-          <div class="info-value">2024.09.21(토) - 2024.09.22(일) / 1박</div>
+          <div class="info-value">
+            {{ formattedCheckinDate }} - {{ formattedCheckoutDate }} /
+            {{ stayDuration }}박
+          </div>
         </div>
         <div class="info-cell">
           <div class="info-label">투숙 인원</div>
-          <div class="info-value">성인 2명 / 소인 0명</div>
+          <div class="info-value">
+            성인 {{ adultCount }}명 / 소인 {{ childCount }}명
+          </div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">객실 수</div>
-          <div class="info-value">1실</div>
+          <div class="info-value">{{ roomCount }}실</div>
         </div>
         <div class="info-cell">
           <div class="info-label">쿠폰 적용</div>
@@ -45,8 +52,7 @@
     </div>
     <div class="total-price">
       <span class="price-label">총 금액 (VAT 포함)</span>
-      <span class="price-value">비회원가 398,000 원</span>
-      <button class="price-detail-btn">요금별 금액</button>
+      <span class="price-value">{{ userRole }}가 {{ totalPrice }} 원</span>
     </div>
     <div class="agreement-section">
       <label class="agreement-item">
@@ -72,7 +78,27 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 import { ref, computed } from "vue";
+import { userLoginStore } from "@/stores/loginStore";
+import { useReservationStore } from "@/stores/reservationStore";
+
+const userStore = userLoginStore();
+const reservationStore = useReservationStore();
+
+const { userRole } = storeToRefs(userStore);
+
+const {
+  roomCount,
+  totalPrice,
+  adultCount,
+  childCount,
+  stayDuration,
+  selectedRoom,
+  accommodationName,
+  formattedCheckinDate,
+  formattedCheckoutDate,
+} = storeToRefs(reservationStore);
 
 const agreementChecked1 = ref(false);
 const agreementChecked2 = ref(false);
