@@ -70,7 +70,7 @@
 
   <div
     class="container-fluid d-flex justify-content-center my-5"
-    v-if="themePark?.ticketAvailable"
+    v-if="themePark?.ticketAvailable === 'Y'"
   >
     <material-button
       color="danger"
@@ -115,9 +115,12 @@ const currentAccommodationId = computed(
   () => Number(route.query.accommodationId) || null
 );
 // 현재 선택한 테마파크 식별자
-const currentThemeParkId = computed(
-  () => Number(route.query.currentThemeParkId) || null
-);
+const currentThemeParkId = computed(() => {
+  const themeParkId =
+    Number(route.query.themeParkId) || themeParks.value[0]?.id || null;
+  console.log("Current Theme Park ID:", themeParkId);
+  return themeParkId;
+});
 
 onMounted(async () => {
   // 모든 숙박시설 조회
@@ -139,14 +142,17 @@ const changeAccommodation = async (accommodationId) =>
   });
 
 // 테마파크 변경
-const changeThemePark = (themeParkId) =>
-  router.push({
+const changeThemePark = async (themeParkId) => {
+  console.log("Selected Theme Park ID:", themeParkId);
+  await router.push({
     name: "ThemePark",
     query: {
       ...route.query,
       themeParkId: themeParkId,
     },
   });
+  console.log("Updated Route Query:", route.query.themeParkId); // 쿼리 파라미터가 업데이트되었는지 확인
+};
 
 const goToTicketSelectionView = () =>
   router.push({
