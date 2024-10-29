@@ -137,10 +137,6 @@
           <small class="input-hint">객실 정원은 영유아 포함입니다.</small>
         </div>
       </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary w-100">예약하기</button>
-      </div>
     </form>
   </div>
 </template>

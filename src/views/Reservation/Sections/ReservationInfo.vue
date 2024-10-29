@@ -69,8 +69,12 @@
       </label>
     </div>
     <div class="action-buttons">
-      <button class="cancel-btn">취소</button>
-      <button class="reserve-btn" :disabled="!allAgreementsChecked">
+      <button class="cancel-btn" @click="handleCancel">취소</button>
+      <button
+        class="reserve-btn"
+        :disabled="!allAgreementsChecked"
+        @click="handlePay"
+      >
         결제하기
       </button>
     </div>
@@ -80,9 +84,11 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { userLoginStore } from "@/stores/loginStore";
 import { useReservationStore } from "@/stores/reservationStore";
 
+const router = useRouter(); // router 인스턴스 생성
 const userStore = userLoginStore();
 const reservationStore = useReservationStore();
 
@@ -107,6 +113,23 @@ const agreementChecked3 = ref(false);
 const allAgreementsChecked = computed(
   () => agreementChecked1.value && agreementChecked2.value
 );
+
+const handleCancel = () => {
+  const isConfirmed = confirm(
+    "지금까지 입력한 내용이 모두 삭제됩니다. 메인페이지로 이동하시겠습니까?"
+  );
+
+  if (isConfirmed) {
+    // 예약 관련 상태 초기화
+    reservationStore.$reset(); // store의 상태를 초기값으로 리셋
+    // 메인 페이지로 이동
+    router.push("/"); // 메인 페이지 경로에 맞게 수정하세요
+  }
+};
+
+const handlePay = async () => {
+  await reservationStore.callImpRequestPay();
+};
 </script>
 
 <style lang="scss" scoped>
