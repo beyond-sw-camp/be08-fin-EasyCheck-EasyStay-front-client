@@ -25,6 +25,8 @@ import ElToggles from "../layouts/sections/elements/toggles/TogglesView.vue";
 import ElTypography from "../layouts/sections/elements/typography/TypographyView.vue";
 
 import ThemeParkView from "@/views/ThemeParks/ThemeParkView.vue";
+import ThemeParkInfo from "@/views/ThemeParks/ThemeParkInfo.vue";
+import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
 import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
@@ -65,6 +67,7 @@ import NoticesListView from "@/views/Notices/NoticesListView.vue";
 import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
 import EventsListView from "@/views/Events/EventsListView.vue";
+import EventDetail from "@/views/Events/EventDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -200,25 +203,43 @@ const router = createRouter({
       name: "Accommodation",
       component: AccommodationView,
     },
+    // 테마파크 라우팅
     {
-      path: "/themepark/:themeparkId",
+      path: "/themepark",
       name: "ThemePark",
       component: ThemeParkView,
-      props: (route) => ({
-        themeParkId: route.query.themeParkId || 1,
-      }),
+      redirect: { name: "ThemeParkInfo" },
+      children: [
+        {
+          path: "",
+          component: ThemeParkInfo,
+          name: "ThemeParkInfo",
+        },
+        {
+          path: "tickets",
+          name: "TicketSelection",
+          component: TicketSelectionView,
+        },
+        {
+          path: "order",
+          name: "TicketOrder",
+          component: TicketOrderView,
+          beforeEnter: (to, from, next) => {
+            // 새로고침이나 직접 URL 접근인 경우
+            if (from.name === undefined) {
+              console.log("새로고침 시도");
+
+              return next({ name: "ThemeParkInfo" });
+            }
+            return next();
+          },
+        },
+      ],
     },
     {
-      path: "/themepark/:themeParkId/tickets",
-      name: "TicketSelection",
-      component: TicketSelectionView,
-      props: true,
-    },
-    {
-      path: "/ticketorder",
-      name: "TicketOrderView",
-      component: TicketOrderView,
-      props: true,
+      path: "/themepark/error",
+      name: "ThemeParkErrorPage",
+      component: ThemeParkErrorPage,
     },
     {
       path: "/usageguide/:guidePageName",
@@ -357,8 +378,13 @@ const router = createRouter({
     },
     {
       path: "/eventsListView",
-      name: "eventsListView",
+      name: "EventsListView",
       component: EventsListView,
+    },
+    {
+      path: "/eventsListView/:id",
+      name: "EventDetail",
+      component: EventDetail,
     },
     {
       path: "/users/mypage/pwAuth",

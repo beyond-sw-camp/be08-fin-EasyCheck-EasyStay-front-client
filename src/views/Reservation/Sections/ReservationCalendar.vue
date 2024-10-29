@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
 const DATE_SELECTION_MODE = {
@@ -25,7 +25,8 @@ const tomorrow = new Date().setDate(today.getDate() + 1);
 const selectMode = ref(DATE_SELECTION_MODE.START);
 const reservationStore = useReservationStore();
 
-const attrs = reactive([
+// 초기값을 함수로 분리
+const getInitialAttrs = () => [
   {
     key: "today",
     highlight: {
@@ -38,7 +39,23 @@ const attrs = reactive([
       end: tomorrow,
     },
   },
-]);
+];
+
+const attrs = reactive(getInitialAttrs());
+
+// watch 수정
+watch(
+  () => reservationStore.accommodationId,
+  () => {
+    // reactive 배열의 내용을 업데이트
+    attrs.length = 0; // 배열 비우기
+    attrs.push(...getInitialAttrs()); // 새로운 초기값 추가
+
+    // store의 날짜도 초기화
+    reservationStore.setCheckinDate(today);
+    reservationStore.setCheckoutDate(new Date(tomorrow));
+  }
+);
 
 const clickDate = (e) => {
   const { date: selectedDate } = e;

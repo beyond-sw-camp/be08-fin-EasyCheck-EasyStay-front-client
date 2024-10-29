@@ -1,5 +1,7 @@
 <template>
-  <navbar-default />
+  <div class="col-12">
+    <NavbarDefault :sticky="true" />
+  </div>
   <Header />
   <div class="container py-4">
     <div v-if="notice" class="notice-header mb-4">

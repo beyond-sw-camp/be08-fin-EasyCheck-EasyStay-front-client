@@ -62,6 +62,10 @@ const updateMovingTabPosition = () => {
 const onClickTab = (index, accommodationId, accommodationName) => {
   reservationStore.setAccommodationId(accommodationId);
   reservationStore.setAccommodationName(accommodationName);
+  // 검색한 객실, 체크인, 체크아웃 날짜 초기화
+  reservationStore.resetRoomSelection();
+  reservationStore.resetReservationForm();
+  reservationStore.initCheckInCheckOut();
 };
 
 watch(updateMovingTabPosition);

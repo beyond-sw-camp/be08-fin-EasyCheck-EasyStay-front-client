@@ -54,7 +54,10 @@ export const userLoginStore = defineStore("userStore", {
         state.consentItems2.every((item) => item.checked)
       );
     },
-
+    userRole: (state) =>
+      state.userInfo?.role === "CORP_USER" ? "법인회원" : "일반회원",
+    email: (state) => state.userInfo?.email.split("@")[0], // @ 앞부분 반환
+    domain: (state) => state.userInfo?.email.split("@")[1], // @ 뒷부분 반환
     setAuthenticated(state, status) {
       state.isAuthenticated = status;
     },
@@ -66,6 +69,15 @@ export const userLoginStore = defineStore("userStore", {
       this.isLoggedIn = status;
     },
 
+    checkLogin() {
+      if (localStorage.getItem("accessToken")) {
+        this.isLoggedIn = true;
+      } else {
+        this.isLoggedIn = false;
+      }
+    },
+
+    // 일반회원 - 로그인
     async login(loginData) {
       const mypageStoreInstance = mypageStore();
 
@@ -307,7 +319,16 @@ export const userLoginStore = defineStore("userStore", {
           error.response?.data?.message || "비밀번호 변경에 실패했습니다.";
       }
     },
-
+    // 유저 정보 불러오기
+    async fetchUserInfo() {
+      try {
+        const response = await apiClient.get("/users/info");
+        this.userInfo = response.data;
+      } catch (err) {
+        this.userInfo = {};
+        console.log(err);
+      }
+    },
     // 이메일 중복 체크
     async checkEmailDuplicate(email) {
       try {
