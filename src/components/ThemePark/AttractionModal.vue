@@ -59,8 +59,9 @@ const formattedStandardUse = computed(() => {
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000;
+  padding-top: 12vh;
 }
 
 .modal-content {
@@ -70,7 +71,7 @@ const formattedStandardUse = computed(() => {
   position: relative;
   max-width: 500px;
   width: 90%;
-  max-height: 100vh;
+  max-height: 80vh;
   overflow-y: auto;
   z-index: 1060;
 }
