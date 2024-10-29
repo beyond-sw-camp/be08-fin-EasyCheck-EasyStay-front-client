@@ -14,6 +14,10 @@ export const mypageStore = defineStore("mypageStore", {
       oldPassword: "",
       newPassword: "",
     },
+
+    // 사업장 정보를 담을 배열
+    accommodations: [],
+    branchQuery: "", // 선택된 지점
   }),
 
   actions: {
@@ -69,6 +73,16 @@ export const mypageStore = defineStore("mypageStore", {
       } catch (error) {
         console.error("탈퇴 실패:", error);
         throw error;
+      }
+    },
+
+    // 모든 시설 조회 API 호출
+    async fetchAccommodations() {
+      try {
+        const response = await apiClient.get("/accommodations");
+        this.accommodations = response.data;
+      } catch (error) {
+        console.error("Failed to fetch accommodations:", error);
       }
     },
   },
