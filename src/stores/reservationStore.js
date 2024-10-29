@@ -35,6 +35,10 @@ export const useReservationStore = defineStore("reservationStore", {
     adultCount: 0,
     childCount: 0,
 
+    agreementChecked1: false,
+    agreementChecked2: false,
+    agreementChecked3: false,
+
     // 예약 하기위한 폼 토글
     showReservationForm: false,
     // 예약 요약 토글
@@ -57,12 +61,11 @@ export const useReservationStore = defineStore("reservationStore", {
 
     // 결제 관련
     paymentMehod: "vbank",
-    isPaymentSuccess: false,
-    isPaymentFailed: false,
-    isPaymentLoading: false,
   }),
 
   getters: {
+    allAgreementsChecked: (state) =>
+      state.agreementChecked1 && state.agreementChecked2,
     accommodationTabs: (state) =>
       state.accommodationList.map((accommodation) => ({
         accommodationId: accommodation.id,
@@ -133,6 +136,13 @@ export const useReservationStore = defineStore("reservationStore", {
     closeReservationForm() {
       this.showReservationForm = false;
     },
+    // 예약 동의여부
+    setAgreementChecked1(value) {
+      this.agreementChecked1 = value;
+    },
+    setAgreementChecked2(value) {
+      this.agreementChecked2 = value;
+    },
     selectReservationRoom(room) {
       this.selectedRoom = room;
       this.adultCount = room.standardOccupancy;
@@ -192,18 +202,26 @@ export const useReservationStore = defineStore("reservationStore", {
       this.childCount = 0;
     },
     // 예약 API 호출
-    async createReservation() {
+    async createReservation(form) {
+      console.log(`예약 호출 roomId = ${form}`);
+
       try {
         const response = await apiClient.post("/reservation-room", {
-          roomId: this.roomId,
+          roomId: this.selectedRoom.roomId,
           reservationDate: new Date().toISOString(),
           checkinDate: this.formattedCheckinDate,
           checkoutDate: this.formattedCheckoutDate,
           reservationStatus: "RESERVATION",
           totalPrice: this.totalPriceNumber,
           paymentStatus: "UNPAID",
+          ...form,
+          adultCount: this.adultCount,
+          childCount: this.childCount,
+          totalRoomCount: this.roomCount,
         });
         this.reservationResult = response.data;
+        console.log("예약 결과");
+        console.log(response.data);
       } catch (err) {
         console.log(err);
       }
@@ -237,89 +255,101 @@ export const useReservationStore = defineStore("reservationStore", {
       }
     },
     // IMP 호출
-    async callImpRequestPay() {
-      IMP.init("imp18668427");
+    async callImpRequestPay(method) {
+      return new Promise((resolve, reject) => {
+        IMP.init("imp18668427");
 
-      const userStore = userLoginStore();
+        const userStore = userLoginStore();
 
-      const userData = userStore.userInfo;
+        const userData = userStore.userInfo;
 
-      IMP.request_pay(
-        {
-          pg: "html5_inicis", // 결제 서비스 제공사
-          pay_method: this.paymentMethod, // 선택한 결제 방법
-          merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
-          name: `EasyStay 결제`,
-          amount: this.totalPriceNumber,
+        IMP.request_pay(
+          {
+            pg: "html5_inicis", // 결제 서비스 제공사
+            pay_method: method, // 선택한 결제 방법
+            merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
+            name: `EasyStay 결제`,
+            amount: this.totalPriceNumber,
 
-          // 로그인한 사용자 정보로 업데이트된 결제 정보
-          buyer_email: userData.email || "이메일 정보 없음",
-          buyer_name: userData.name || "이름 정보 없음",
-          buyer_tel: userData.phone || "전화번호 정보 없음",
-          buyer_addr: userData.addr || "주소 정보 없음",
-          buyer_postcode: userData.postcode || "우편번호 정보 없음",
+            // 로그인한 사용자 정보로 업데이트된 결제 정보
+            buyer_email: userData.email || "이메일 정보 없음",
+            buyer_name: userData.name || "이름 정보 없음",
+            buyer_tel: userData.phone || "전화번호 정보 없음",
+            buyer_addr: userData.addr || "주소 정보 없음",
+            buyer_postcode: userData.postcode || "우편번호 정보 없음",
 
-          // 가상계좌 선택 시 추가 정보
-          vbank_due:
-            this.paymentMethod === "vbank" ? this.getVbankDueDate() : undefined,
-          bank: this.paymentMethod === "vbank" ? "우리은행" : undefined,
-          accountHolder:
-            this.paymentMethod === "vbank"
-              ? userData.name || "이름 정보 없음"
-              : undefined,
-        },
-        async (rsp) => {
-          if (rsp.success) {
-            alert("결제 성공!");
-            console.log("결제 성공:", rsp);
+            // 가상계좌 선택 시 추가 정보
+            vbank_due:
+              this.paymentMethod === "vbank"
+                ? this.getVbankDueDate()
+                : undefined,
+            bank: method === "vbank" ? "우리은행" : undefined,
+            accountHolder:
+              method === "vbank"
+                ? userData.name || "이름 정보 없음"
+                : undefined,
+          },
+          async (rsp) => {
+            if (rsp.success) {
+              alert("결제 성공!");
+              console.log("결제 성공:", rsp);
 
-            // 결제 성공 후 결제 내역을 서버에 저장
-            const payRequest = {
-              impUid: rsp.imp_uid,
-              reservationId: this.reservationResult.reservationId,
-              method: "CARD",
-              amount: this.totalPriceNumber,
-              paymentDate: new Date().toISOString(),
-              completionStatus: "COMPLETE",
-              depositDeadline:
-                this.paymentMethod === "vbank" ? this.getVbankDueDate() : null,
-              bank: this.paymentMethod === "vbank" ? "우리은행" : null,
-              accountHolder:
-                this.paymentMethod === "vbank"
-                  ? userData.name || "이름 정보 없음"
-                  : null,
-            };
+              // 결제 성공 후 결제 내역을 서버에 저장
+              const payRequest = {
+                impUid: rsp.imp_uid,
+                reservationId: this.reservationResult.id,
+                method: "CARD",
+                amount: this.totalPriceNumber,
+                paymentDate: new Date().toISOString(),
+                completionStatus: "COMPLETE",
+                depositDeadline:
+                  method === "vbank" ? this.getVbankDueDate() : null,
+                bank: method === "vbank" ? "우리은행" : null,
+                accountHolder:
+                  this.paymentMethod === "vbank"
+                    ? userData.name || "이름 정보 없음"
+                    : null,
+              };
 
-            try {
-              await apiClient.post("/payment", payRequest);
-              alert("결제 내역이 데이터베이스에 저장되었습니다.");
-              this.isPaymentSuccess = true;
-              this.isPaymentFailed = false;
-            } catch (error) {
-              console.error("결제 내역 저장 실패:", error);
-              alert("결제 내역을 저장하는 중 오류가 발생했습니다.");
+              try {
+                await apiClient.post("/payment", payRequest);
+                alert("결제 내역이 데이터베이스에 저장되었습니다.");
+                this.isPaymentSuccess = true;
+                this.isPaymentFailed = false;
+                resolve(true);
+                return true;
+              } catch (error) {
+                console.error("결제 내역 저장 실패:", error);
+                alert("결제 내역을 저장하는 중 오류가 발생했습니다.");
+                this.isPaymentSuccess = false;
+                this.isPaymentFailed = true;
+                resolve(false);
+              }
+            } else {
+              alert("결제 실패: " + rsp.error_msg);
+              console.log("결제 실패:", rsp);
+
+              // 결제가 실패한 경우 예약 상태를 CANCELED로 업데이트
+              try {
+                await apiClient.put(
+                  `/reservation-room/${this.reservationResult?.id}`,
+                  {
+                    reservationStatus: "CANCELED",
+                  }
+                );
+                alert("예약 상태가 CANCELED로 업데이트되었습니다.");
+                resolve(false);
+              } catch (error) {
+                console.error("예약 상태 업데이트 실패:", error);
+                reject(error);
+                alert("예약 상태를 업데이트하는 중 오류가 발생했습니다.");
+              }
               this.isPaymentSuccess = false;
               this.isPaymentFailed = true;
             }
-          } else {
-            alert("결제 실패: " + rsp.error_msg);
-            console.log("결제 실패:", rsp);
-
-            // 결제가 실패한 경우 예약 상태를 CANCELED로 업데이트
-            try {
-              await apiClient.put(`/reservation-room/${this.reservationId}`, {
-                reservationStatus: "CANCELED",
-              });
-              alert("예약 상태가 CANCELED로 업데이트되었습니다.");
-            } catch (error) {
-              console.error("예약 상태 업데이트 실패:", error);
-              alert("예약 상태를 업데이트하는 중 오류가 발생했습니다.");
-            }
-            this.isPaymentSuccess = false;
-            this.isPaymentFailed = true;
           }
-        }
-      );
+        );
+      });
     },
     getVbankDueDate() {
       const today = new Date();
