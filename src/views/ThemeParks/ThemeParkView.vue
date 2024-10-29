@@ -1,5 +1,6 @@
 <template>
-  <div class="position-sticky z-index-sticky top-0">
+  <!-- 스크롤 위치에 따라 navbar 표시/숨기기 -->
+  <div class="position-sticky z-index-sticky top-0" v-show="showNavbar">
     <div class="row">
       <div class="col-12">
         <navbar-default :sticky="true" />
@@ -13,10 +14,10 @@
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import { useAccommodationStore } from "@/stores/accommodationStore";
 import { useThemeParkStore } from "@/stores/themeparkStore";
-import { onMounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-// pinia 스토어
+// Pinia 스토어
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 
@@ -24,22 +25,24 @@ const accommodationStore = useAccommodationStore();
 const route = useRoute();
 const router = useRouter();
 
+// navbar 표시 여부 상태
+const showNavbar = ref(true);
+
+// 스크롤 이벤트 핸들러
+const handleScroll = () => {
+  showNavbar.value = window.scrollY === 0; // 화면 맨 위에서만 Navbar 표시
+};
+
 // 첫 번째 숙소와 테마파크로 리다이렉트하는 함수
 const redirectToFirstAccommodation = async () => {
   const accommodations = accommodationStore.accommodations;
   if (accommodations && accommodations.length > 0) {
-    // 첫 번째 숙소의 ID 가져오기
     const firstAccommodationId = accommodations[0].id;
-
-    // 해당 숙소의 테마파크 정보 가져오기
     await themeParkStore.fetchThemeParks(firstAccommodationId);
-
-    // 첫 번째 테마파크 ID 가져오기
     const themeParks = themeParkStore.themeParks;
     const firstThemeParkId =
       themeParks && themeParks.length > 0 ? themeParks[0].id : null;
 
-    // 현재 경로에 쿼리 파라미터 추가하여 리다이렉트
     await router.replace({
       path: route.path,
       query: {
@@ -51,26 +54,29 @@ const redirectToFirstAccommodation = async () => {
   }
 };
 
+// 컴포넌트 마운트 시 초기화 및 스크롤 이벤트 등록
 onMounted(async () => {
-  // 모든 숙박시설 조회
   await accommodationStore.fetchResortAccommodations();
-
-  // accommodationId가 없는 경우 첫 번째 숙소로 리다이렉트
   if (!route.query.accommodationId) {
     await redirectToFirstAccommodation();
   }
+
+  // 스크롤 이벤트 리스너 추가
+  window.addEventListener("scroll", handleScroll);
 });
 
-// accommodationId가 바뀌는 경우
+// 컴포넌트 언마운트 시 스크롤 이벤트 리스너 제거
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
+// accommodationId가 변경될 경우
 watch(
   () => route.query.accommodationId,
   async (newAccommodationId) => {
     if (newAccommodationId) {
       await accommodationStore.fetchAccommodationById(newAccommodationId);
       await themeParkStore.fetchThemeParks(newAccommodationId);
-
-      // accommodationId가 변경되었는데 themeParkId가 없는 경우
-      // 해당 숙소의 첫 번째 테마파크로 설정
       if (!route.query.themeParkId) {
         const themeParks = themeParkStore.themeParks;
         if (themeParks && themeParks.length > 0) {
@@ -88,7 +94,7 @@ watch(
   { immediate: true }
 );
 
-// themeParkId 변경될 경우
+// themeParkId가 변경될 경우
 watch(
   () => route.query.themeParkId,
   (newThemeParkId) => {
