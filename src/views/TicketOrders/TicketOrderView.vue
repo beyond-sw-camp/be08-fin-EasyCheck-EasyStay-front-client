@@ -20,6 +20,7 @@
       <button class="btn btn-primary mx-2" @click="handleSubmit">
         구매하기
       </button>
+      <button @click="goToTicketRefund">결제 내역 조회하기</button>
     </div>
   </div>
 </template>
@@ -42,7 +43,13 @@ const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 const ticketStore = useTicketStore();
 const { themeParkId } = storeToRefs(themeParkStore);
-const { adultTicket, childTicket, totalPrice, adultTicketAmount, childTicketAmount } = storeToRefs(ticketStore);
+const {
+  adultTicket,
+  childTicket,
+  totalPrice,
+  adultTicketAmount,
+  childTicketAmount,
+} = storeToRefs(ticketStore);
 const { accommodationId } = storeToRefs(accommodationStore);
 
 const buyerName = ref("");
@@ -63,6 +70,11 @@ const handleBeforeUnload = (e) => {
   return message;
 };
 
+// 결제 내역 조회 페이지로 이동
+const goToTicketRefund = () => {
+  router.push({ name: "TicketRefund" });
+};
+
 onMounted(() => {
   window.addEventListener("beforeunload", handleBeforeUnload);
 });
@@ -77,6 +89,8 @@ const isFormValid = computed(() => {
   console.log("성인/아동 티켓 선택 여부:", isTicketSelected); // 디버그 로그
   console.log("구매자 이름:", buyerName.value); // 디버그 로그
   console.log("구매자 전화번호:", buyerPhone.value); // 디버그 로그
+  console.log("구매자 이메일1:", buyerEmail.value); // 디버그 로그
+  console.log("구매자 이메일2:", buyerEmailDomain.value); // 디버그 로그
   console.log("필수 약관 동의:", termsChecked1.value); // 디버그 로그
 
   return (
