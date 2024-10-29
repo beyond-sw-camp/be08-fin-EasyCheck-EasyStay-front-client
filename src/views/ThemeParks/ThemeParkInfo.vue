@@ -93,7 +93,6 @@ import { useAccommodationStore } from "@/stores/accommodationStore";
 import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import NoticeInfo from "@/views/ThemeParks/NoticeInfo.vue";
 
 // pinia 스토어
 const themeParkStore = useThemeParkStore();
