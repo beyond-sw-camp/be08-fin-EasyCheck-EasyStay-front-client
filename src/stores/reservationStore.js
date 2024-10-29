@@ -56,7 +56,7 @@ export const useReservationStore = defineStore("reservationStore", {
     reservationResult: null,
 
     // 결제 관련
-    paymentMehod: "",
+    paymentMehod: "vbank",
     isPaymentSuccess: false,
     isPaymentFailed: false,
     isPaymentLoading: false,
