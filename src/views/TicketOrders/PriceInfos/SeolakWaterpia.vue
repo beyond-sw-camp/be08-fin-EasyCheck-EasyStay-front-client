@@ -1,5 +1,5 @@
 <template>
-  <div class="price-info-container">
+  <div class="price-info-container mx-5 px-5">
     <h2>설악 워터피아 이용 요금 안내</h2>
 
     <!-- 요금 테이블 -->
@@ -198,10 +198,6 @@
 <script setup></script>
 
 <style scoped>
-.price-info-container {
-  padding: 3rem;
-}
-
 /* 반응형 테이블 설정 */
 .responsive-table-container {
   overflow-x: auto;

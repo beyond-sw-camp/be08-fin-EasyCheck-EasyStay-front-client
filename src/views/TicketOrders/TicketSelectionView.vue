@@ -48,15 +48,15 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="price-info-section my-5">
-    <PriceInfoWrapper :guidePageName="guidePageName" />
+    <div class="price-info-section my-5">
+      <PriceInfoWrapper v-if="guidePageName" :guidePageName="guidePageName" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
@@ -80,7 +80,7 @@ const { groupedTickets } = storeToRefs(ticketStore);
 const { accommodation } = storeToRefs(accommodationStore);
 const { themePark } = storeToRefs(themeParkStore);
 
-// guidePageName 가져오기
+// guidePageName 동기화
 const guidePageName = computed(() => themePark.value?.guidePageName);
 
 // 요금 할인 적용
@@ -97,7 +97,15 @@ const handlePurchase = (ticketGroup) => {
 
 // 테마파크 및 티켓 정보 조회
 onMounted(async () => {
-  await ticketStore.fetchTickets(route.query.themeParkId);
+  // themeParkId가 있을 경우 해당 테마파크 데이터 로드
+  const themeParkId = route.query.themeParkId;
+  if (themeParkId) {
+    await themeParkStore.fetchThemeParkById(
+      route.query.accommodationId,
+      themeParkId
+    );
+    await ticketStore.fetchTickets(themeParkId);
+  }
 });
 </script>
 

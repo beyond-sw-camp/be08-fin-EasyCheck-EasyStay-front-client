@@ -1,8 +1,7 @@
-<!-- src/components/PriceInfoWrapper.vue -->
 <template>
   <suspense>
     <template #default>
-      <component :is="priceInfoComponent" />
+      <component :is="priceInfoComponent || 'div'" />
     </template>
     <template #fallback>
       <div class="spinner-overlay">
@@ -22,7 +21,6 @@ const props = defineProps({
   },
 });
 
-// guidePageName을 통해서 특정 요금 정보 컴포넌트를 동적으로 가져옵니다
 const priceInfoComponent = computed(() => {
   const availableComponents = import.meta.glob(
     "@/views/TicketOrders/PriceInfos/*.vue"
