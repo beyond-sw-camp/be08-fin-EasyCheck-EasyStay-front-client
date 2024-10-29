@@ -49,6 +49,9 @@
       </div>
     </div>
   </div>
+  <div class="price-info-section my-5">
+    <PriceInfoWrapper :guidePageName="guidePageName" />
+  </div>
 </template>
 
 <script setup>
@@ -57,7 +60,9 @@ import { computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useThemeParkStore } from "@/stores/themeparkStore";
 import { userLoginStore } from "@/stores/loginStore";
+import PriceInfoWrapper from "@/views/TicketOrders/PriceInfos/PriceInfoWrapper.vue";
 
 // 라우팅
 const route = useRoute();
@@ -66,30 +71,34 @@ const router = useRouter();
 // pinia 스토어
 const authStore = userLoginStore();
 const ticketStore = useTicketStore();
+const accommodationStore = useAccommodationStore();
+const themeParkStore = useThemeParkStore();
 
-const accmomodationStore = useAccommodationStore();
-
-// pina state, getters
+// 상태 및 getter
 const { isLoggedIn } = storeToRefs(authStore);
 const { groupedTickets } = storeToRefs(ticketStore);
-const { accommodation } = storeToRefs(accmomodationStore);
+const { accommodation } = storeToRefs(accommodationStore);
+const { themePark } = storeToRefs(themeParkStore);
 
-const themeParkId = computed(() => route.query.themeParkId);
+// guidePageName 가져오기
+const guidePageName = computed(() => themePark.value?.guidePageName);
 
-// 숙박시설, 테마파크, 티켓 정보 조회하기
-onMounted(async () => {
-  await ticketStore.fetchTickets(themeParkId.value);
-});
-
+// 요금 할인 적용
 const getDiscountedPrice = (price) => {
   const discountRate = 0.8;
   return Math.floor(price * discountRate);
 };
 
+// 티켓 구매 처리
 const handlePurchase = (ticketGroup) => {
   ticketStore.selectTicket(ticketGroup);
   router.replace({ name: "TicketOrder" });
 };
+
+// 테마파크 및 티켓 정보 조회
+onMounted(async () => {
+  await ticketStore.fetchTickets(route.query.themeParkId);
+});
 </script>
 
 <style scoped>
