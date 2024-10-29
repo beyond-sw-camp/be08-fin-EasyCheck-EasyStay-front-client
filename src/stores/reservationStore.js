@@ -83,6 +83,16 @@ export const useReservationStore = defineStore("reservationStore", {
       }).format(price);
     },
 
+    // 숫자만 있는 가격 (결제 API용)
+    totalPriceNumber: (state) => {
+      const basePrice =
+        state.userInfo?.userRole === "CORP_USER"
+          ? state.selectedRoom?.corpPrice
+          : state.selectedRoom?.normalPrice;
+
+      return basePrice * state.roomCount || 0;
+    },
+
     // 날짜 포맷팅 getter 통합
     formattedCheckinDate: (state) => formatDate(state.checkIn),
     formattedCheckoutDate: (state) => formatDate(state.checkOut),
@@ -224,7 +234,7 @@ export const useReservationStore = defineStore("reservationStore", {
           pay_method: this.paymentMethod, // 선택한 결제 방법
           merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
           name: `EasyStay 결제`,
-          amount: this.totalPrice,
+          amount: this.totalPriceNumber,
 
           // 로그인한 사용자 정보로 업데이트된 결제 정보
           buyer_email: userData.email || "이메일 정보 없음",
@@ -253,7 +263,7 @@ export const useReservationStore = defineStore("reservationStore", {
                 impUid: rsp.imp_uid,
                 reservationId: this.reservationId,
                 method: this.paymentMethod,
-                amount: this.totalPrice,
+                amount: this.totalPriceNumber,
                 paymentDate: new Date().toISOString(),
                 completionStatus: "COMPLETE",
                 depositDeadline:
