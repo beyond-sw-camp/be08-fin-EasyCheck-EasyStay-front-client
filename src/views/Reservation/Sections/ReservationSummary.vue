@@ -1,26 +1,3 @@
-<script setup>
-import { storeToRefs } from "pinia";
-import { useReservationStore } from "@/stores/reservationStore.js";
-
-const reservationStore = useReservationStore();
-
-const {
-  checkinMonth,
-  checkinDayKo,
-  checkinDate,
-  checkoutMonth,
-  checkoutDayKo,
-  checkoutDate,
-  stayDuration,
-  roomCount,
-} = storeToRefs(reservationStore);
-
-const onClickSearch = async () => {
-  reservationStore.fetchReservationAvailableRooms();
-  reservationStore.setShowRoomSelectionGrid(true);
-};
-</script>
-
 <template>
   <div class="reservation-summary card">
     <div class="card-body">
@@ -67,6 +44,29 @@ const onClickSearch = async () => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const {
+  checkinMonth,
+  checkinDayKo,
+  checkinDate,
+  checkoutMonth,
+  checkoutDayKo,
+  checkoutDate,
+  stayDuration,
+  roomCount,
+} = storeToRefs(reservationStore);
+
+const onClickSearch = async () => {
+  reservationStore.fetchReservationAvailableRooms();
+  reservationStore.setShowRoomSelectionGrid(true);
+};
+</script>
 
 <style scoped lang="scss">
 @import "@/assets/scss/material-kit/custom/_variables.scss";
