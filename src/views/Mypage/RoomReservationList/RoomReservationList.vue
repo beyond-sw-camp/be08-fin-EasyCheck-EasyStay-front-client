@@ -44,44 +44,11 @@ onMounted(async () => {
 
 const fetchReservationsWithDetails = async () => {
   try {
-    // 사업장 정보 가져오기
-    console.log("사업장 정보를 가져오는 중...");
-    await accommodationStore.fetchAccommodations(); // 사업장 정보를 가져오는 메서드 호출
-    console.log("사업장 정보 가져오기 완료:", accommodationStore.accommodations);
-
-    const accommodations = accommodationStore.accommodations;
-    if (accommodations.length === 0) {
-      console.error("숙소 정보가 없습니다.");
-      return;
-    }
-
-    // 각 사업장에 대한 roomtype과 room 정보 가져오기
-    for (const accommodation of accommodations) {
-      console.log(`방 타입과 객실 정보를 가져오는 중: ${accommodation.name}`);
-      await roomStore.fetchRoomTypesByAccommodationId(accommodation.id);
-      await roomStore.fetchAccommodationRooms(accommodation.id);
-      console.log(`방 타입과 객실 정보 가져오기 완료: ${accommodation.name}`);
-    }
-
-    // 로그인한 사용자 정보 가져오기
+    // 사용자 정보 가져오기
     console.log("사용자 정보를 가져오는 중...");
     await userStore.getUserData(); // 사용자 정보를 가져오는 메서드 호출
     const userId = userStore.userData.id; // 사용자 ID 가져오기
     console.log("로그인한 사용자 ID:", userId);
-
-    // 모든 예약 가져오기
-    console.log("모든 예약 정보를 가져오는 중...");
-    await reservationStore.fetchReservationRoomLists();
-    const allReservations = reservationStore.reservations;
-    console.log("모든 예약 정보:", allReservations);
-
-    // 로그인한 사용자의 예약만 필터링
-    const userReservations = allReservations.filter(reservation => {
-      console.log(`예약의 user_id: ${reservation.user_id}, 비교할 userId: ${userId}`);
-      return reservation.user_id === userId; // user_id로 비교
-    });
-    console.log("로그인한 사용자의 예약 정보:", userReservations);
-
 
     // 모든 결제 정보 가져오기
     console.log("모든 결제 정보를 가져오는 중...");
@@ -89,36 +56,34 @@ const fetchReservationsWithDetails = async () => {
     const allPayments = paymentStore.payments;
     console.log("모든 결제 정보:", allPayments);
 
-    reservations.value = userReservations.map(reservation => {
-      const payment = allPayments.find(p => p.reservation_id === reservation.id);
+    // 로그인한 사용자의 결제 정보만 필터링
+    const userPayments = allPayments.filter(payment =>
+      payment.userId === userId // userId로 비교
+    );
+    console.log("로그인한 사용자의 결제 정보:", userPayments);
 
-      // 예약에 해당하는 객실 찾기
-      const room = roomStore.rooms.find(r => r.id === reservation.room_id);
-      const roomType = room ? roomStore.roomTypes.find(rt => rt.roomTypeId === room.room_type_id) : null;
-      const accommodation = roomType ? accommodations.find(a => a.id === roomType.accommodationEntity.id) : null;
-
-      const reservationDetail = {
-        accommodationName: accommodation ? accommodation.name : "정보 없음",
-        checkinDate: reservation.checkin_date,
-        checkoutDate: reservation.checkout_date,
-        typeName: roomType ? roomType.name : "정보 없음",
-        reservationStatus: reservation.reservation_status,
-        reservationDate: reservation.created_at,
+    // 각 결제 정보를 기반으로 예약 정보를 구성
+    reservations.value = userPayments.map(payment => {
+      return {
+        accommodationName: payment.accommodationName || "정보 없음",
+        checkinDate: payment.checkinDate,
+        checkoutDate: payment.checkoutDate,
+        typeName: "정보 없음", // 방 타입이 필요하다면 추가적으로 가져와야 함
+        reservationStatus: payment.completionStatus, // 결제 완료 상태를 예약 상태로 사용
+        reservationDate: payment.paymentDate, // 결제 날짜를 예약 날짜로 사용
         payment: {
-          method: payment?.method || "정보 없음",
-          completionStatus: payment?.completion_status || "정보 없음",
+          method: payment.method || "정보 없음",
+          completionStatus: payment.completionStatus || "정보 없음",
         },
-        totalPrice: reservation.total_price,
+        totalPrice: payment.amount, // 결제 금액을 총 가격으로 사용
       };
-
-      console.log("예약 상세 정보:", reservationDetail);
-      return reservationDetail;
     });
 
   } catch (error) {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
 };
+
 
 
 </script>
@@ -213,16 +178,17 @@ const fetchReservationsWithDetails = async () => {
               <tbody>
                 <tr v-for="reservation in reservations" :key="reservation.id">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td> <!-- 숙소 이름 -->
-                  <td>{{ reservation.checkinDate }}</td> <!-- 체크인 날짜 -->
-                  <td>{{ reservation.checkoutDate }}</td> <!-- 체크아웃 날짜 -->
+                  <td>{{ reservation.checkinDate || '정보 없음' }}</td> <!-- 체크인 날짜 -->
+                  <td>{{ reservation.checkoutDate || '정보 없음' }}</td> <!-- 체크아웃 날짜 -->
                   <td>{{ reservation.typeName || '정보 없음' }}</td> <!-- 방 타입 이름 -->
-                  <td>{{ reservation.reservationStatus }}</td> <!-- 예약 상태 -->
-                  <td>{{ reservation.reservationDate }}</td> <!-- 예약 날짜 -->
+                  <td>{{ reservation.reservationStatus || '정보 없음' }}</td> <!-- 예약 상태 -->
+                  <td>{{ reservation.reservationDate || '정보 없음' }}</td> <!-- 예약 날짜 -->
                   <td>{{ reservation.payment?.method || '정보 없음' }}</td> <!-- 결제 방법 -->
                   <td>{{ reservation.payment?.completionStatus || '정보 없음' }}</td> <!-- 결제 완료 상태 -->
-                  <td>{{ reservation.totalPrice }}</td> <!-- 총 가격 -->
+                  <td>{{ reservation.totalPrice !== undefined ? reservation.totalPrice : '정보 없음' }}</td> <!-- 총 가격 -->
                 </tr>
               </tbody>
+
             </table>
           </div>
         </div>
