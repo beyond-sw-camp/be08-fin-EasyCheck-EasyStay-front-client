@@ -56,11 +56,23 @@
     </div>
     <div class="agreement-section">
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked1" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked1"
+          @change="
+            (e) => reservationStore.setAgreementChecked1(e.target.checked)
+          "
+        />
         <span>(필수) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked2" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked2"
+          @change="
+            (e) => reservationStore.setAgreementChecked2(e.target.checked)
+          "
+        />
         <span>(필수) 예약 규정 확인 및 동의 전문보기</span>
       </label>
       <label class="agreement-item">
@@ -68,25 +80,19 @@
         <span>(선택) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
     </div>
-    <div class="action-buttons">
-      <button class="cancel-btn">취소</button>
-      <button class="reserve-btn" :disabled="!allAgreementsChecked">
-        결제하기
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 import { useReservationStore } from "@/stores/reservationStore";
 
 const userStore = userLoginStore();
 const reservationStore = useReservationStore();
 
-const { userRole } = storeToRefs(userStore);
+const { userRole, agreementChecked1, agreementChecked2 } =
+  storeToRefs(userStore);
 
 const {
   roomCount,
@@ -99,14 +105,6 @@ const {
   formattedCheckinDate,
   formattedCheckoutDate,
 } = storeToRefs(reservationStore);
-
-const agreementChecked1 = ref(false);
-const agreementChecked2 = ref(false);
-const agreementChecked3 = ref(false);
-
-const allAgreementsChecked = computed(
-  () => agreementChecked1.value && agreementChecked2.value
-);
 </script>
 
 <style lang="scss" scoped>
@@ -185,37 +183,6 @@ const allAgreementsChecked = computed(
 
       input[type="checkbox"] {
         margin-right: 10px;
-      }
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin: 4rem 0;
-
-    button {
-      flex: 1;
-      padding: 15px;
-      font-size: 18px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &.cancel-btn {
-        background-color: #f8f8f8;
-        color: #333;
-        margin-right: 10px;
-      }
-
-      &.reserve-btn {
-        background-color: #e74c3c;
-        color: #fff;
-
-        &:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
       }
     }
   }

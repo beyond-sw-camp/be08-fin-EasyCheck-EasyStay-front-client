@@ -22,10 +22,9 @@
         <room-selection-grid v-if="showRoomSelectionGrid" />
       </div>
       <div class="mt-4">
-        <reservation-form v-if="showReservationForm" />
-      </div>
-      <div class="mt-4">
-        <reservation-info v-if="showReservationForm" />
+        <reservation-form v-if="showReservationForm">
+          <reservation-info />
+        </reservation-form>
       </div>
     </div>
   </main>
@@ -40,8 +39,8 @@ import RoomSelectionGrid from "./Sections/RoomSelectionGrid.vue";
 import ReservationForm from "./Sections/ReservationForm.vue";
 import ReservationInfo from "./Sections/ReservationInfo.vue";
 
-import { onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
+import { onMounted, onUnmounted } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
 const reservationStore = useReservationStore();

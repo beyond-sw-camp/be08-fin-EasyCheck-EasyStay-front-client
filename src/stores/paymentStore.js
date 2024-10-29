@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
 
+const { IMP } = window;
+
 export const usePaymentStore = defineStore("paymentStore", {
   state: () => ({
     payments: [], // 결제 내역 리스트
