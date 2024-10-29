@@ -2,9 +2,11 @@
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
-import apiClient from "@/api";
 import { userLoginStore } from "@/stores/loginStore";
-import { useNoticeStore } from "@/stores/notice";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useReservationStore } from "@/stores/reservationStore";
+import { usePaymentStore } from "@/stores/paymentStore";
+
 import easystayImage from '@/assets/img/easystay.png';
 import setMaterialInput from "@/assets/js/material-input";
 
@@ -17,9 +19,13 @@ import MaterialButton from "@/components/MaterialButton.vue";
 const error = ref(null);
 const router = useRouter();
 const userStore = userLoginStore();
-const noticeStore = useNoticeStore();
-
-const branchQuery = ref(noticeStore.query.branch);
+const accommodationStore = useAccommodationStore();
+const accommodations = accommodationStore.accommodations;
+const reservationStore = useReservationStore();
+const reservations = ref([]);
+const paymentStore = usePaymentStore();
+const branchQuery = ref('');
+const loading = ref(false);
 
 onMounted(async () => {
   setMaterialInput();
@@ -40,12 +46,55 @@ onMounted(async () => {
     router.push("/users/login");
   }
 
-  await noticeStore.fetchAccommodations();
+  const updateBranch = () => {
+    // 지점 변경 시의 로직을 여기에 추가
+    console.log("Selected branch:", branchQuery.value);
+  };
+
+  // 사업장 조회
+  await accommodationStore.fetchAccommodations();
+
+  // 객실 예약 및 결제 내역 조회
+  await fetchReservations();
+
 });
 
-const updateBranch = () => {
-  noticeStore.setQueryBranch(branchQuery.value);
+const fetchReservations = async () => {
+  try {
+    await reservationStore.fetchReservationRoomLists();
+    reservations.value = reservationStore.reservations;
+
+    await paymentStore.fetchAllPayments();
+    const paymentData = paymentStore.payments;
+
+    console.log('Payment Data:', paymentData);
+
+    // 사업장 정보 가져오기
+    await accommodationStore.fetchAccommodations();
+    const accommodationsMap = {};
+    accommodationStore.accommodations.forEach(branch => {
+      accommodationsMap[branch.id] = branch.name; // ID를 키로 사용하여 매핑
+    });
+
+    console.log('Accommodations:', accommodationsMap);
+
+    // 예약과 결제 정보를 매칭
+    reservations.value.forEach(reservation => {
+      const payment = paymentData.find(p => p.reservationRoomId === reservation.id);
+      reservation.payment = payment;
+
+      // 지점 이름 추가
+      reservation.accommodationName = accommodationsMap[reservation.accommodationId]; // 매핑된 지점 이름
+
+      // 디버깅용 로그 추가
+      console.log('Reservation:', reservation);
+    });
+  } catch (err) {
+    error.value = "예약 및 결제 정보를 가져오는 데 실패했습니다.";
+    console.error("Error:", err);
+  }
 };
+
 
 </script>
 
@@ -74,7 +123,6 @@ const updateBranch = () => {
                 <!-- 검색바 추가 -->
                 <div class="row mt-4">
                   <div class="col-12 text-center">
-
                     <div class="d-flex justify-content-center align-items-center mb-3">
 
                       <div class="d-flex align-items-center me-3">
@@ -83,7 +131,7 @@ const updateBranch = () => {
                         <select id="resort-select" v-model="branchQuery" class="form-select me-2"
                           @change="updateBranch">
                           <option value="" disabled>지점을 선택하세요</option>
-                          <option v-for="branch in noticeStore.accommodations" :key="branch.id" :value="branch.name">
+                          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
                             {{ branch.name }}
                           </option>
                         </select>
@@ -98,7 +146,8 @@ const updateBranch = () => {
                           class="form-control input-group-outline" />
                       </div>
 
-                      <MaterialButton @click="searchReservations" class="btn btn-primary ms-2 mt-2">검색
+                      <MaterialButton @click="searchReservations" class="btn btn-primary ms-2 mt-3"
+                        style="background: linear-gradient(to right, #ff7e5f, #feb47b);">검색
                       </MaterialButton>
                     </div>
 
@@ -108,7 +157,7 @@ const updateBranch = () => {
             </div>
           </div>
 
-          <div class="row justify-content-center text-black fs-6 mb-4">
+          <div class=" row justify-content-center text-black fs-6 mb-4">
             <div class="text-center mt-3">
               <h5 class="custom-font">EASY STAY's membership offers special value.</h5>
               <div v-if="error" class="text-danger">{{ error }}</div>
@@ -120,7 +169,6 @@ const updateBranch = () => {
             </div>
           </div>
 
-
           <!-- 객실 예약 내역 -->
           <div class="col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
@@ -128,20 +176,28 @@ const updateBranch = () => {
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>예약 ID</th>
                   <th>지점</th>
-                  <th>투숙 시작일</th>
-                  <th>투숙 종료일</th>
-                  <th>상태</th>
+                  <th>체크인</th>
+                  <th>체크아웃</th>
+                  <th>객실 이름</th>
+                  <th>예약 상태</th>
+                  <th>결제 날짜</th>
+                  <th>결제 방법</th>
+                  <th>결제 상태</th>
+                  <th>총 가격</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="reservation in reservations" :key="reservation.id">
-                  <td>{{ reservation.id }}</td>
-                  <td>{{ reservation.branch }}</td>
-                  <td>{{ reservation.checkInDate }}</td>
-                  <td>{{ reservation.checkOutDate }}</td>
-                  <td>{{ reservation.status }}</td>
+                  <td>{{ reservation.accommodationame }}</td> <!-- 지점 -->
+                  <td>{{ reservation.checkinDate }}</td> <!-- 체크인 -->
+                  <td>{{ reservation.checkoutDate }}</td> <!-- 체크아웃 -->
+                  <td>{{ reservation.typeName }}</td> <!-- 객실 이름-->
+                  <td>{{ reservation.reservationStatus }}</td> <!-- 예약 상태-->
+                  <td>{{ reservation.reservationDate }}</td> <!-- 결제 날짜 -->
+                  <td>{{ reservation.payment?.method }}</td> <!-- 결제 방법 -->
+                  <td>{{ reservation.payment?.completionStatus }}</td> <!-- 결제 상태 -->
+                  <td>{{ reservation.totalPrice }}</td> <!-- 총 가격 -->
                 </tr>
               </tbody>
             </table>

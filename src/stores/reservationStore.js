@@ -16,6 +16,8 @@ export const useReservationStore = defineStore("reservationStore", {
 
     accommodationList: [],
     availableRoomList: [],
+
+    reservations: [],
   }),
 
   getters: {
@@ -130,6 +132,23 @@ export const useReservationStore = defineStore("reservationStore", {
       } catch (err) {
         this.availableRoomList = [];
         console.log(err);
+      }
+    },
+
+    async fetchReservationRoomLists() {
+      try {
+        const response = await apiClient.get("/reservation-room", {
+          params: {
+            page: 0, // 페이지 번호
+            size: 5, // 한 페이지에 표시할 예약 수
+          },
+        });
+
+        // 예약 내역을 상태 관리에 저장
+        this.reservations = response.data;
+      } catch (error) {
+        console.error("예약 내역을 가져오는 중 오류 발생:", error);
+        alert("예약 내역을 불러오는 데 실패했습니다.");
       }
     },
   },
