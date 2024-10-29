@@ -5,6 +5,7 @@ import { mypageStore } from "./mypageStore";
 
 export const userLoginStore = defineStore("userStore", {
   state: () => ({
+    id: "",
     message: null,
     selectedPhonePrefix: "",
     phoneMiddle: "",

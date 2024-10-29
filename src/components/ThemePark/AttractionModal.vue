@@ -69,7 +69,10 @@ const formattedStandardUse = computed(() => {
   border-radius: 10px;
   position: relative;
   max-width: 500px;
-  width: 100%;
+  width: 90%;
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 1060;
 }
 
 .close-button {

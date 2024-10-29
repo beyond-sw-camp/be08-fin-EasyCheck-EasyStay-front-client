@@ -49,6 +49,10 @@ export const useReservationStore = defineStore("reservationStore", {
     accommodationList: [],
     // 체크인 체크아웃 날짜에 예약 가능한 방 정보
     availableRoomList: [],
+
+    // 모든 예약 내역 조회하기
+    reservations: [],
+
     // 객실 예약시 선택한 방 정보
     selectedRoom: null,
 
@@ -359,6 +363,22 @@ export const useReservationStore = defineStore("reservationStore", {
       const isoDate = dueDate.toISOString().slice(0, 19); // "YYYY-MM-DDTHH:MM:SS" 형식으로 자름
       console.log("vbank_due:", isoDate); // 로그로 확인
       return isoDate;
+    },
+
+    async fetchReservationRoomLists() {
+      try {
+        const response = await apiClient.get("/reservation-room", {
+          params: {
+            page: 0,
+            size: 5,
+          },
+        });
+
+        this.reservations = response.data;
+      } catch (error) {
+        console.error("예약 내역을 가져오는 중 오류 발생:", error);
+        alert("예약 내역을 불러오는 데 실패했습니다.");
+      }
     },
   },
 });

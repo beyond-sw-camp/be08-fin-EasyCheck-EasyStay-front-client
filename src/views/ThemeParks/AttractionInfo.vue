@@ -2,7 +2,11 @@
   <section class="my-3 py-3">
     <div class="d-flex justify-content-between align-items-center px-7 mb-5">
       <h3 class="text-start text-black">시설 안내</h3>
-      <MaterialButton color="danger" @click="handleUsageGuide">
+      <MaterialButton
+        class="large-button"
+        color="danger"
+        @click="handleUsageGuide"
+      >
         이용 안내
       </MaterialButton>
     </div>
@@ -210,5 +214,12 @@ const splideOptions = {
 
 .splide__track {
   margin-bottom: 3rem !important;
+}
+
+.large-button {
+  font-size: 1.2rem;
+  padding: 0.75rem 1.5rem;
+  min-width: 150px;
+  min-height: 50px;
 }
 </style>

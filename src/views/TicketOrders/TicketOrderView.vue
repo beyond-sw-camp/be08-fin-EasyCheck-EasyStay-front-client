@@ -5,15 +5,33 @@
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
-    <product-info class="mb-4" v-model:adultCount="adultCount" v-model:childCount="childCount" />
+    <product-info
+      class="mb-4"
+      v-model:adultCount="adultCount"
+      v-model:childCount="childCount"
+    />
 
-    <buyer-info class="mb-4" v-model:buyerName="buyerName" v-model:buyerPhone="buyerPhone"
-      v-model:buyerEmail="buyerEmail" v-model:buyerEmailDomain="buyerEmailDomain" />
+    <buyer-info
+      class="mb-4"
+      v-model:buyerName="buyerName"
+      v-model:buyerPhone="buyerPhone"
+      v-model:buyerEmail="buyerEmail"
+      v-model:buyerEmailDomain="buyerEmailDomain"
+    />
 
-    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
-      @openModal="handleOpenModal" />
+    <usage-info
+      class="mb-4"
+      v-model:termsChecked1="termsChecked1"
+      v-model:termsChecked2="termsChecked2"
+      @openModal="handleOpenModal"
+    />
 
-    <privacy-agreement-modal v-if="isModalOpen" :type="modalType" @close="closeModal" @agree="handleAgree" />
+    <privacy-agreement-modal
+      v-if="isModalOpen"
+      :type="modalType"
+      @close="closeModal"
+      @agree="handleAgree"
+    />
 
     <div class="d-flex justify-content-center mt-5">
       <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>
@@ -42,7 +60,13 @@ const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 const ticketStore = useTicketStore();
 const { themeParkId } = storeToRefs(themeParkStore);
-const { adultTicket, childTicket, totalPrice, adultTicketAmount, childTicketAmount } = storeToRefs(ticketStore);
+const {
+  adultTicket,
+  childTicket,
+  totalPrice,
+  adultTicketAmount,
+  childTicketAmount,
+} = storeToRefs(ticketStore);
 const { accommodationId } = storeToRefs(accommodationStore);
 
 const buyerName = ref("");
@@ -72,7 +96,8 @@ onUnmounted(() => {
 });
 
 const isFormValid = computed(() => {
-  const isTicketSelected = (adultTicket.value && adultTicketAmount.value > 0) ||
+  const isTicketSelected =
+    (adultTicket.value && adultTicketAmount.value > 0) ||
     (childTicket.value && childTicketAmount.value > 0);
   console.log("성인/아동 티켓 선택 여부:", isTicketSelected); // 디버그 로그
   console.log("구매자 이름:", buyerName.value); // 디버그 로그
@@ -132,7 +157,8 @@ const handleSubmit = async () => {
       console.log("Payment Data:", paymentData);
 
       IMP.request_pay(paymentData, async (response) => {
-        if (response.success && response.imp_uid) { // 성공 시 imp_uid 확인
+        if (response.success && response.imp_uid) {
+          // 성공 시 imp_uid 확인
           console.log("결제 성공:", response); // 결제 성공 응답 확인
 
           const paymentRequest = {
