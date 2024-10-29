@@ -17,36 +17,50 @@ import { useThemeParkStore } from "@/stores/themeparkStore";
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-// Pinia 스토어
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 
-// 라우터 객체
 const route = useRoute();
 const router = useRouter();
-
-// navbar 표시 여부 상태
 const showNavbar = ref(true);
 
-// 스크롤 이벤트 핸들러
 const handleScroll = () => {
-  showNavbar.value = window.scrollY === 0; // 화면 맨 위에서만 Navbar 표시
+  showNavbar.value = window.scrollY === 0;
 };
 
-// 첫 번째 숙소와 테마파크로 리다이렉트하는 함수
+// URL에 있는 쿼리 파라미터 사용하여 초기 로드 설정
+onMounted(async () => {
+  await accommodationStore.fetchResortAccommodations();
+  if (route.query.accommodationId && route.query.themeParkId) {
+    await accommodationStore.fetchAccommodationById(
+      route.query.accommodationId
+    );
+    await themeParkStore.fetchThemeParks(route.query.accommodationId);
+    await themeParkStore.fetchThemeParkById(
+      route.query.accommodationId,
+      route.query.themeParkId
+    );
+  } else {
+    await redirectToFirstAccommodation(); // 쿼리가 없는 경우만 초기화
+  }
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
 const redirectToFirstAccommodation = async () => {
   const accommodations = accommodationStore.accommodations;
   if (accommodations && accommodations.length > 0) {
     const firstAccommodationId = accommodations[0].id;
     await themeParkStore.fetchThemeParks(firstAccommodationId);
     const themeParks = themeParkStore.themeParks;
-    const firstThemeParkId =
-      themeParks && themeParks.length > 0 ? themeParks[0].id : null;
+    const firstThemeParkId = themeParks?.length ? themeParks[0].id : null;
 
     await router.replace({
       path: route.path,
       query: {
-        ...route.query,
         accommodationId: firstAccommodationId,
         themeParkId: firstThemeParkId,
       },
@@ -54,23 +68,6 @@ const redirectToFirstAccommodation = async () => {
   }
 };
 
-// 컴포넌트 마운트 시 초기화 및 스크롤 이벤트 등록
-onMounted(async () => {
-  await accommodationStore.fetchResortAccommodations();
-  if (!route.query.accommodationId) {
-    await redirectToFirstAccommodation();
-  }
-
-  // 스크롤 이벤트 리스너 추가
-  window.addEventListener("scroll", handleScroll);
-});
-
-// 컴포넌트 언마운트 시 스크롤 이벤트 리스너 제거
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
-
-// accommodationId가 변경될 경우
 watch(
   () => route.query.accommodationId,
   async (newAccommodationId) => {
@@ -79,11 +76,10 @@ watch(
       await themeParkStore.fetchThemeParks(newAccommodationId);
       if (!route.query.themeParkId) {
         const themeParks = themeParkStore.themeParks;
-        if (themeParks && themeParks.length > 0) {
+        if (themeParks?.length) {
           await router.replace({
             path: route.path,
             query: {
-              ...route.query,
               themeParkId: themeParks[0].id,
             },
           });
@@ -94,7 +90,6 @@ watch(
   { immediate: true }
 );
 
-// themeParkId가 변경될 경우
 watch(
   () => route.query.themeParkId,
   (newThemeParkId) => {
