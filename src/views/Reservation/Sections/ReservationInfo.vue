@@ -128,6 +128,7 @@ const handleCancel = () => {
 };
 
 const handlePay = async () => {
+  await reservationStore.createReservation();
   await reservationStore.callImpRequestPay();
 };
 </script>

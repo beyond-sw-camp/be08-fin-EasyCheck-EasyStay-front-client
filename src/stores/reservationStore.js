@@ -191,7 +191,23 @@ export const useReservationStore = defineStore("reservationStore", {
       this.adultCount = 0;
       this.childCount = 0;
     },
-
+    // 예약 API 호출
+    async createReservation() {
+      try {
+        const response = await apiClient.post("/reservation-room", {
+          roomId: this.roomId,
+          reservationDate: new Date().toISOString(),
+          checkinDate: this.formattedCheckinDate,
+          checkoutDate: this.formattedCheckoutDate,
+          reservationStatus: "RESERVATION",
+          totalPrice: this.totalPriceNumber,
+          paymentStatus: "UNPAID",
+        });
+        this.reservationResult = response.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
     async fetchAndInitAccommodationNavs() {
       try {
         const response = await apiClient.get("/accommodations");
@@ -260,8 +276,8 @@ export const useReservationStore = defineStore("reservationStore", {
             // 결제 성공 후 결제 내역을 서버에 저장
             const payRequest = {
               impUid: rsp.imp_uid,
-              reservationId: this.reservationId,
-              method: this.paymentMethod,
+              reservationId: this.reservationResult.reservationId,
+              method: "CARD",
               amount: this.totalPriceNumber,
               paymentDate: new Date().toISOString(),
               completionStatus: "COMPLETE",
