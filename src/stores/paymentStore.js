@@ -30,6 +30,7 @@ export const usePaymentStore = defineStore("paymentStore", {
           params: { page, size },
         });
         this.payments = response.data;
+        console.log(payments);
         this.loading = false;
       } catch (error) {
         this.loading = false;
