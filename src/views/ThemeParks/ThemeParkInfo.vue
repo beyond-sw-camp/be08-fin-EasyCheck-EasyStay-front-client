@@ -82,13 +82,6 @@
       {{ themePark.name }} 이용권 구매하기
     </material-button>
   </div>
-
-  <div class="section-divider my-4"></div>
-  <notice-info
-    v-if="themePark != null"
-    class="px-8"
-    :themeParkName="themePark.name"
-  />
 </template>
 
 <script setup>
