@@ -51,7 +51,10 @@ export async function processTicketPayment(orderId, totalPrice, buyerDetails) {
   );
 }
 
-export async function refundPayment(orderId, impUid) {
+export async function refundPayment(paymentId, impUid) {
+
+  console.log("Received paymentId:", paymentId);
+  console.log("Received impUid:", impUid);
 
   if (!impUid) {
     alert("impUid가 누락되었습니다. 결제 정보를 확인해주세요.");
@@ -60,8 +63,8 @@ export async function refundPayment(orderId, impUid) {
 
   try {
     // 서버에 환불 요청
-    const response = await apiClient.patch(
-      `/tickets/payment/${orderId}`,
+    const response = await apiClient.put(
+      `/tickets/payment/${paymentId}`,
       {
         impUid: impUid,
         reason: "고객 요청으로 인한 환불",

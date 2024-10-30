@@ -14,7 +14,7 @@
 
                 <!-- 환불하기 버튼 -->
                 <button v-if="ticketPayment.paymentStatus === 'COMPLETED'"
-                    @click="handleRefund(ticketPayment.orderId, ticketPayment.impUid)">
+                    @click="handleRefund(ticketPayment.id, ticketPayment.impUid)">
                     환불하기
                 </button>
             </li>
