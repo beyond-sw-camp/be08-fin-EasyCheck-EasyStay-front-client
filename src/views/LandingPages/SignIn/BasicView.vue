@@ -11,7 +11,6 @@ import Header from "@/examples/Header.vue";
 
 //Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
-import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 
 // material-input
@@ -83,17 +82,17 @@ function login() {
                 <h4 class="text-center mb-4">회원 로그인</h4>
                 <form role="form" class="text-start">
 
-                  <MaterialInput id="email1" class="input-group-outline my-3"
-                    :label="{ text: '아이디', class: 'form-label' }" type="email" v-model="email" />
-                  <MaterialInput id="password1" class="input-group-outline mb-3"
-                    :label="{ text: '비밀번호', class: 'form-label' }" type="password" v-model="password" />
-                  <MaterialSwitch class="d-flex align-items-center mb-3" id="rememberMe1" labelClass="mb-0 ms-3"
-                    checked>아이디 저장</MaterialSwitch>
-                  <div class="text-center">
-                    <MaterialButton type="button" @click="login" class="my-4 mb-2" variant="gradient" color="dark"
-                      fullWidth>Sign in
-                    </MaterialButton>
-                  </div>
+                  <form role="form" class="text-start" @submit.prevent="login">
+                    <MaterialInput id="email1" class="input-group-outline my-3"
+                      :label="{ text: '아이디', class: 'form-label' }" type="email" v-model="email" />
+                    <MaterialInput id="password1" class="input-group-outline mb-3"
+                      :label="{ text: '비밀번호', class: 'form-label' }" type="password" v-model="password" />
+                    <div class="text-center">
+                      <MaterialButton type="submit" class="my-4 mb-2" variant="gradient" color="dark" fullWidth>Sign in
+                      </MaterialButton>
+                    </div>
+                  </form>
+
                   <p class="mt-4 text-sm text-center">
                     <RouterLink to="/users/signUp" class="text-dark text-gradient font-weight-bold">회원가입</RouterLink>
                     |
