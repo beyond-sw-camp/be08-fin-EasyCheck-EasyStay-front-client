@@ -1,16 +1,8 @@
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <navbar-default :sticky="true" />
-      </div>
-    </div>
-  </div>
   <router-view />
 </template>
 
 <script setup>
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import { useAccommodationStore } from "@/stores/accommodationStore";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { onMounted, watch } from "vue";
