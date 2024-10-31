@@ -39,12 +39,23 @@
                 <div class="quantity-group">
                   <label class="quantity-label">대인</label>
                   <div class="input-group">
-                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementAdult">
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="decrementAdult"
+                    >
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input type="number" id="adultCount" class="form-control quantity-input" v-model="adultTicketAmount"
-                      min="0" />
-                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementAdult">
+                    <input
+                      type="number"
+                      id="adultCount"
+                      class="form-control quantity-input"
+                      v-model="adultTicketAmount"
+                      min="0"
+                    />
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="incrementAdult"
+                    >
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -56,12 +67,23 @@
                 <div class="quantity-group">
                   <label class="quantity-label">소인</label>
                   <div class="input-group">
-                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementChild">
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="decrementChild"
+                    >
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input type="number" id="childCount" class="form-control quantity-input" v-model="childTicketAmount"
-                      min="0" />
-                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementChild">
+                    <input
+                      type="number"
+                      id="childCount"
+                      class="form-control quantity-input"
+                      v-model="childTicketAmount"
+                      min="0"
+                    />
+                    <button
+                      class="btn btn-primary quantity-btn mb-0"
+                      @click="incrementChild"
+                    >
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -75,7 +97,7 @@
           <tr>
             <td class="label-cell">총 금액 (VAT 포함)</td>
             <td class="content-cell total-price">
-              <strong class="total-amount">{{ totalPrice }}</strong>
+              <strong class="total-amount">{{ formattedTotalPrice }} 원</strong>
             </td>
           </tr>
         </tbody>
@@ -87,6 +109,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
+import { computed } from "vue";
 
 import { useTicketStore } from "@/stores/ticketStore";
 import { useThemeParkStore } from "@/stores/themeparkStore";
@@ -97,7 +120,13 @@ const themeParkStore = useThemeParkStore();
 
 // pinia state, getters
 const { themePark } = storeToRefs(themeParkStore);
-const { adultTicket, childTicket, totalPrice, adultTicketAmount, childTicketAmount } = storeToRefs(ticketStore);
+const {
+  adultTicket,
+  childTicket,
+  totalPrice,
+  adultTicketAmount,
+  childTicketAmount,
+} = storeToRefs(ticketStore);
 
 const formatDate = (date) => {
   return date ? dayjs(date).format("YYYY-MM-DD") : "알 수 없음";
@@ -112,6 +141,11 @@ const incrementChild = () => childTicketAmount.value++;
 const decrementChild = () => {
   if (childTicketAmount.value > 0) childTicketAmount.value--;
 };
+
+// 총 금액을 1000 단위로 포맷하는 computed 속성
+const formattedTotalPrice = computed(() =>
+  new Intl.NumberFormat("ko-KR").format(totalPrice.value)
+);
 </script>
 
 <style scoped>

@@ -5,19 +5,42 @@
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
-    <product-info class="mb-4" v-model:adultCount="adultCount" v-model:childCount="childCount" />
+    <product-info
+      class="mb-4"
+      v-model:adultCount="adultCount"
+      v-model:childCount="childCount"
+    />
 
-    <buyer-info class="mb-4" v-model:buyerName="buyerName" v-model:buyerPhone="buyerPhone"
-      v-model:buyerEmail="buyerEmail" v-model:buyerEmailDomain="buyerEmailDomain" />
+    <buyer-info
+      class="mb-4"
+      v-model:buyerName="buyerName"
+      v-model:buyerPhone="buyerPhone"
+      v-model:buyerEmail="buyerEmail"
+      v-model:buyerEmailDomain="buyerEmailDomain"
+    />
 
-    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
-      @openModal="handleOpenModal" />
+    <usage-info
+      class="mb-4"
+      v-model:termsChecked1="termsChecked1"
+      v-model:termsChecked2="termsChecked2"
+      @openModal="handleOpenModal"
+    />
 
-    <privacy-agreement-modal v-if="isModalOpen" :type="modalType" @close="closeModal" @agree="handleAgree" />
+    <privacy-agreement-modal
+      v-if="isModalOpen"
+      :type="modalType"
+      @close="closeModal"
+      @agree="handleAgree"
+    />
 
     <div class="d-flex justify-content-center mt-5">
       <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>
-      <button class="btn btn-primary mx-2" @click="handleSubmit">
+      <!-- `disabled` 속성을 `isFormValid`로 설정 -->
+      <button
+        class="btn btn-primary mx-2"
+        @click="handleSubmit"
+        :disabled="!isFormValid"
+      >
         구매하기
       </button>
       <button @click="goToTicketRefund">결제 내역 조회하기</button>
@@ -83,16 +106,11 @@ onUnmounted(() => {
   window.removeEventListener("beforeunload", handleBeforeUnload);
 });
 
+// 필수 입력값 모두 입력 시 true 반환
 const isFormValid = computed(() => {
   const isTicketSelected =
     (adultTicket.value && adultTicketAmount.value > 0) ||
     (childTicket.value && childTicketAmount.value > 0);
-  console.log("성인/아동 티켓 선택 여부:", isTicketSelected); // 디버그 로그
-  console.log("구매자 이름:", buyerName.value); // 디버그 로그
-  console.log("구매자 전화번호:", buyerPhone.value); // 디버그 로그
-  console.log("구매자 이메일1:", buyerEmail.value); // 디버그 로그
-  console.log("구매자 이메일2:", buyerEmailDomain.value); // 디버그 로그
-  console.log("필수 약관 동의:", termsChecked1.value); // 디버그 로그
 
   return (
     buyerName.value &&
@@ -120,9 +138,6 @@ const handleSubmit = async () => {
       };
 
       const orderResponse = await apiClient.post(`/tickets/orders`, orderData);
-      console.log("Order Response Data:", orderResponse.data.data); // 응답 데이터 확인
-
-      // orderId 경로에 문제가 없는지 확인
       const orderId = orderResponse.data?.data?.orderId;
 
       if (!orderId) {
@@ -137,31 +152,25 @@ const handleSubmit = async () => {
       const paymentData = {
         pg: "html5_inicis",
         pay_method: "card",
-        merchant_uid: orderId, // 생성된 orderId가 유효한지 확인
+        merchant_uid: orderId,
         name: "입장권 구매",
         amount: totalPrice.value,
         buyer_name: buyerName.value || "",
         buyer_tel: buyerPhone.value || "",
         buyer_email: `${buyerEmail.value}@${buyerEmailDomain.value}` || "",
       };
-      console.log("Payment Data:", paymentData);
 
       IMP.request_pay(paymentData, async (response) => {
         if (response.success && response.imp_uid) {
-          // 성공 시 imp_uid 확인
-          console.log("결제 성공:", response); // 결제 성공 응답 확인
-
           const paymentRequest = {
             impUid: response.imp_uid,
             orderId: orderId,
             paymentAmount: response.paid_amount || totalPrice.value,
             paymentMethod: "EMAIL",
-            paymentDate: new Date().toISOString(), // ISO 형식의 날짜 문자열
+            paymentDate: new Date().toISOString(),
           };
-          console.log("Payment Request Data:", paymentRequest);
 
           try {
-            // 결제 정보 전송
             await apiClient.post(`/tickets/payment/${orderId}`, paymentRequest);
             alert("결제가 완료되었습니다.");
           } catch (error) {
