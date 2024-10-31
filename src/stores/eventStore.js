@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
-import axios from "axios";
 
 export const useEventStore = defineStore("eventStore", {
   state: () => ({

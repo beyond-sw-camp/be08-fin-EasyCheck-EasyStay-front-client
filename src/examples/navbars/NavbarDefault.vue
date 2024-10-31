@@ -4,7 +4,9 @@ import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
 import { userLoginStore } from "@/stores/loginStore.js";
 import LogoImg from "@/assets/img/logos/logo-ct-dark.png";
+import { useAccommodationStore } from "@/stores";
 
+// props를 통해 네비게이션의 외형이나 메뉴 항목 등을 동적으로 설정할 수 있음.
 const props = defineProps({
   transparent: {
     type: Boolean,
@@ -26,6 +28,42 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+});
+
+// accommodationStore 사용 및 메뉴 기본 값 설정
+const accommodationStore = useAccommodationStore();
+const menus = ref([
+  { name: "리조트 안내", items: [] },
+  { name: "호텔 안내", items: [] },
+  {
+    name: "이용안내",
+    items: [
+      { name: "테마파크", href: "/themepark" },
+      { name: "이벤트", href: "/eventsListView" },
+      { name: "공지사항", href: "/noticesListView" },
+      { name: "건의사항", href: "/suggestionsListView" },
+    ],
+  },
+]);
+
+// API 호출 및 메뉴 항목 설정
+onMounted(async () => {
+  await accommodationStore.fetchAccommodations();
+
+  // API로부터 불러온 accommodations를 Resort와 Hotel로 분류
+  menus.value[0].items = accommodationStore.accommodations
+    .filter((item) => item.accommodationType === "RESORT")
+    .map((resort) => ({
+      name: resort.name,
+      href: `/accommodation/${resort.id}`,
+    }));
+
+  menus.value[1].items = accommodationStore.accommodations
+    .filter((item) => item.accommodationType === "HOTEL")
+    .map((hotel) => ({
+      name: hotel.name,
+      href: `/accommodation/${hotel.id}`,
+    }));
 });
 
 const router = useRouter();
@@ -188,44 +226,26 @@ watch(
             </button>
             <div id="nav-menu" class="nav-menu" v-show="isMenuVisible">
               <div class="menu-grid">
-                <!-- 제목 행 추가 -->
                 <div class="grid-header">
-                  <div>리조트 안내</div>
-                  <div>호텔 안내</div>
-                  <div>이용 안내</div>
-                  <div>고객 센터</div>
+                  <div
+                    class="col-md- col-sm-6 col-6 mb-4"
+                    v-for="{ name, items } of menus"
+                    :key="name"
+                  >
+                    <h6 class="text-sm text-white">{{ name }}</h6>
+                    <ul class="flex-column ms-n3 nav">
+                      <li
+                        class="nav-item"
+                        v-for="item of items"
+                        :key="item.name"
+                      >
+                        <RouterLink class="nav-link text-white" :to="item.href">
+                          {{ item.name }}
+                        </RouterLink>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-                <!-- 메뉴 항목 -->
-                <RouterLink to="/accommodation/1" @click="isMenuVisible = false"
-                  >Section 1</RouterLink
-                >
-                <RouterLink to="/accommodation/2" @click="isMenuVisible = false"
-                  >Section 2</RouterLink
-                >
-                <RouterLink to="/accommodation/3" @click="isMenuVisible = false"
-                  >Section 3</RouterLink
-                >
-                <RouterLink to="/accommodation/2" @click="isMenuVisible = false"
-                  >Section 4</RouterLink
-                >
-                <RouterLink to="/section5" @click="isMenuVisible = false"
-                  >Section 5</RouterLink
-                >
-                <RouterLink to="/accommodation/3" @click="isMenuVisible = false"
-                  >Section 6</RouterLink
-                >
-                <RouterLink to="/section7" @click="isMenuVisible = false"
-                  >Section 7</RouterLink
-                >
-                <RouterLink to="/section8" @click="isMenuVisible = false"
-                  >Section 8</RouterLink
-                >
-                <RouterLink to="/section8" @click="isMenuVisible = false"
-                  >Section 9</RouterLink
-                >
-                <RouterLink to="/section10" @click="isMenuVisible = false"
-                  >Section 10</RouterLink
-                >
               </div>
             </div>
           </li>
@@ -294,7 +314,7 @@ watch(
 }
 .nav-menu {
   position: absolute;
-  top: 100%; /* 헤더 바로 아래에 위치 */
+  top: 100; /* 헤더 바로 아래에 위치 */
   left: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.7);
@@ -303,12 +323,16 @@ watch(
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease-in-out;
   z-index: 9999; /* 화면 맨 앞에 고정 */
+  justify-content: center;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4열로 나누기 */
-  grid-gap: 10px; /* 항목 간의 간격 */
+  left: 10;
+  right: 10;
+  place-items: center;
+  grid-template-columns: repeat(3, 1fr); /* 3열로 나누기 */
+  grid-gap: 8px; /* 항목 간의 간격 */
 }
 
 .grid-header {
@@ -316,12 +340,13 @@ watch(
   font-weight: bold; /* 제목 강조 */
   text-align: center; /* 제목 가운데 정렬 */
   color: white; /* 제목 텍스트 색 */
-  margin-bottom: 10px; /* 제목과 메뉴 항목 간의 간격 */
+  margin-bottom: 20px; /* 제목과 메뉴 항목 간의 간격 */
+  justify-content: center;
 }
 
 .grid-header div {
   position: relative; /* 경계선 위치 조정을 위해 상대적으로 설정 */
-  padding-top: 10px; /* 선과 텍스트 간의 간격 */
+  padding-top: 20px; /* 선과 텍스트 간의 간격 */
 }
 
 .grid-header div::before {
@@ -342,6 +367,7 @@ watch(
   text-align: center; /* 텍스트 가운데 정렬 */
   border-radius: 5px; /* 항목 둥글게 만들기 */
   transition: background-color 0.3s; /* 호버 효과를 위한 전환 */
+  justify-content: center;
 }
 
 .menu-grid a:hover {
