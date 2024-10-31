@@ -14,7 +14,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
 // material-input
 import setMaterialInput from "@/assets/js/material-input";
 
-import PWAuthView from "./Sections/PWAuthView.vue";
+import Authentication from "@/views/LandingPages/SignIn/Sections/Authentication.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -70,7 +70,7 @@ const handleNext = () => {
           </div>
         </div>
 
-        <PWAuthView v-model="signUpformData" @authenticate="authenticatePhone" />
+        <Authentication v-model="signUpformData" @authenticate="authenticatePhone" />
 
         <!-- 버튼 -->
         <div class="text-center mt-4 mb-5">
