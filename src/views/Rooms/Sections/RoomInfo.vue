@@ -40,3 +40,10 @@ const roomStore = useRoomStore();
 
 const { currentRoom, roomType } = storeToRefs(roomStore);
 </script>
+
+<style scoped>
+.room-info-table th,
+.room-info-table td {
+  border: 1px solid #dee2e6 !important;
+}
+</style>
