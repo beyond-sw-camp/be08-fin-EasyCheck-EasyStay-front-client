@@ -1,30 +1,23 @@
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
   <Header />
   <section class="py-10">
     <div class="container">
       <h2>Events</h2>
       <div class="banner-slider">
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 1.png" alt="Banner 1" />
+          <img :src="ThumnailImg1" alt="Banner 1" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 2.png" alt="Banner 2" />
+          <img :src="ThumnailImg2" alt="Banner 2" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 3.png" alt="Banner 3" />
+          <img :src="ThumnailImg3" alt="Banner 3" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 4.png" alt="Banner 3" />
+          <img :src="ThumnailImg4" alt="Banner 3" />
         </div>
         <div class="slide">
-          <img src="@/assets/img/이벤트배너 5.png" alt="Banner 3" />
+          <img :src="ThumnailImg5" alt="Banner 3" />
         </div>
         <!-- 추가적인 배너 이미지를 여기다 넣을 수 있습니다 -->
 
@@ -94,7 +87,12 @@
 </template>
 
 <script setup>
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
+import ThumnailImg1 from "@/assets/img/이벤트배너 1.png";
+import ThumnailImg2 from "@/assets/img/이벤트배너 2.png";
+import ThumnailImg3 from "@/assets/img/이벤트배너 3.png";
+import ThumnailImg4 from "@/assets/img/이벤트배너 4.png";
+import ThumnailImg5 from "@/assets/img/이벤트배너 5.png";
+
 import Header from "@/examples/Header.vue";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
