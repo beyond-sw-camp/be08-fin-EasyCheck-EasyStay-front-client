@@ -56,8 +56,6 @@ function goToFindPW() {
           </div>
         </div>
 
-        <hr class="my-2" style="border-top: 3px solid #000;" />
-
         <Authentication @authenticationSuccess="onAuthenticationSuccess" />
 
         <!-- 버튼 -->

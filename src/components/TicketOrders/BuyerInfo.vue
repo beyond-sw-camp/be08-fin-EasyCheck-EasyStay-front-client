@@ -12,6 +12,7 @@
       <fieldset class="input-fieldset">
         <legend class="sr-only">정보 입력</legend>
         <div class="grid-area-2x2">
+          <!-- 구매자 이름 -->
           <div class="form-group">
             <label for="buyerName">구매자 이름</label>
             <div class="input-group input-lg">
@@ -23,6 +24,7 @@
             </span>
           </div>
 
+          <!-- 휴대전화 번호 -->
           <div class="form-group">
             <label for="buyerPhone">휴대전화 번호</label>
             <div class="input-group input-lg">
@@ -34,6 +36,7 @@
             </span>
           </div>
 
+          <!-- 이메일 입력 -->
           <div class="form-group email-group">
             <label for="buyerEmail">이메일</label>
             <div class="input-group input-lg d-flex align-items-center">
@@ -64,7 +67,6 @@ const props = defineProps({
   buyerPhone: String,
   buyerEmail: String,
   buyerEmailDomain: String,
-  isLoggedIn: Boolean,
 });
 
 const emit = defineEmits([
@@ -84,9 +86,9 @@ const buyerEmail = ref(props.buyerEmail);
 const buyerEmailDomain = ref(props.buyerEmailDomain);
 const sameAsReservation = ref(false);
 
-// 유효성 검사를 위한 computed properties
+// 유효성 검사
 const isBuyerNameValid = computed(() => buyerName.value.trim() !== "");
-const isBuyerPhoneValid = computed(() => /^\d{10,11}$/.test(buyerPhone.value)); // 10자리 또는 11자리의 숫자만 허용
+const isBuyerPhoneValid = computed(() => /^\d{10,11}$/.test(buyerPhone.value));
 const isEmailValid = computed(() => {
   const email = `${buyerEmail.value.trim()}@${buyerEmailDomain.value.trim()}`;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -136,6 +138,19 @@ const copyReservationInfo = () => {
 
 .form-group {
   position: relative;
+}
+
+.input-group-outline {
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.input-group-outline:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 .input-group-add {
