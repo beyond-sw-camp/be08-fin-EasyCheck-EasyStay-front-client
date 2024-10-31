@@ -8,78 +8,41 @@
         <div class="form-group">
           <label for="reservationName" class="form-label">예약자 이름 *</label>
           <div class="input-group">
-            <input
-              :value="userInfo?.name"
-              readonly
-              type="text"
-              id="reservationName"
-              class="form-control"
-              placeholder="이름"
-            />
+            <input :value="userInfo?.name" readonly type="text" id="reservationName" class="form-control"
+              placeholder="이름" />
           </div>
 
-          <small class="input-hint"
-            >온라인 비회원으로 예약 시 본인인증이 필요합니다.</small
-          >
+          <small class="input-hint">온라인 비회원으로 예약 시 본인인증이 필요합니다.</small>
         </div>
 
         <div class="form-group">
-          <label for="reservationPhone" class="form-label"
-            >예약자 휴대전화 번호 *</label
-          >
-          <input
-            readonly
-            type="tel"
-            :value="userInfo?.phone"
-            id="reservationPhone"
-            class="form-control"
-            placeholder="'-' 제외하고 숫자만 입력"
-          />
+          <label for="reservationPhone" class="form-label">예약자 휴대전화 번호 *</label>
+          <input readonly type="tel" :value="userInfo?.phone" id="reservationPhone" class="form-control"
+            placeholder="'-' 제외하고 숫자만 입력" />
         </div>
       </div>
 
       <div class="form-section">
         <h3 class="form-title">투숙자 정보 입력</h3>
         <div class="form-check">
-          <input
-            type="checkbox"
-            id="sameAsReservation"
-            v-model="sameAsReservation"
-            @change="copyReservationInfo"
-            class="form-check-input"
-          />
-          <label for="sameAsReservation" class="form-check-label"
-            >예약자 정보와 동일</label
-          >
+          <input type="checkbox" id="sameAsReservation" v-model="sameAsReservation" @change="copyReservationInfo"
+            class="form-check-input" />
+          <label for="sameAsReservation" class="form-check-label">예약자 정보와 동일</label>
         </div>
 
         <div class="form-group">
           <label for="guestName" class="form-label">내표 투숙자 이름 *</label>
-          <input
-            type="text"
-            id="representativeName"
-            v-model="form.representativeName"
-            class="form-control"
-            :class="{ 'is-invalid': v$.form.representativeName.$error }"
-            placeholder="이름"
-          />
+          <input type="text" id="representativeName" v-model="form.representativeName" class="form-control"
+            :class="{ 'is-invalid': v$.form.representativeName.$error }" placeholder="이름" />
           <div class="error-message" v-if="v$.form.representativeName.$error">
             {{ v$.form.representativeName.$errors[0].$message }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="guestPhone" class="form-label"
-            >내표 투숙자 휴대전화 번호 *</label
-          >
-          <input
-            type="tel"
-            id="representativePhone"
-            v-model="form.representativePhone"
-            class="form-control"
-            :class="{ 'is-invalid': v$.form.representativePhone.$error }"
-            placeholder="'-' 제외하고 숫자만 입력"
-          />
+          <label for="guestPhone" class="form-label">내표 투숙자 휴대전화 번호 *</label>
+          <input type="tel" id="representativePhone" v-model="form.representativePhone" class="form-control"
+            :class="{ 'is-invalid': v$.form.representativePhone.$error }" placeholder="'-' 제외하고 숫자만 입력" />
           <div class="error-message" v-if="v$.form.representativePhone.$error">
             {{ v$.form.representativePhone.$errors[0].$message }}
           </div>
@@ -88,23 +51,11 @@
         <div class="form-group">
           <label class="form-label">이메일 (선택)</label>
           <div class="email-group">
-            <input
-              type="text"
-              v-model="form.emailLocal"
-              class="form-control"
-              placeholder="이메일"
-            />
+            <input type="text" v-model="form.emailLocal" class="form-control" placeholder="이메일" />
             <span class="email-at">@</span>
-            <input
-              type="text"
-              v-model="form.emailDomain"
-              class="form-control"
-              placeholder="도메인"
-            />
+            <input type="text" v-model="form.emailDomain" class="form-control" placeholder="도메인" />
           </div>
-          <small class="input-hint"
-            >이메일 주소 입력 시 '예약확인정' 메일이 발송됩니다.</small
-          >
+          <small class="input-hint">이메일 주소 입력 시 '예약확인정' 메일이 발송됩니다.</small>
         </div>
 
         <div class="form-group">
@@ -123,10 +74,8 @@
               <span>소인 {{ childCount }}명</span>
             </div>
           </div>
-          <small class="input-hint"
-            >객실 정원은 최대 {{ selectedRoom?.maxOccupancy }}인까지
-            가능합니다.</small
-          >
+          <small class="input-hint">객실 정원은 최대 {{ selectedRoom?.maxOccupancy }}인까지
+            가능합니다.</small>
           <small class="input-hint">객실 정원은 영유아 포함입니다.</small>
         </div>
       </div>
@@ -134,12 +83,8 @@
       <div class="form-section">
         <h3 class="form-title">결제 방법</h3>
         <div class="payment-methods">
-          <button
-            type="button"
-            class="payment-method-btn"
-            :class="{ active: form.paymentMethod === 'card' }"
-            @click="selectPaymentMethod('card')"
-          >
+          <button type="button" class="payment-method-btn" :class="{ active: form.paymentMethod === 'card' }"
+            @click="selectPaymentMethod('card')">
             <div class="payment-content">
               <span class="payment-icon">💳</span>
               <div class="payment-info">
@@ -151,12 +96,8 @@
             </div>
           </button>
 
-          <button
-            type="button"
-            class="payment-method-btn"
-            :class="{ active: form.paymentMethod === 'vbank' }"
-            @click="selectPaymentMethod('vbank')"
-          >
+          <button type="button" class="payment-method-btn" :class="{ active: form.paymentMethod === 'vbank' }"
+            @click="selectPaymentMethod('vbank')">
             <div class="payment-content">
               <span class="payment-icon">🏦</span>
               <div class="payment-info">
@@ -174,11 +115,7 @@
   <slot />
   <div class="action-buttons">
     <button class="cancel-btn" @click="handleCancel">취소</button>
-    <button
-      class="reserve-btn"
-      :disabled="!allAgreementsChecked"
-      @click="handleSubmit"
-    >
+    <button class="reserve-btn" :disabled="!allAgreementsChecked" @click="handleSubmit">
       결제하기
     </button>
   </div>
@@ -292,7 +229,13 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
-  console.log(form.value);
+  // 로그인 상태 확인
+  if (!userStore.isLoggedIn) {
+    alert("로그인이 필요합니다.");
+    router.push({ name: "login" }); // 로그인 화면의 경로에 맞게 수정
+    return;
+  }
+
   const isFormValid = await v$.value.$validate();
   if (!isFormValid) return;
 
@@ -478,6 +421,7 @@ const handleSubmit = async () => {
     border-radius: 8px;
   }
 }
+
 .action-buttons {
   display: flex;
   justify-content: space-between;
@@ -508,6 +452,7 @@ const handleSubmit = async () => {
     }
   }
 }
+
 .payment-methods {
   display: flex;
   gap: 20px;
