@@ -178,6 +178,16 @@ export const useReservationStore = defineStore("reservationStore", {
     resetAccommodationList() {
       this.accommodationList = [];
     },
+    initReservationForm(form) {
+      console.log("[initReservationForm]]");
+
+      console.log(form);
+
+      this.accommodationId = form.accommodationId;
+      this.accommodationName = form.accommodationName;
+      this.checkIn = form.checkInDate;
+      this.checkOut = form.checkOutDate;
+    },
     increaseRoomCount() {
       this.roomCount += 1;
     },
@@ -186,13 +196,20 @@ export const useReservationStore = defineStore("reservationStore", {
         this.roomCount -= 1;
       }
     },
-    initCheckInCheckOut() {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+    initCheckInCheckOut(checkInDate, checkOutDate) {
+      console.log(checkInDate, checkOutDate);
 
-      this.checkIn = today;
-      this.checkOut = tomorrow;
+      if (!checkInDate && !checkOutDate) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        this.checkIn = today;
+        this.checkOut = tomorrow;
+      } else {
+        this.checkIn = new Date(checkInDate);
+        this.checkOut = new Date(checkOutDate);
+      }
     },
 
     resetRoomSelection() {
@@ -228,6 +245,17 @@ export const useReservationStore = defineStore("reservationStore", {
         console.log(response.data);
       } catch (err) {
         console.log(err);
+      }
+    },
+    async fetchAccommodationList() {
+      try {
+        const response = await apiClient.get("/accommodations");
+        this.accommodationList = response.data;
+        this.setAccommodationId(response.data[0].id);
+        this.setAccommodationName(response.data[0].name);
+      } catch (err) {
+        console.log(err);
+        this.accommodationList = [];
       }
     },
     async fetchAndInitAccommodationNavs() {

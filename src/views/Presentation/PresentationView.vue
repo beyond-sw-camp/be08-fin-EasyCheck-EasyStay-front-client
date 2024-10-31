@@ -5,7 +5,6 @@ import apiClient from "@/api";
 import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
 import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
-import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
@@ -57,43 +56,20 @@ const onSearchRooms = async ({
   checkInDate: inDate,
   checkOutDate: outDate,
   roomCount: count,
+  accommodationId,
 }) => {
   selectedResort.value = resort; // 선택한 리조트 저장
   checkInDate = inDate; // 체크인 날짜 저장
   checkOutDate = outDate; // 체크아웃 날짜 저장
   roomCount = count; // 객실 수 저장
 
-  try {
-    const response = await apiClient.get("/reservation-room/available", {
-      params: {
-        accommodationId: resort,
-        checkinDate: inDate,
-        checkoutDate: outDate,
-        roomCount: count,
-      },
-    });
-    availableRooms.value = response.data;
-  } catch (error) {
-    console.error("객실 검색 중 오류가 발생했습니다.", error);
-  }
-};
-
-const onRoomSelected = (room) => {
-  if (!selectedResort.value || !checkInDate || !checkOutDate || !roomCount) {
-    console.error(
-      "리조트, 체크인 날짜, 체크아웃 날짜, 객실 수 정보가 누락되었습니다."
-    );
-    return;
-  }
-
   router.push({
-    name: "ReservationPage",
+    name: "Reservation",
     query: {
-      roomId: room.roomId,
-      accommodationId: selectedResort.value, // 선택한 리조트 ID
-      checkInDate: checkInDate, // 선택한 체크인 날짜
-      checkOutDate: checkOutDate, // 선택한 체크아웃 날짜
-      roomCount: roomCount, // 선택한 객실 수
+      checkInDate,
+      checkOutDate,
+      accommodationId,
+      roomCount,
     },
   });
 };
@@ -201,11 +177,7 @@ onUnmounted(() => {
       </div>
       <div class="roomSearchForm-container">
         <div class="container p-0">
-          <RoomSearchForm
-            class="m-auto"
-            :accommodations="accommodations"
-            @search="onSearchRooms"
-          />
+          <RoomSearchForm class="m-auto" :accommodations="accommodations" />
           <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
         </div>
       </div>

@@ -11,6 +11,7 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 import { ref, reactive, watch } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
@@ -25,6 +26,8 @@ const tomorrow = new Date().setDate(today.getDate() + 1);
 const selectMode = ref(DATE_SELECTION_MODE.START);
 const reservationStore = useReservationStore();
 
+const { checkIn, checkOut } = storeToRefs(reservationStore);
+
 // 초기값을 함수로 분리
 const getInitialAttrs = () => [
   {
@@ -35,8 +38,8 @@ const getInitialAttrs = () => [
       end: { fillMode: "outline" },
     },
     dates: {
-      start: today,
-      end: tomorrow,
+      start: checkIn,
+      end: checkOut,
     },
   },
 ];
@@ -44,18 +47,18 @@ const getInitialAttrs = () => [
 const attrs = reactive(getInitialAttrs());
 
 // watch 수정
-watch(
-  () => reservationStore.accommodationId,
-  () => {
-    // reactive 배열의 내용을 업데이트
-    attrs.length = 0; // 배열 비우기
-    attrs.push(...getInitialAttrs()); // 새로운 초기값 추가
+// watch(
+//   () => reservationStore.accommodationId,
+//   () => {
+//     // reactive 배열의 내용을 업데이트
+//     attrs.length = 0; // 배열 비우기
+//     attrs.push(...getInitialAttrs()); // 새로운 초기값 추가
 
-    // store의 날짜도 초기화
-    reservationStore.setCheckinDate(today);
-    reservationStore.setCheckoutDate(new Date(tomorrow));
-  }
-);
+//     // store의 날짜도 초기화
+//     reservationStore.setCheckinDate(today);
+//     reservationStore.setCheckoutDate(new Date(tomorrow));
+//   }
+// );
 
 const clickDate = (e) => {
   const { date: selectedDate } = e;

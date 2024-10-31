@@ -45,16 +45,18 @@ import { useReservationStore } from "@/stores/reservationStore.js";
 
 const reservationStore = useReservationStore();
 
-const { showRoomSelectionGrid, showReservationForm } =
-  storeToRefs(reservationStore);
+const {
+  showRoomSelectionGrid,
+  showReservationForm,
+  accommodationId,
+  accommodationName,
+} = storeToRefs(reservationStore);
 
 onMounted(async () => {
   // 숙박시설들 불러오기
-  await reservationStore.fetchAndInitAccommodationNavs();
-});
-
-onMounted(() => {
-  reservationStore.initCheckInCheckOut();
+  if (!accommodationId && !accommodationName) {
+    await reservationStore.fetchAndInitAccommodationNavs();
+  }
 });
 
 onUnmounted(() => {
