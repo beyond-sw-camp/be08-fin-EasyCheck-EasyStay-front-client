@@ -92,14 +92,28 @@ onMounted(async () => {
         <div class="col-md-3 mb-4 ms-auto">
           <div>
             <a :href="brand.route">
-              <img :src="brand.logo" class="mb-3 footer-logo" alt="main_logo" style="filter: brightness(0) invert(1)" />
+              <img
+                :src="brand.logo"
+                class="mb-3 footer-logo"
+                alt="main_logo"
+                style="filter: brightness(0) invert(1)"
+              />
             </a>
             <h6 class="font-weight-bolder mb-4 text-white">{{ brand.name }}</h6>
           </div>
           <div>
             <ul class="d-flex flex-row ms-n3 nav">
-              <li class="nav-item" v-for="{ icon, link } of socials" :key="link">
-                <a class="nav-link pe-1 text-white" :href="link" target="_blank" v-html="icon">
+              <li
+                class="nav-item"
+                v-for="{ icon, link } of socials"
+                :key="link"
+              >
+                <a
+                  class="nav-link pe-1 text-white"
+                  :href="link"
+                  target="_blank"
+                  v-html="icon"
+                >
                 </a>
               </li>
             </ul>
@@ -124,8 +138,12 @@ onMounted(async () => {
               All rights reserved. Copyright ©
               {{ new Date().getFullYear() }}
               EasyStay by
-              <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server" target="_blank"
-                class="text-white">EasyCheck</a>.
+              <a
+                href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server"
+                target="_blank"
+                class="text-white"
+                >EasyCheck</a
+              >.
             </p>
           </div>
         </div>

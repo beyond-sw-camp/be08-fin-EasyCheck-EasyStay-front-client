@@ -1,8 +1,4 @@
 <template>
-  <navbar-default />
-  <div class="col-12">
-    <NavbarDefault :sticky="true" />
-  </div>
   <Header />
   <section class="py-6 luxurious-section">
     <div class="container">
@@ -147,7 +143,6 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 import { suggestionStore } from "@/stores/suggestionStore";
 import { useAccommodationStore } from "@/stores";
