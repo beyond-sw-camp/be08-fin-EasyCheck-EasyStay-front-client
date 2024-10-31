@@ -242,6 +242,15 @@ const router = createRouter({
       path: "/ticket/result",
       name: "TicketResult",
       component: TicketResultView,
+      beforeEnter: (to, from, next) => {
+        // 새로고침이나 직접 URL 접근인 경우
+
+        if (from.name === undefined) {
+          console.log("새로고침 시도");
+          return next({ name: "presentation" });
+        }
+        return next();
+      },
     },
     {
       path: "/themepark/error",
