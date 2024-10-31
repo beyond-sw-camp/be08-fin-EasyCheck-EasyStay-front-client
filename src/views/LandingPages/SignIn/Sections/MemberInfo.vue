@@ -25,18 +25,6 @@ const consentItems2 = ref([
   { label: '통신사 이용약관 동의 (필수)', checked: false, details: '상세 내용 4' },
 ]);
 
-// 모달 관련 상태 및 함수 정의
-const isModalVisible = ref(false);
-const modalContent = ref("");
-const modalTitle = ref("");
-
-const openModal = (details, title) => {
-  console.log("Opening modal with details:", details); // 로그 추가
-  modalContent.value = details;
-  modalTitle.value = title;
-  isModalVisible.value = true;
-};
-
 
 const toggleAll = () => {
   const isCheckedValue = isChecked.value;
@@ -429,9 +417,6 @@ watch(() => loginStore.signUpformData.password, validatePassword);
       </tbody>
     </table>
   </div>
-
-  <consentModal :isVisible="isModalVisible" @update:isVisible="isModalVisible = $event" :content="modalContent"
-    :title="modalTitle" />
 
 </template>
 

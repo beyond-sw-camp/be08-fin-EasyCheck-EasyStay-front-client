@@ -10,32 +10,106 @@ onMounted(() => {
   setMaterialInput();
 });
 
+const consentItems = ref([
+  {
+    label: '개인정보 이용 동의 (필수)',
+    checked: false,
+    detail: `
+      본인은 EASY STAY(이하 ‘회사’라 합니다)가 제공하는 본인확인서비스(이하 ‘서비스’라 합니다)를 이용하기 위해, 다음과 같이 ‘회사’가 본인의 개인정보를 수집/이용하고, 개인정보의 취급을 위탁하는 것에 동의합니다. <br><br>
+      <h5> 1. 수집항목</h5>
+      <ul>
+        <li>이용자의 성명, 이동전화번호, 가입한 이동전화 회사</li>
+        <li>연계정보(CI), 중복가입확인정보(DI)</li>
+        <li>이용자가 이용하는 웹사이트 또는 Application 정보, 이용일시</li>
+        <li>가입한 이동전화회사 및 이동전화브랜드</li>
+      </ul>
+      <h5>2. 이용목적</h5>
+      <ul>
+        <li>이용자가 웹사이트 또는 Application에 입력한 본인확인정보의 정확성 여부 확인 (본인확인서비스 제공)</li>
+        <li>해당 웹사이트 또는 Application에 연계정보(CI)/중복가입확인정보(DI) 전송</li>
+        <li>서비스 관련 상담 및 불만 처리 등</li>
+        <li>이용 웹사이트/Application 정보 등에 대한 분석 및 세분화를 통한, 이용자의 서비스 이용 선호도 분석</li>
+      </ul>
+      <h5>3. 개인정보의 보유 및 이용기간</h5>
+      <p>이용자가 서비스를 이용하는 기간에 한하여 보유 및 이용. 다만, 아래의 경우는 제외:</p>
+      <ul>
+        <li>법령에서 정하는 경우 해당 기간까지 보유 (상세 사항은 회사의 개인정보취급방침에 기재된 바에 따름)</li>
+      </ul>
+    `,
+    type: '필수',
+  },
+  {
+    label: '고유식별 정보 처리 동의 (필수)',
+    checked: false,
+    detail: `
+      본인은 EASY STAY(이하 ‘회사’라 합니다)가 제공하는 본인확인서비스(이하 ‘서비스’라 합니다)를 이용하기 위해, 다음과 같이 본인의 개인정보를 회사가 아래 기재된 제3자에게 제공하는 것에 동의합니다. <br><br>
+      <h5>1. 고유식별정보를 제공받는 자</h5>
+      <ul>
+        <li>NICE평가정보(주)</li>
+        <li>SCI평가정보(주)</li>
+      </ul>
+      <h5>2. 고유식별정보를 제공받는 자의 목적</h5>
+      <ul>
+        <li>연계정보(CI)/중복가입확인정보(DI) 생성 및 회사에 제공</li>
+        <li>부정 이용 방지 및 민원 처리</li>
+      </ul>
+      <h5>3. 제공하는 개인정보 항목</h5>
+      <p>회사가 보유하고 있는 고객의 주민등록번호 및 외국인등록번호</p>
+      <h5>4. 고유식별정보를 제공받는 자의 보유 및 이용기간</h5>
+      <p>연계정보(CI)/중복가입확인정보(DI) 생성 후 3개월</p>
+      <h5>5. 위 개인정보 수집, 이용 및 취급위탁에 동의하지 않을 권리가 있으며, 동의하지 않으실 경우 서비스를 이용할 수 없습니다.</h5>
+    `,
+    type: '필수',
+  },
+  {
+    label: '서비스 이용약관 동의 (필수)',
+    checked: false,
+    detail: `
+<h5>제 1 조 (목적)</h5>
+      <p>본 약관은 SCI평가정보㈜(이하 ‘회사’라 한다)가 제공하는 본인확인서비스(이하 ‘서비스’라 한다)에 관한 이용조건 및 절차 등 기본적인 사항을 규정함을 목적으로 합니다.</p>
+      
+      <h5>제 2 조 (약관의 효력 및 변경)</h5>
+      <ol>
+        <li>본 약관은 ‘이용자’에게 ‘서비스’ 화면에 게시하거나, 기타의 방법으로 공지하는 것으로 효력이 발생합니다.</li>
+        <li>‘회사’는 약관의 규제에 관한 법률 및 기타 관련 법령에 위배되지 않는 범위에서 본 약관의 내용을 개정할 수 있으며, 변경된 경우에는 제1항과 같은 방법으로 공지합니다. 다만 ‘이용자’의 권리와 의무에 관한 중요한 사항은 변경된 내용의 시행 15일 이전에 공지합니다.</li>
+        <li>‘이용자’는 변경된 약관에 대한 내용을 알지 못하여 발생하는 손해 및 피해에 대해서는 ‘회사’가 책임을 지지 않습니다.</li>
+      </ol>
+
+      <h5>제 3 조 (약관 외 준칙)</h5>
+      <p>본 약관에 명시되지 아니한 사항에 대해서는 정보통신망 이용 촉진 및 정보보호 등에 관한 법률 등 기타 관련 법령 또는 상관례에 따릅니다.</p>
+    `,
+    type: '필수',
+  },
+  {
+    label: '통신사 이용약관 동의 (필수)',
+    checked: false,
+    detail: `
+      <h5>제 1 조 (목적)</h5>
+      <p>이 약관은 ‘본인확인서비스’를 제공하는 에스케이텔레콤 주식회사(이하 ‘회사’라 합니다)와 ‘본인확인서비스’ 이용자 (이하 ‘이용자’라 합니다)간에 ‘본인확인서비스’ 이용에 관한 ‘회사’와 ‘이용자’의 권리와 의무, 기타 제반 사항을 정함을 목적으로 합니다.</p>
+    `,
+    type: '필수',
+  },
+]);
+
 // 약관 동의
 const isChecked = ref(false);
-const consentItems = ref([
-  { label: '개인정보 이용 동의 (필수)', checked: false, detail: '개인정보 이용에 대한 세부 내용...' },
-  { label: '고유식별 정보 처리 동의 (필수)', checked: false, detail: '고유식별 정보 처리에 대한 세부 내용...' },
-]);
-
-const consentItems2 = ref([
-  { label: '서비스 이용약관 동의 (필수)', checked: false, detail: '서비스 이용약관에 대한 세부 내용...' },
-  { label: '통신사 이용약관 동의 (필수)', checked: false, detail: '통신사 이용약관에 대한 세부 내용...' },
-]);
 
 const toggleAll = () => {
-  const isCheckedValue = isChecked.value;
+  const isCheckedValue = isAllChecked.value; // 전체 체크 상태
   consentItems.value.forEach(item => {
-    item.checked = isCheckedValue;
-  });
-
-  consentItems2.value.forEach(item => {
-    item.checked = isCheckedValue;
+    item.checked = isCheckedValue; // 모든 항목의 체크 상태를 설정
   });
 };
 
-const isAllChecked = computed(() => {
-  return consentItems.value.every(item => item.checked) &&
-    consentItems2.value.every(item => item.checked);
+const isAllChecked = computed({
+  get() {
+    return consentItems.value.every(item => item.checked); // 모든 항목이 체크되어 있으면 true
+  },
+  set(value) {
+    consentItems.value.forEach(item => {
+      item.checked = value; // 전체 체크박스가 체크/해제되면 개별 항목도 업데이트
+    });
+  }
 });
 
 // 전화번호
@@ -111,143 +185,148 @@ function onAuthenticationSuccess() {
   alert("인증에 성공했습니다!");
 }
 
-// 약관 자세히 보기
-const showModal = ref(false);
+const isModalVisible = ref(false);
 const modalTitle = ref('');
 const modalContent = ref('');
 
-const showDetail = (detail) => {
-  modalTitle.value = '약관 자세히 보기';
-  modalContent.value = detail; // 선택된 항목의 세부 내용을 저장
-  showModal.value = true; // 모달 열기
+const showModal = (title, content) => {
+  modalTitle.value = title;
+  modalContent.value = content;
+  isModalVisible.value = true;
 };
 
 const closeModal = () => {
-  showModal.value = false; // 모달 닫기
+  isModalVisible.value = false;
 };
-
 
 </script>
 
 <template>
-  <div class="align-items-start" loading="lazy">
-    <!-- 약관 동의 -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="form-check text-start mt-2">
-          <input class="form-check-input custom-checkbox" type="checkbox" id="privacyConsent" v-model="isChecked"
-            @change="toggleAll" />
-          <label class="form-check-label fw-bold text-black fs-7 mb-0" for="privacyConsent">
-            휴대폰 본인확인 전체동의
-          </label>
-        </div>
-      </div>
-    </div>
+  <div class="align-items-start">
+    <h4 class="text-left">동의 항목 목록</h4>
+    <p class="text-left">아래 항목에 대해 동의해 주시기 바랍니다.</p>
 
-    <hr style="border-top: 2px solid #ccc;" />
-
-    <div class="row mb-3">
-      <div class="col-5" v-for="(item, index) in consentItems" :key="index">
-        <div class="form-check text-start">
-          <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent1_' + index"
-            v-model="item.checked" />
-          <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent1_' + index">
-            {{ item.label }}
-          </label>
-          <MaterialButton class="btn btn-link p-0" @click="showDetail(item.detail)">자세히 보기</MaterialButton>
-        </div>
-      </div>
-    </div>
-
-    <hr style="border-top: 2px solid #ccc;" />
-
-    <div class="row mb-4">
-      <div class="col-5" v-for="(item, index) in consentItems2" :key="index">
-        <div class="form-check text-start">
-          <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent2_' + index"
-            v-model="item.checked" />
-          <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent2_' + index">
-            {{ item.label }}
-          </label>
-          <MaterialButton class="btn btn-link p-0" @click="showDetail(item.detail)">자세히 보기</MaterialButton>
-        </div>
-      </div>
-    </div>
-
-    <hr style="border-top: 2px solid #ccc;" />
-
-    <table class="table mt-5">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th scope="col" class="col-5">동의 항목</th>
+          <th scope="col" class="col-2">동의</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
-          <td colspan="2">
-            <div class="text-start">
-              <h5 class="text-black mb-2">회원 정보 입력</h5>
-            </div>
-          </td>
-        </tr>
-
-        <!-- 성함 -->
-        <tr>
-          <td class="fw-bold fs-8">성함</td>
+          <td class="text-black-50">휴대폰 인증 전체 동의</td>
           <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0" id="name"
-                :label="{ text: '성함', class: 'form-label' }" type="text" />
-            </div>
+            <input type="checkbox" v-model="isAllChecked" @change="toggleAll" />
           </td>
         </tr>
-
-        <!-- 전화번호 -->
-        <tr>
-          <td class="fw-bold fs-8">전화번호</td>
+        <tr v-for="(item, index) in consentItems" :key="index">
           <td>
-            <div class="d-flex align-items-center col-5">
-              <!-- 통신사 -->
-              <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 20%;">
-                <option value="" disabled selected>통신사 선택</option>
-                <option v-for="carrier in carrierOptions" :key="carrier.value" :value="carrier.value">
-                  {{ carrier.text }}
-                </option>
-              </select>
-
-              <!-- 전화번호 -->
-              <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix" style="width: 15%;">
-                <option v-for="input in phoneFields.inputs" :key="input.id" :value="input.text">
-                  {{ input.text }}
-                </option>
-              </select>
-
-              <MaterialInput class="input-group-outline mb-0 me-2" v-model="phoneMiddle" type="text"
-                style="width: 25%;" />
-              <MaterialInput class="input-group-outline mb-0" v-model="phoneSuffix" type="text"
-                style="width: 25%; margin-right: 10px;" />
-
-              <!-- 인증 요청 버튼 -->
-              <button class="btn btn-black custom-btn mt-3" @click="authenticatePhone">
-                인증 요청
-              </button>
-            </div>
+            {{ item.label }}
+            <button @click="showModal(item.label, item.detail)" class="btn btn-link text-secondary mt-3">자세히 보기</button>
+          </td>
+          <td>
+            <input type="checkbox" v-model="item.checked" />
           </td>
         </tr>
-
-        <!-- 인증번호 입력란 -->
-        <transition name="slide-fade">
-          <tr v-if="isVerificationRequested">
-            <td class="fw-bold fs-8">인증번호</td>
-            <td>
-              <div class="d-flex align-items-center justify-content-start col-5">
-                <MaterialInput class="input-group-outline mb-0" v-model="verificationCode" type="text"
-                  placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
-                <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
-              </div>
-            </td>
-          </tr>
-        </transition>
       </tbody>
     </table>
-
-    <hr style="border-top: 2px solid #ccc;" />
   </div>
 
-  <Modal v-model:isVisible="showModal" :title="modalTitle" :content="modalContent" @close="closeModal" />
+  <table class="table mt-5">
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <div class="text-start">
+            <h5 class="text-black mb-2">회원 정보 입력</h5>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 성함 -->
+      <tr>
+        <td class="fw-bold fs-8">성함</td>
+        <td>
+          <div class="d-flex align-items-center col-5">
+            <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0 custom-check-btn"
+              id="name" :label="{ text: '성함', class: 'form-label' }" type="text" />
+          </div>
+        </td>
+      </tr>
+
+      <!-- 전화번호 -->
+      <tr>
+        <td class="fw-bold fs-8">전화번호</td>
+        <td>
+          <div class="d-flex align-items-center col-5">
+            <!-- 통신사 -->
+            <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 20%;">
+              <option value="" disabled selected>통신사 선택</option>
+              <option v-for="carrier in carrierOptions" :key="carrier.value" :value="carrier.value">
+                {{ carrier.text }}
+              </option>
+            </select>
+
+            <!-- 전화번호 -->
+            <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix" style="width: 15%;">
+              <option v-for="input in phoneFields.inputs" :key="input.id" :value="input.text">
+                {{ input.text }}
+              </option>
+            </select>
+
+            <MaterialInput class="input-group-outline mb-0 me-2" v-model="phoneMiddle" type="text"
+              style="width: 25%;" />
+            <MaterialInput class="input-group-outline mb-0" v-model="phoneSuffix" type="text"
+              style="width: 25%; margin-right: 10px;" />
+
+            <!-- 인증 요청 버튼 -->
+            <button class="btn btn-black custom-btn mt-3" @click="authenticatePhone">
+              인증 요청
+            </button>
+          </div>
+        </td>
+      </tr>
+      <transition name="slide-fade">
+        <tr v-if="isVerificationRequested">
+          <td class="fw-bold fs-8">인증번호</td>
+          <td>
+            <div class="d-flex align-items-center justify-content-start col-5">
+              <MaterialInput class="input-group-outline mb-0" v-model="verificationCode" type="text"
+                placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
+              <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
+            </div>
+          </td>
+        </tr>
+      </transition>
+    </tbody>
+  </table>
+
+  <hr style="border-top: 2px solid #ccc;" />
+  <Modal :isVisible="isModalVisible" :title="modalTitle" :content="modalContent" @close="closeModal" />
 </template>
+
+<style scoped>
+.table th,
+.table td {
+  vertical-align: middle;
+  padding: 0.5rem 0.75rem;
+  /* 간격 조정 */
+}
+
+.text-left {
+  text-align: left;
+}
+
+.table {
+  width: 60%;
+}
+
+.custom-check-btn {
+  padding: -10px -24px;
+  /* 상하 패딩과 좌우 패딩을 줄입니다. */
+  font-size: 0.875rem;
+  /* 폰트 크기를 줄입니다. */
+  line-height: 1;
+  /* 줄 높이를 조정하여 버튼의 높이를 줄입니다. */
+}
+</style>
