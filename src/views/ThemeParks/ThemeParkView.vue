@@ -15,7 +15,7 @@ const accommodationStore = useAccommodationStore();
 
 const route = useRoute();
 const router = useRouter();
-// URL에 있는 쿼리 파라미터 사용하여 초기 로드 설정
+
 onMounted(async () => {
   await accommodationStore.fetchResortAccommodations();
   if (route.query.accommodationId && route.query.themeParkId) {
@@ -28,7 +28,6 @@ onMounted(async () => {
   }
 });
 
-// 첫 번째 숙박 시설과 테마 파크로 리디렉션
 const redirectToFirstAccommodation = async () => {
   const accommodations = accommodationStore.accommodations;
   if (accommodations && accommodations.length > 0) {
@@ -47,14 +46,12 @@ const redirectToFirstAccommodation = async () => {
   }
 };
 
-// 숙박 시설 및 테마 파크 로드
 const loadAccommodationAndThemePark = async (accommodationId, themeParkId) => {
   await accommodationStore.fetchAccommodationById(accommodationId);
   await themeParkStore.fetchThemeParks(accommodationId);
   await themeParkStore.fetchThemeParkById(accommodationId, themeParkId);
 };
 
-// 숙박 시설 ID 변경 시 테마 파크 업데이트
 watch(
   () => route.query.accommodationId,
   async (newAccommodationId) => {
@@ -68,7 +65,6 @@ watch(
   { immediate: true }
 );
 
-// 테마 파크 ID 변경 시 업데이트
 watch(
   () => route.query.themeParkId,
   async (newThemeParkId) => {
@@ -83,4 +79,9 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 페이지 전체에서 X축 스크롤 방지 */
+body {
+  overflow-x: hidden;
+}
+</style>

@@ -1,8 +1,13 @@
 <template>
-  <MainImage v-if="themePark != null" :themePark="themePark" />
+  <div v-if="loading" class="spinner">로딩 중...</div>
 
-  <section class="accommodation-tabs px-8 pt-4" v-if="accommodations.length">
-    <div class="container">
+  <MainImage v-if="themePark && !loading" :themePark="themePark" />
+
+  <section
+    class="accommodation-tabs px-6 pt-4"
+    v-if="accommodations.length && !loading"
+  >
+    <div class="container-fluid">
       <div class="row">
         <div class="col-12">
           <div class="nav-wrapper position-relative end-0">
@@ -15,16 +20,18 @@
                 v-for="accommodation in accommodations"
                 :key="accommodation.id"
               >
-                <button
-                  class="nav-link px-4 py-2"
-                  :class="{
-                    active: currentAccommodationId === accommodation.id,
-                  }"
-                  @click="changeAccommodation(accommodation.id)"
-                  role="tab"
-                >
-                  {{ accommodation.name }}
-                </button>
+                <transition name="fade">
+                  <button
+                    class="nav-link px-4 py-2"
+                    :class="{
+                      active: currentAccommodationId === accommodation.id,
+                    }"
+                    @click="changeAccommodation(accommodation.id)"
+                    role="tab"
+                  >
+                    {{ accommodation.name }}
+                  </button>
+                </transition>
               </li>
             </ul>
           </div>
@@ -33,8 +40,8 @@
     </div>
   </section>
 
-  <section class="themepark-tabs px-8" v-if="themeParks.length !== 0">
-    <div class="container">
+  <section class="themepark-tabs px-6" v-if="themeParks.length && !loading">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-12">
           <div class="nav-wrapper position-relative end-0">
@@ -43,14 +50,16 @@
               role="tablist"
             >
               <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
-                <button
-                  class="nav-link px-4 py-2"
-                  :class="{ active: tab.id === currentThemeParkId }"
-                  @click="changeThemePark(tab.id)"
-                  role="tab"
-                >
-                  {{ tab.name }}
-                </button>
+                <transition name="fade">
+                  <button
+                    class="nav-link px-4 py-2"
+                    :class="{ active: tab.id === currentThemeParkId }"
+                    @click="changeThemePark(tab.id)"
+                    role="tab"
+                  >
+                    {{ tab.name }}
+                  </button>
+                </transition>
               </li>
             </ul>
           </div>
@@ -59,10 +68,9 @@
     </div>
   </section>
 
-  <div class="container-fluid px-8">
+  <div class="container-fluid px-6" v-if="themePark && !loading">
     <div class="section-divider"></div>
-    <attraction-info
-      v-if="themePark != null"
+    <AttractionInfo
       :themeParkId="Number(themePark.id)"
       :currentThemePark="themePark"
     />
@@ -70,22 +78,22 @@
 
   <div
     class="container-fluid d-flex justify-content-center my-5"
-    v-if="themePark?.ticketAvailable === 'Y'"
+    v-if="themePark?.ticketAvailable === 'Y' && !loading"
   >
-    <material-button
+    <MaterialButton
       color="danger"
       size="lg"
       variant="gradient"
       @click="goToTicketSelectionView"
-      class="mx-3"
+      class="material-button mx-3"
     >
       {{ themePark.name }} 이용권 구매하기
-    </material-button>
+    </MaterialButton>
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useThemeParkStore } from "@/stores/themeparkStore";
@@ -94,48 +102,42 @@ import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 
-// pinia 스토어
+const loading = ref(true);
+
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
-
-// 라우터 객체
 const router = useRouter();
 const route = useRoute();
 
-// 현재 선택한 숙박시설 식별자
 const currentAccommodationId = computed(
   () => Number(route.query.accommodationId) || null
 );
-// 현재 선택한 테마파크 식별자
 const currentThemeParkId = computed(() => {
-  const themeParkId =
-    Number(route.query.themeParkId) || themeParks.value[0]?.id || null;
-  console.log("Current Theme Park ID:", themeParkId);
-  return themeParkId;
+  return Number(route.query.themeParkId) || themeParks.value[0]?.id || null;
 });
 
 onMounted(async () => {
-  // 모든 숙박시설 조회
   await accommodationStore.fetchResortAccommodations();
+  loading.value = false;
 });
 
-// pinia 스토어에서 fetch 받은 accommodations 받아오기
 const { accommodations } = storeToRefs(accommodationStore);
 const { themeParks, themePark } = storeToRefs(themeParkStore);
 
-// 숙박 시설 변경
-const changeAccommodation = async (accommodationId) =>
-  router.push({
+const changeAccommodation = async (accommodationId) => {
+  loading.value = true;
+  await router.push({
     name: "ThemePark",
     query: {
       ...route.query,
       accommodationId: accommodationId,
     },
   });
+  loading.value = false;
+};
 
-// 테마파크 변경
 const changeThemePark = async (themeParkId) => {
-  console.log("Selected Theme Park ID:", themeParkId);
+  loading.value = true;
   await router.push({
     name: "ThemePark",
     query: {
@@ -143,10 +145,10 @@ const changeThemePark = async (themeParkId) => {
       themeParkId: themeParkId,
     },
   });
-  console.log("Updated Route Query:", route.query.themeParkId); // 쿼리 파라미터가 업데이트되었는지 확인
+  loading.value = false;
 };
 
-const goToTicketSelectionView = () =>
+const goToTicketSelectionView = () => {
   router.push({
     name: "TicketSelection",
     query: {
@@ -154,88 +156,84 @@ const goToTicketSelectionView = () =>
       accommodationId: route.query.accommodationId,
     },
   });
+};
 </script>
 
 <style scoped>
-.accommodation-nav-tabs {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #e0e0e0;
-  margin-bottom: 20px;
+/* 로딩 스피너 */
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #007bff;
+  height: 100vh;
+  overflow-x: hidden;
 }
 
-.accommodation-nav-tabs .nav-link {
+.accommodation-nav-tabs,
+.themepark-nav-tabs {
+  background-color: #f2f4f7;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.nav-link {
   color: #495057;
   font-size: 1.1rem;
   font-weight: 600;
   padding: 12px 20px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s;
 }
 
-.accommodation-nav-tabs .nav-link.active {
-  background-color: #ffffff;
-  color: #007bff;
-  border-bottom: 3px solid #ff0000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.nav-link.active {
+  background-color: #007bff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transform: scale(1.05);
 }
 
-.themepark-nav-tabs {
-  background-color: #ffffff;
-  border-bottom: 1px solid #cccccc;
-  margin-bottom: 20px;
-}
-
-.themepark-nav-tabs .nav-link {
-  color: #333333;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 10px 16px;
-  border-radius: 6px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.themepark-nav-tabs .nav-link.active {
-  background-color: #ffebcd;
-  color: #333333;
-  border-bottom: 2px solid #007bff;
-  box-shadow: none;
+.nav-link:hover {
+  transform: scale(1.03);
 }
 
 .section-divider {
-  height: 1px;
-  background: linear-gradient(to right, transparent, #ccc, transparent);
+  height: 2px;
+  background: linear-gradient(to right, #007bff, #ff0000);
   margin: 3rem 0;
-  position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.section-divider::before {
-  content: "●";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  color: #ccc;
-  padding: 0 10px;
-  font-size: 0.8rem;
+.material-button {
+  background-color: #007bff;
+  font-size: 1.2rem;
+  padding: 0.8rem 2rem;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, transform 0.3s;
+  color: white;
+  max-width: 100%;
 }
 
-.nav-wrapper {
-  padding: 0.5rem 0;
+.material-button:hover {
+  transform: scale(1.05);
+  background-color: #0056b3;
 }
 
-.nav-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-}
+@media (max-width: 768px) {
+  .nav-link {
+    padding: 8px 16px;
+    font-size: 1rem;
+  }
 
-.nav-item {
-  text-align: center;
-}
-
-.nav-link {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  .material-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+  }
 }
 </style>
