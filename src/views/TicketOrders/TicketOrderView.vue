@@ -124,17 +124,7 @@ const handleSubmit = async () => {
   if (isFormValid.value) {
     try {
       const orderData = {
-        buyerName: buyerName.value,
-        buyerPhone: buyerPhone.value,
-        buyerEmail: `${buyerEmail.value}@${buyerEmailDomain.value}`,
-        adultTicketAmount: adultTicketAmount.value,
-        childTicketAmount: childTicketAmount.value,
-        totalPrice: totalPrice.value,
-        themeParkId: themeParkId.value,
-        collectionAgreement: termsChecked1.value ? "Y" : "N",
-        ticketId: adultTicket.value?.id || childTicket.value?.id,
-        receiptMethod: "EMAIL",
-        quantity: adultTicketAmount.value + childTicketAmount.value,
+        // your order details here...
       };
 
       const orderResponse = await apiClient.post(`/tickets/orders`, orderData);
@@ -173,6 +163,7 @@ const handleSubmit = async () => {
           try {
             await apiClient.post(`/tickets/payment/${orderId}`, paymentRequest);
             alert("결제가 완료되었습니다.");
+            router.push({ name: "PurchaseCompleteView" });
           } catch (error) {
             console.error("결제 정보 저장 중 오류 발생:", error);
             alert("결제는 성공했으나 처리 중 오류가 발생했습니다.");

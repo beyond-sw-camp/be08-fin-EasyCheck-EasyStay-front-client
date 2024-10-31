@@ -30,6 +30,7 @@ import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
 import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+import PurchaseCompleteView from "@/views/TicketPurchaseComplete/PurchaseCompleteView.vue";
 
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
@@ -236,6 +237,11 @@ const router = createRouter({
           },
         },
       ],
+    },
+    {
+      path: "/purchase-complete",
+      name: "PurchaseCompleteView",
+      component: PurchaseCompleteView,
     },
     {
       path: "/themepark/error",
