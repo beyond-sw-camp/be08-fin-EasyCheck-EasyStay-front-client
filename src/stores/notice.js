@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-// 1번
-import axios from "axios";
+import apiClient from "@/api";
 
 export const useNoticeStore = defineStore("notice", {
   state: () => ({
@@ -53,7 +52,7 @@ export const useNoticeStore = defineStore("notice", {
       this.error = null;
 
       try {
-        const response = await axios.get(`/api/v1/notices-reply`);
+        const response = await apiClient.get(`/notices-reply`);
         console.log("사업장 : ", response);
         this.notices = response.data; // API 응답 데이터를 notices에 저장
       } catch (err) {
@@ -69,7 +68,7 @@ export const useNoticeStore = defineStore("notice", {
 
       try {
         console.log("Fetching accommodations...");
-        const response = await axios.get("/api/v1/accommodations"); // 리조트 목록 API 호출
+        const response = await apiClient.get("/accommodations"); // 리조트 목록 API 호출
         console.log("사업장 정보 : ", response);
         this.accommodations = response.data; // API 응답 데이터를 accommodations에 저장
       } catch (err) {
@@ -85,7 +84,7 @@ export const useNoticeStore = defineStore("notice", {
       this.error = null;
 
       try {
-        const response = await axios.get(`/api/v1/notices-reply/${id}`);
+        const response = await apiClient.get(`/notices-reply/${id}`);
         this.notice = response.data; // 가져온 데이터를 state에 저장
         console.log("데이터 확인 : ", response);
       } catch (err) {
