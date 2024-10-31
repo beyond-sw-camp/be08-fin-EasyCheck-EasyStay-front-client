@@ -37,16 +37,26 @@
         </div>
       </div>
     </div>
+    <div class="price-info-section my-5">
+      <PriceInfoWrapper v-if="guidePageName" :guidePageName="guidePageName" />
+    </div>
+
+    <!-- 맨 위로 이동 버튼 -->
+    <button v-if="showScrollButton" class="scroll-to-top" @click="scrollToTop">
+      ▲
+    </button>
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useThemeParkStore } from "@/stores/themeparkStore";
 import { userLoginStore } from "@/stores/loginStore";
+import PriceInfoWrapper from "@/views/TicketOrders/PriceInfos/PriceInfoWrapper.vue";
 
 // 라우팅
 const route = useRoute();
@@ -55,30 +65,68 @@ const router = useRouter();
 // pinia 스토어
 const authStore = userLoginStore();
 const ticketStore = useTicketStore();
+const accommodationStore = useAccommodationStore();
+const themeParkStore = useThemeParkStore();
 
-const accmomodationStore = useAccommodationStore();
-
-// pina state, getters
+// 상태 및 getter
 const { isLoggedIn } = storeToRefs(authStore);
 const { groupedTickets } = storeToRefs(ticketStore);
-const { accommodation } = storeToRefs(accmomodationStore);
+const { accommodation } = storeToRefs(accommodationStore);
+const { themePark } = storeToRefs(themeParkStore);
 
-const themeParkId = computed(() => route.query.themeParkId);
+// guidePageName 동기화
+const guidePageName = computed(() => themePark.value?.guidePageName);
 
-// 숙박시설, 테마파크, 티켓 정보 조회하기
-onMounted(async () => {
-  await ticketStore.fetchTickets(themeParkId.value);
-});
-
+// 요금 할인 적용
 const getDiscountedPrice = (price) => {
   const discountRate = 0.8;
   return Math.floor(price * discountRate);
 };
 
+// 티켓 구매 처리
 const handlePurchase = (ticketGroup) => {
+  if (!isLoggedIn.value) {
+    router.push({ name: "Login" });
+    return;
+  }
   ticketStore.selectTicket(ticketGroup);
   router.replace({ name: "TicketOrder" });
 };
+
+// 테마파크 및 티켓 정보 조회
+onMounted(async () => {
+  const themeParkId = route.query.themeParkId;
+  if (themeParkId) {
+    await themeParkStore.fetchThemeParkById(
+      route.query.accommodationId,
+      themeParkId
+    );
+    await ticketStore.fetchTickets(themeParkId);
+  }
+});
+
+// 맨 위로 이동 버튼 상태
+const showScrollButton = ref(false);
+
+// 스크롤 위치 감시
+const handleScroll = () => {
+  showScrollButton.value = window.scrollY > 300;
+};
+
+// 맨 위로 이동 함수
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+// 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+// 컴포넌트가 언마운트될 때 스크롤 이벤트 리스너 제거
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <style scoped>
@@ -124,5 +172,30 @@ const handlePurchase = (ticketGroup) => {
 
 .card-price {
   font-size: 1.2rem;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background-color: rgba(0, 123, 255, 0.6); /* 반투명한 배경 */
+  color: white;
+  border: none;
+  border-radius: 50%; /* 완전한 원형 */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 가벼운 그림자 */
+}
+
+.scroll-to-top:hover {
+  background-color: rgba(0, 123, 255, 0.85); /* 마우스오버 시 색상 강조 */
+  transform: scale(1.1); /* 약간 확대 */
 }
 </style>
