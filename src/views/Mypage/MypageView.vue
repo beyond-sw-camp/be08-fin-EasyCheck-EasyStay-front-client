@@ -6,7 +6,6 @@ import { userLoginStore } from "@/stores/loginStore";
 import { mypageStore } from "@/stores/mypageStore";
 
 // example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 
 // material-input
@@ -43,32 +42,23 @@ import easystayImage from '@/assets/img/easystay.png';
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0 w-100">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
-  <Header>
-    <div class="page-header align-items-start min-vh-90" loading="lazy" style="padding-top: 80px;">
+  <Header class="header">
+    <div class="page-header align-items-start min-vh-90" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
-      <div class="container custom-login-container my-auto position-relative">
+      <div class="container custom-login-container my-auto position-relative" style="padding-top: 60px;">
 
         <div class="row">
           <div class="col-12">
-
             <div class="bg-image" :style="{ backgroundImage: 'url(' + easystayImage + ')' }"
               style="background-size: cover; background-position: center; height: 230px; display: flex; align-items: center; justify-content: center; z-index: 1;">
               <div class="py-3 mb-3 text-center" style="background-color: rgba(255, 255, 255, 0.3); width: 100%;">
-                <h3 class="text-black font-weight-bolder mb-0 mt-4">마이페이지</h3>
-                <div class="row mt-3 text-black justify-content-center fs-4">
-                </div>
-                <div class="row mt-3 justify-content-center">
+                <h3 class="text-black font-weight-bolder mb-4 mt-4">마이페이지</h3>
+                <div>환영합니다, {{ userStore.userData.name }}님!</div>
+                <div class="row mt-3 text-black justify-content-center fs-4"></div>
+                <div class="row justify-content-center">
                   <div class="d-flex justify-content-center w-50">
                     <RouterLink to="/users/mypage/infoAuth" class="mx-3">회원 정보 수정 ></RouterLink>
-                    <RouterLink to="/users/mypage/pwAuth" class="mx-3">비밀번호 변경 > </RouterLink>
+                    <RouterLink to="/users/mypage/pwAuth" class="mx-3">비밀번호 변경 ></RouterLink>
                     <RouterLink to="/users/resign" class="mx-3">회원 탈퇴 ></RouterLink>
                   </div>
                 </div>
@@ -101,39 +91,9 @@ import easystayImage from '@/assets/img/easystay.png';
             </div>
           </div>
         </div>
-
-        <div style="border-top: 1px solid #000; width: 25%; margin: 10px auto;"></div>
-
-        <div class="row justify-content-center text-black fs-6 mb-4">
-          <div class="text-center mt-3">
-            <h5 class="custom-font">EASY STAY's membership offers special value.</h5>
-            <div v-if="error" class="text-danger">{{ error }}</div>
-            <div v-else>
-              <!-- 사용자 정보 표시 -->
-              <div>환영합니다, {{ userStore.userData.name }}님!</div>
-              <div>회원 ID: {{ userStore.userData.email }}</div>
-            </div>
-
-          </div>
-        </div>
-
       </div>
     </div>
   </Header>
 </template>
 
-<style>
-.footer {
-  position: relative;
-  /* relative로 변경하여 흐름에 따라 위치하도록 */
-  bottom: 0;
-  width: 100%;
-  /* 전체 너비 */
-  background-color: white;
-  /* 필요에 따라 배경색 추가 */
-}
-
-.custom-font {
-  font-family: 'Caveat', cursive;
-}
-</style>
+<style scoped></style>

@@ -1,7 +1,4 @@
 <template>
-  <div class="col-12">
-    <NavbarDefault :sticky="true" />
-  </div>
   <Header />
   <div class="container py-4">
     <div v-if="notice" class="notice-header mb-4">
@@ -13,11 +10,7 @@
     </div>
     <hr class="my-4" />
     <div v-if="notice" class="notice-image mb-4">
-      <img
-        src="@/assets/img/006.png"
-        alt="Notice Image"
-        class="img-fluid rounded"
-      />
+      <img src="@/assets/img/006.png" alt="Notice Image" class="img-fluid rounded" />
     </div>
     <div v-if="notice" class="notice-content p-4">
       <p class="lead">{{ notice.content }}</p>
@@ -93,32 +86,46 @@ const goBack = () => {
 hr {
   border: 0;
   height: 1px;
-  background-color: #ccc; /* 구분선 색상 설정 */
+  background-color: #ccc;
+  /* 구분선 색상 설정 */
 }
 
 .notice-image img {
-  max-width: 100%; /* 이미지가 컨테이너를 넘지 않도록 설정 */
-  height: auto; /* 비율 유지 */
+  max-width: 100%;
+  /* 이미지가 컨테이너를 넘지 않도록 설정 */
+  height: auto;
+  /* 비율 유지 */
 }
 
 /* 버튼 스타일 추가 */
 .btn-secondary {
-  background-color: #6c757d; /* 회색 배경 */
-  color: white; /* 흰색 글자 */
-  border: none; /* 테두리 없음 */
-  border-radius: 5px; /* 둥근 모서리 */
-  padding: 10px 20px; /* 패딩 추가 */
-  transition: background-color 0.3s; /* 배경 색상 변화 효과 */
+  background-color: #6c757d;
+  /* 회색 배경 */
+  color: white;
+  /* 흰색 글자 */
+  border: none;
+  /* 테두리 없음 */
+  border-radius: 5px;
+  /* 둥근 모서리 */
+  padding: 10px 20px;
+  /* 패딩 추가 */
+  transition: background-color 0.3s;
+  /* 배경 색상 변화 효과 */
 }
 
 .related-notices {
-  border-top: 2px solid #ccc; /* 구분선 추가 */
-  padding-top: 20px; /* 상단 패딩 */
+  border-top: 2px solid #ccc;
+  /* 구분선 추가 */
+  padding-top: 20px;
+  /* 상단 패딩 */
 }
 
 .related-notice-divider {
-  border: none; /* 기본 테두리 제거 */
-  border-top: 1px solid #ccc; /* 구분선 추가 */
-  margin: 5px 0; /* 위아래 여백 */
+  border: none;
+  /* 기본 테두리 제거 */
+  border-top: 1px solid #ccc;
+  /* 구분선 추가 */
+  margin: 5px 0;
+  /* 위아래 여백 */
 }
 </style>

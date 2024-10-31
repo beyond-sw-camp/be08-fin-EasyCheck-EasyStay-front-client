@@ -13,7 +13,7 @@
           :lng="centerCoordinate.lng"
           :draggable="true"
         >
-          <kakao-map-marker />
+          <!-- <kakao-map-marker /> -->
         </kakao-map>
       </div>
     </div>

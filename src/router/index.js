@@ -68,6 +68,7 @@ import SuggestionsListView from "@/views/Suggestions/SuggestionsListView.vue";
 import NoticeDetail from "@/views/Notices/NoticeDetail.vue";
 import EventsListView from "@/views/Events/EventsListView.vue";
 import EventDetail from "@/views/Events/EventDetail.vue";
+import TicketRefund from "@/views/TicketOrders/TicketRefund.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -311,6 +312,15 @@ const router = createRouter({
       path: "/reservation/result",
       name: "ReservationResult",
       component: ReservationResultView,
+      beforeEnter: (to, from, next) => {
+        // 새로고침이나 직접 URL 접근인 경우
+
+        if (from.name === undefined) {
+          console.log("새로고침 시도");
+          return next({ name: "presentation" });
+        }
+        return next();
+      },
     },
     {
       path: "/users/mypage",
@@ -410,6 +420,11 @@ const router = createRouter({
       path: "/users/corporateJoinComplete",
       name: "CorporateJoinCompleteView",
       component: CorporateJoinCompleteView,
+    },
+    {
+      path: "/ticketrefund",
+      name: "TicketRefund",
+      component: TicketRefund,
     },
   ],
 });

@@ -3,6 +3,8 @@ import { onMounted, ref, computed } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 import { userLoginStore } from "@/stores/loginStore";
 import setMaterialInput from "@/assets/js/material-input";
+import Modal from "./Modal.vue";
+import MaterialButton from "@/components/MaterialButton.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -11,13 +13,13 @@ onMounted(() => {
 // 약관 동의
 const isChecked = ref(false);
 const consentItems = ref([
-  { label: '개인정보 이용 동의 (필수)', checked: false },
-  { label: '고유식별 정보 처리 동의 (필수)', checked: false },
+  { label: '개인정보 이용 동의 (필수)', checked: false, detail: '개인정보 이용에 대한 세부 내용...' },
+  { label: '고유식별 정보 처리 동의 (필수)', checked: false, detail: '고유식별 정보 처리에 대한 세부 내용...' },
 ]);
 
 const consentItems2 = ref([
-  { label: '서비스 이용약관 동의 (필수)', checked: false },
-  { label: '통신사 이용약관 동의 (필수)', checked: false },
+  { label: '서비스 이용약관 동의 (필수)', checked: false, detail: '서비스 이용약관에 대한 세부 내용...' },
+  { label: '통신사 이용약관 동의 (필수)', checked: false, detail: '통신사 이용약관에 대한 세부 내용...' },
 ]);
 
 const toggleAll = () => {
@@ -109,6 +111,22 @@ function onAuthenticationSuccess() {
   alert("인증에 성공했습니다!");
 }
 
+// 약관 자세히 보기
+const showModal = ref(false);
+const modalTitle = ref('');
+const modalContent = ref('');
+
+const showDetail = (detail) => {
+  modalTitle.value = '약관 자세히 보기';
+  modalContent.value = detail; // 선택된 항목의 세부 내용을 저장
+  showModal.value = true; // 모달 열기
+};
+
+const closeModal = () => {
+  showModal.value = false; // 모달 닫기
+};
+
+
 </script>
 
 <template>
@@ -136,6 +154,7 @@ function onAuthenticationSuccess() {
           <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent1_' + index">
             {{ item.label }}
           </label>
+          <MaterialButton class="btn btn-link p-0" @click="showDetail(item.detail)">자세히 보기</MaterialButton>
         </div>
       </div>
     </div>
@@ -150,6 +169,7 @@ function onAuthenticationSuccess() {
           <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent2_' + index">
             {{ item.label }}
           </label>
+          <MaterialButton class="btn btn-link p-0" @click="showDetail(item.detail)">자세히 보기</MaterialButton>
         </div>
       </div>
     </div>
@@ -228,4 +248,6 @@ function onAuthenticationSuccess() {
 
     <hr style="border-top: 2px solid #ccc;" />
   </div>
+
+  <Modal v-model:isVisible="showModal" :title="modalTitle" :content="modalContent" @close="closeModal" />
 </template>

@@ -50,6 +50,41 @@ export async function processTicketPayment(orderId, totalPrice, buyerDetails) {
     }
   );
 }
+
+export async function refundPayment(paymentId, impUid) {
+
+  console.log("Received paymentId:", paymentId);
+  console.log("Received impUid:", impUid);
+
+  if (!impUid) {
+    alert("impUid가 누락되었습니다. 결제 정보를 확인해주세요.");
+    return;
+  }
+
+  try {
+    // 서버에 환불 요청
+    const response = await apiClient.put(
+      `/tickets/payment/${paymentId}`,
+      {
+        impUid: impUid,
+        reason: "고객 요청으로 인한 환불",
+      }
+    );
+
+    if (response.status === 200 || response.status === 204) {
+      alert("환불이 완료되었습니다.");
+      console.log("환불 성공:", response);
+    } else {
+      throw new Error(response.data.error_msg || "환불 실패");
+    }
+  } catch (error) {
+    alert(`환불 처리 중 오류가 발생했습니다: ${error.message}`);
+    if (error.response && error.response.data.errors) {
+      const errorMessage = error.response.data.errors[0].errorMessage;
+      alert(`환불 실패: ${errorMessage}`);
+    }
+  }
+}
 </script>
 
 <style scoped>

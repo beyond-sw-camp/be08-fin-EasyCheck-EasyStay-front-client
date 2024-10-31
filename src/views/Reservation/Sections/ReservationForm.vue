@@ -14,13 +14,10 @@
               type="text"
               id="reservationName"
               class="form-control"
-              :class="{ 'is-invalid': v$.form.reservationName.$error }"
               placeholder="이름"
             />
           </div>
-          <div class="error-message" v-if="v$.form.reservationName.$error">
-            {{ v$.form.reservationName.$errors[0].$message }}
-          </div>
+
           <small class="input-hint"
             >온라인 비회원으로 예약 시 본인인증이 필요합니다.</small
           >
@@ -36,12 +33,8 @@
             :value="userInfo?.phone"
             id="reservationPhone"
             class="form-control"
-            :class="{ 'is-invalid': v$.form.reservationPhone.$error }"
             placeholder="'-' 제외하고 숫자만 입력"
           />
-          <div class="error-message" v-if="v$.form.reservationPhone.$error">
-            {{ v$.form.reservationPhone.$errors[0].$message }}
-          </div>
         </div>
       </div>
 
@@ -64,14 +57,14 @@
           <label for="guestName" class="form-label">내표 투숙자 이름 *</label>
           <input
             type="text"
-            id="guestName"
-            v-model="form.guestName"
+            id="representativeName"
+            v-model="form.representativeName"
             class="form-control"
-            :class="{ 'is-invalid': v$.form.guestName.$error }"
+            :class="{ 'is-invalid': v$.form.representativeName.$error }"
             placeholder="이름"
           />
-          <div class="error-message" v-if="v$.form.guestName.$error">
-            {{ v$.form.guestName.$errors[0].$message }}
+          <div class="error-message" v-if="v$.form.representativeName.$error">
+            {{ v$.form.representativeName.$errors[0].$message }}
           </div>
         </div>
 
@@ -81,14 +74,14 @@
           >
           <input
             type="tel"
-            id="guestPhone"
-            v-model="form.guestPhone"
+            id="representativePhone"
+            v-model="form.representativePhone"
             class="form-control"
-            :class="{ 'is-invalid': v$.form.guestPhone.$error }"
+            :class="{ 'is-invalid': v$.form.representativePhone.$error }"
             placeholder="'-' 제외하고 숫자만 입력"
           />
-          <div class="error-message" v-if="v$.form.guestPhone.$error">
-            {{ v$.form.guestPhone.$errors[0].$message }}
+          <div class="error-message" v-if="v$.form.representativePhone.$error">
+            {{ v$.form.representativePhone.$errors[0].$message }}
           </div>
         </div>
 
@@ -137,70 +130,119 @@
           <small class="input-hint">객실 정원은 영유아 포함입니다.</small>
         </div>
       </div>
+      <!-- template 안의 결제 방법 부분을 다음과 같이 수정 -->
+      <div class="form-section">
+        <h3 class="form-title">결제 방법</h3>
+        <div class="payment-methods">
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: form.paymentMethod === 'card' }"
+            @click="selectPaymentMethod('card')"
+          >
+            <div class="payment-content">
+              <span class="payment-icon">💳</span>
+              <div class="payment-info">
+                <span class="payment-text">카드 결제</span>
+              </div>
+            </div>
+            <div v-if="form.paymentMethod === 'card'" class="selected-mark">
+              ✓
+            </div>
+          </button>
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary w-100">예약하기</button>
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: form.paymentMethod === 'vbank' }"
+            @click="selectPaymentMethod('vbank')"
+          >
+            <div class="payment-content">
+              <span class="payment-icon">🏦</span>
+              <div class="payment-info">
+                <span class="payment-text">무통장 입금</span>
+              </div>
+            </div>
+            <div v-if="form.paymentMethod === 'vbank'" class="selected-mark">
+              ✓
+            </div>
+          </button>
+        </div>
       </div>
     </form>
+  </div>
+  <slot />
+  <div class="action-buttons">
+    <button class="cancel-btn" @click="handleCancel">취소</button>
+    <button
+      class="reserve-btn"
+      :disabled="!allAgreementsChecked"
+      @click="handleSubmit"
+    >
+      결제하기
+    </button>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 import { useVuelidate } from "@vuelidate/core";
 import { userLoginStore } from "@/stores/loginStore";
 import { required, minLength, helpers } from "@vuelidate/validators";
 import { useReservationStore } from "@/stores/reservationStore";
 
+const router = useRouter();
 const userStore = userLoginStore();
 const reservationStore = useReservationStore();
 
-const { selectedRoom, childCount, adultCount, totalGuests } =
-  storeToRefs(reservationStore);
+const {
+  selectedRoom,
+  childCount,
+  adultCount,
+  totalGuests,
+  allAgreementsChecked,
+} = storeToRefs(reservationStore);
 const { userInfo, email, domain } = storeToRefs(userStore);
 
 const form = ref({
-  reservationName: "",
-  reservationPhone: "",
-  guestName: "",
-  guestPhone: "",
+  representativeName: "",
+  representativePhone: "",
   emailLocal: "",
   emailDomain: "",
+  paymentMethod: "", // 추가
 });
 
 const rules = {
   form: {
-    reservationName: {
-      required: helpers.withMessage("예약자 이름을 입력해주세요.", required),
-      minLength: helpers.withMessage(
-        "이름은 2자 이상이어야 합니다.",
-        minLength(2)
-      ),
-    },
-    reservationPhone: {
-      required: helpers.withMessage("휴대전화 번호를 입력해주세요.", required),
-      phoneNumber: helpers.withMessage(
-        "올바른 휴대전화 번호를 입력해주세요.",
-        helpers.regex(/^[0-9]{11}$/)
-      ),
-    },
-    guestName: {
+    representativeName: {
       required: helpers.withMessage("투숙자 이름을 입력해주세요.", required),
       minLength: helpers.withMessage(
         "이름은 2자 이상이어야 합니다.",
         minLength(2)
       ),
     },
-    guestPhone: {
+    representativePhone: {
       required: helpers.withMessage("휴대전화 번호를 입력해주세요.", required),
       phoneNumber: helpers.withMessage(
         "올바른 휴대전화 번호를 입력해주세요.",
         helpers.regex(/^[0-9]{11}$/)
       ),
     },
+    paymentMethod: {
+      required: helpers.withMessage("결제 방법을 선택해주세요.", required),
+    },
   },
 };
+
+// 결제 방법 선택 함수 추가
+const selectPaymentMethod = (method) => {
+  form.value.paymentMethod = method;
+};
+
+// computed 속성 추가
+const selectedPaymentMethod = computed(() => form.value.paymentMethod);
 
 const v$ = useVuelidate(rules, { form });
 
@@ -208,13 +250,13 @@ const sameAsReservation = ref(false);
 
 const copyReservationInfo = () => {
   if (sameAsReservation.value) {
-    form.value.guestName = userInfo.value?.name;
-    form.value.guestPhone = userInfo.value?.phone;
+    form.value.representativeName = userInfo.value?.name;
+    form.value.representativePhone = userInfo.value?.phone;
     form.value.emailLocal = email.value;
     form.value.emailDomain = domain.value;
   } else {
-    form.value.guestName = "";
-    form.value.guestPhone = "";
+    form.value.representativePhone = "";
+    form.value.representativeName = "";
     form.value.emailLocal = "";
     form.value.emailDomain = "";
   }
@@ -236,23 +278,38 @@ const increaseChild = () => {
   if (totalGuests.value < selectedRoom.value?.maxOccupancy) childCount.value++;
 };
 
+const handleCancel = () => {
+  const isConfirmed = confirm(
+    "지금까지 입력한 내용이 모두 삭제됩니다. 메인페이지로 이동하시겠습니까?"
+  );
+
+  if (isConfirmed) {
+    // 예약 관련 상태 초기화
+    reservationStore.$reset(); // store의 상태를 초기값으로 리셋
+    // 메인 페이지로 이동
+    router.push("/"); // 메인 페이지 경로에 맞게 수정하세요
+  }
+};
+
 const handleSubmit = async () => {
+  console.log(form.value);
   const isFormValid = await v$.value.$validate();
   if (!isFormValid) return;
 
-  const reservationData = {
+  const reservationForm = {
     ...form.value,
-    adultCount: adultCount.value,
-    childCount: childCount.value,
-    totalGuests: totalGuests.value,
-    checkIn: reservationStore.checkIn,
-    checkOut: reservationStore.checkOut,
-    selectedRoom: reservationStore.selectedRoom,
-    totalPrice: reservationStore.totalPrice,
   };
 
-  console.log("Reservation Data:", reservationData);
-  // API 호출 또는 store action 호출
+  await reservationStore.createReservation(reservationForm);
+  const isSuccess = await reservationStore.callImpRequestPay(
+    form.value.paymentMethod
+  );
+
+  if (isSuccess) {
+    router.replace({ name: "ReservationResult" });
+  } else {
+    router.replace("/");
+  }
 };
 </script>
 
@@ -419,6 +476,123 @@ const handleSubmit = async () => {
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
+  }
+}
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 4rem 0;
+
+  button {
+    flex: 1;
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &.cancel-btn {
+      background-color: #f8f8f8;
+      color: #333;
+      margin-right: 10px;
+    }
+
+    &.reserve-btn {
+      background-color: #e74c3c;
+      color: #fff;
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+.payment-methods {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+
+  .payment-method-btn {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 100px;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      border-color: #e74c3c;
+      background-color: #fff8f8;
+    }
+
+    &.active {
+      border-color: #e74c3c;
+      background-color: #fff5f5;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.1);
+
+      .payment-text {
+        color: #e74c3c;
+      }
+
+      .selected-mark {
+        background-color: #e74c3c;
+      }
+    }
+
+    .payment-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .payment-icon {
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background-color: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .payment-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .payment-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .bank-info {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .selected-mark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #e74c3c;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
   }
 }
 </style>

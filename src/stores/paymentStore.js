@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
 
+const { IMP } = window;
+
 export const usePaymentStore = defineStore("paymentStore", {
   state: () => ({
     payments: [], // 결제 내역 리스트
@@ -30,7 +32,6 @@ export const usePaymentStore = defineStore("paymentStore", {
           params: { page, size },
         });
         this.payments = response.data;
-        console.log(payments);
         this.loading = false;
       } catch (error) {
         this.loading = false;
