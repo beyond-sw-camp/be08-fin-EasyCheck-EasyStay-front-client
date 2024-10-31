@@ -97,7 +97,7 @@ export const useReservationStore = defineStore("reservationStore", {
           ? state.selectedRoom?.corpPrice
           : state.selectedRoom?.normalPrice;
 
-      return basePrice * state.roomCount || 0;
+      return basePrice * state.roomCount * state.stayDuration || 0;
     },
 
     // 날짜 포맷팅 getter 통합
@@ -316,6 +316,7 @@ export const useReservationStore = defineStore("reservationStore", {
                     ? userData.name || "이름 정보 없음"
                     : null,
               };
+              console.log(payRequest);
 
               try {
                 await apiClient.post("/payment", payRequest);
