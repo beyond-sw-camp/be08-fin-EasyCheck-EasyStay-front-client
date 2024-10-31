@@ -4,11 +4,7 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-1">
       <div v-for="room in rooms" :key="room.id" class="col">
         <div class="card h-100">
-          <img
-            :src="room.thumbnailImgUrl"
-            class="card-img-top rounded-0"
-            :alt="room.name"
-          />
+          <img :src="room.thumbnailImgUrl" class="card-img-top rounded-0" :alt="room.name" />
           <div class="card-body rounded-0">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="card-title">
@@ -18,12 +14,11 @@
             </div>
             <p class="card-text fw-bold small">{{ room.description }}</p>
             <p class="card-text fw-bold">
-              <small class="text-muted"
-                >기준 인원:{{ room.standardOccupancy }} / 최대 인원:{{
-                  room.maxOccupancy
-                }}</small
-              >
+              <small class="text-muted">기준 인원:{{ room.standardOccupancy }} / 최대 인원:{{
+                room.maxOccupancy
+              }}</small>
             </p>
+            <p class="card-text fw-bold small">잔여 객실({{ room.remainingRoom }})</p>
             <p class="card-text">
               <small class="text-muted">1박 기준(VAT 포함)</small>
             </p>
@@ -39,11 +34,7 @@
                 </span>
               </div>
             </div>
-            <button
-              class="btn w-100 mt-2"
-              :class="getRoomSelectionClass(room)"
-              @click="toggleRoomSelection(room)"
-            >
+            <button class="btn w-100 mt-2" :class="getRoomSelectionClass(room)" @click="toggleRoomSelection(room)">
               {{ getRoomSelectionText(room) }}
             </button>
           </div>

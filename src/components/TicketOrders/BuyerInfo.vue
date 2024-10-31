@@ -1,6 +1,13 @@
 <template>
   <div class="card p-4 mb-5">
-    <h4 class="mb-3">구매자 정보</h4>
+    <div class="d-flex justify-content-between">
+      <h4 class="mb-3">구매자 정보</h4>
+      <div class="form-check">
+        <input type="checkbox" id="sameAsReservation" v-model="sameAsReservation" @change="copyReservationInfo"
+          class="form-check-input" />
+        <label for="sameAsReservation" class="form-check-label">예약자 정보와 동일</label>
+      </div>
+    </div>
     <div class="field-box">
       <fieldset class="input-fieldset">
         <legend class="sr-only">정보 입력</legend>
@@ -8,13 +15,8 @@
           <div class="form-group">
             <label for="buyerName">구매자 이름</label>
             <div class="input-group input-lg">
-              <MaterialInput
-                class="input-group-outline"
-                placeholder="구매자 이름"
-                size="lg"
-                v-model="buyerName"
-                :readonly="isLoggedIn"
-              />
+              <MaterialInput class="input-group-outline" placeholder="구매자 이름" size="lg" v-model="buyerName"
+                :readonly="isLoggedIn" />
             </div>
             <span v-if="!isBuyerNameValid" class="error-message">
               이름을 입력해 주세요.
@@ -24,13 +26,8 @@
           <div class="form-group">
             <label for="buyerPhone">휴대전화 번호</label>
             <div class="input-group input-lg">
-              <MaterialInput
-                class="input-group-outline"
-                placeholder="휴대전화 번호"
-                size="lg"
-                v-model="buyerPhone"
-                :readonly="isLoggedIn"
-              />
+              <MaterialInput class="input-group-outline" placeholder="휴대전화 번호" size="lg" v-model="buyerPhone"
+                :readonly="isLoggedIn" />
             </div>
             <span v-if="!isBuyerPhoneValid" class="error-message">
               올바른 휴대전화 번호를 입력해 주세요.
@@ -40,23 +37,11 @@
           <div class="form-group email-group">
             <label for="buyerEmail">이메일</label>
             <div class="input-group input-lg d-flex align-items-center">
-              <MaterialInput
-                class="input-group-outline"
-                placeholder="이메일 아이디"
-                size="lg"
-                v-model="buyerEmail"
-                :readonly="isLoggedIn"
-                style="flex: 1"
-              />
+              <MaterialInput class="input-group-outline" placeholder="이메일 아이디" size="lg" v-model="buyerEmail"
+                :readonly="isLoggedIn" style="flex: 1" />
               <span class="input-group-add mx-1">@</span>
-              <MaterialInput
-                class="input-group-outline"
-                placeholder="이메일 도메인"
-                size="lg"
-                v-model="buyerEmailDomain"
-                :readonly="isLoggedIn"
-                style="flex: 1"
-              />
+              <MaterialInput class="input-group-outline" placeholder="이메일 도메인" size="lg" v-model="buyerEmailDomain"
+                :readonly="isLoggedIn" style="flex: 1" />
             </div>
             <span v-if="!isEmailValid" class="error-message">
               유효한 이메일 주소를 입력해 주세요.
@@ -70,6 +55,8 @@
 
 <script setup>
 import { defineProps, defineEmits, ref, watch, computed } from "vue";
+import { userLoginStore } from "@/stores/loginStore";
+import { storeToRefs } from "pinia";
 import MaterialInput from "@/components/MaterialInput.vue";
 
 const props = defineProps({
@@ -87,10 +74,15 @@ const emit = defineEmits([
   "update:buyerEmailDomain",
 ]);
 
+const userStore = userLoginStore();
+
+const { userInfo, email, domain } = storeToRefs(userStore)
+
 const buyerName = ref(props.buyerName);
 const buyerPhone = ref(props.buyerPhone);
 const buyerEmail = ref(props.buyerEmail);
 const buyerEmailDomain = ref(props.buyerEmailDomain);
+const sameAsReservation = ref(false);
 
 // 유효성 검사를 위한 computed properties
 const isBuyerNameValid = computed(() => buyerName.value.trim() !== "");
@@ -112,6 +104,20 @@ watch(buyerEmail, (newValue) => {
 watch(buyerEmailDomain, (newValue) => {
   emit("update:buyerEmailDomain", newValue);
 });
+
+const copyReservationInfo = () => {
+  if (sameAsReservation.value) {
+    buyerName.value = userInfo.value?.name || "";
+    buyerPhone.value = userInfo.value?.phone || "";
+    buyerEmail.value = email.value || ""; // 이메일 아이디 부분을 할당
+    buyerEmailDomain.value = domain.value || ""; // 이메일 도메인 부분을 할당
+  } else {
+    buyerName.value = "";
+    buyerPhone.value = "";
+    buyerEmail.value = "";
+    buyerEmailDomain.value = "";
+  }
+};
 </script>
 
 <style scoped>
