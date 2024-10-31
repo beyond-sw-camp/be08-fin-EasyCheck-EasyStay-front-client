@@ -4,7 +4,11 @@
       {{ accommodation.name || "알 수 없음" }} 이용권 선택
     </h2>
     <div class="ticket-list row">
-      <div v-for="ticketGroup in groupedTickets" :key="ticketGroup.name" class="col-md-4 mb-4">
+      <div
+        v-for="ticketGroup in groupedTickets"
+        :key="ticketGroup.name"
+        class="col-md-4 mb-4"
+      >
         <div class="card ticket-card h-100">
           <div class="card-body">
             <h5 class="card-title">{{ ticketGroup.name }}</h5>
@@ -12,7 +16,9 @@
             <div class="card-prices">
               <p class="card-price">
                 대인:
-                <span class="normal-price">{{ ticketGroup.adultTicket.price }}원</span>
+                <span class="normal-price"
+                  >{{ ticketGroup.adultTicket.price }}원</span
+                >
                 <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.adultTicket.price) }}원
                   (회원가)
@@ -20,7 +26,9 @@
               </p>
               <p class="card-price">
                 소인:
-                <span class="normal-price">{{ ticketGroup.childTicket.price }}원</span>
+                <span class="normal-price"
+                  >{{ ticketGroup.childTicket.price }}원</span
+                >
                 <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.childTicket.price) }}원
                   (회원가)
@@ -30,7 +38,10 @@
                 로그인 시 회원가로 할인 적용됩니다.
               </span>
             </div>
-            <button class="btn btn-primary mt-3 w-100" @click="handlePurchase(ticketGroup)">
+            <button
+              class="btn btn-primary mt-3 w-100"
+              @click="handlePurchase(ticketGroup)"
+            >
               구매하기
             </button>
           </div>
@@ -86,7 +97,7 @@ const getDiscountedPrice = (price) => {
 // 티켓 구매 처리
 const handlePurchase = (ticketGroup) => {
   if (!isLoggedIn.value) {
-    router.push({ name: "Login" });
+    router.push({ name: "login" });
     return;
   }
   ticketStore.selectTicket(ticketGroup);
