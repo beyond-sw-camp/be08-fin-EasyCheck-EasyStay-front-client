@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
 import { usePaymentStore } from "@/stores/paymentStore";
 import { useReservationStore } from "@/stores/reservationStore";
+import KakaoMap from "@/components/map/KakaoMap.vue";
 
 import Header from "@/examples/Header.vue";
 
@@ -30,6 +31,11 @@ const checkInDate = ref('');
 const checkOutDate = ref('');
 
 const { currentReservation } = toRefs(reservationStore);
+
+const centerCoordinate = ref({
+  lat: 37.4972146715141,
+  lng: 126.927607128836
+});
 
 // 결제 상태 값 매핑
 const paymentStatusMapping = {
@@ -239,12 +245,12 @@ const handleCancelReservation = () => {
             <button class="btn btn-danger" @click="handleCancelReservation">예약 취소</button>
           </div>
 
+          <h4>오시는 길 안내</h4>
+          <div class="col-lg-10 col-md-8 col-12 mb-5" style="height: 500px; width: 100%;">
+            <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true" />
+          </div>
         </div>
-
-
       </div>
-
-
     </div>
   </Header>
 </template>
@@ -333,9 +339,9 @@ const handleCancelReservation = () => {
 
 .cancel-button-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   /* 오른쪽으로 정렬 */
-  margin-top: 10px;
+  margin-top: 20px;
   /* 필요에 따라 여백 조정 */
 }
 </style>
