@@ -30,6 +30,7 @@ import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
 import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+import TicketResultView from "@/views/TicketOrders/TicketResultView.vue";
 
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
@@ -238,6 +239,11 @@ const router = createRouter({
       ],
     },
     {
+      path: "/ticket/result",
+      name: "TicketResult",
+      component: TicketResultView,
+    },
+    {
       path: "/themepark/error",
       name: "ThemeParkErrorPage",
       component: ThemeParkErrorPage,
@@ -430,7 +436,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.name === "TicketOrderView") {
+  if (to.name === "TicketOrderView" || to.name === "TicketSelectionView") {
     window.scrollTo(0, 0); // 해당 페이지로 이동할 때 스크롤을 맨 위로 이동
   }
   next();
