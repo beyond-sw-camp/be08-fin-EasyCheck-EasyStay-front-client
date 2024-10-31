@@ -82,7 +82,7 @@ export const useReservationStore = defineStore("reservationStore", {
           ? state.selectedRoom?.corpPrice
           : state.selectedRoom?.normalPrice;
 
-      const price = basePrice * state.roomCount || 0;
+      const price = basePrice * state.roomCount * state.stayDuration || 0;
 
       return new Intl.NumberFormat("ko-KR", {
         style: "currency",
@@ -97,7 +97,7 @@ export const useReservationStore = defineStore("reservationStore", {
           ? state.selectedRoom?.corpPrice
           : state.selectedRoom?.normalPrice;
 
-      return basePrice * state.roomCount || 0;
+      return basePrice * state.roomCount * state.stayDuration || 0;
     },
 
     // 날짜 포맷팅 getter 통합
@@ -179,7 +179,9 @@ export const useReservationStore = defineStore("reservationStore", {
       this.accommodationList = [];
     },
     increaseRoomCount() {
-      this.roomCount += 1;
+      if (this.roomCount < 4) {
+        this.roomCount += 1;
+      }
     },
     decreaseRoomCount() {
       if (this.roomCount > 1) {
@@ -302,7 +304,7 @@ export const useReservationStore = defineStore("reservationStore", {
               const payRequest = {
                 impUid: rsp.imp_uid,
                 reservationId: this.reservationResult.id,
-                method: "CARD",
+                method: this.paymentMehod,
                 amount: this.totalPriceNumber,
                 paymentDate: new Date().toISOString(),
                 completionStatus: "COMPLETE",
@@ -314,6 +316,7 @@ export const useReservationStore = defineStore("reservationStore", {
                     ? userData.name || "이름 정보 없음"
                     : null,
               };
+              console.log(payRequest);
 
               try {
                 await apiClient.post("/payment", payRequest);
