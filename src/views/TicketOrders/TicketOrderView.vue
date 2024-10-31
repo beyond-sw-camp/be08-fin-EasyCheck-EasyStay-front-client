@@ -60,11 +60,13 @@ import ProductInfo from "@/components/TicketOrders/ProductInfo.vue";
 import BuyerInfo from "@/components/TicketOrders/BuyerInfo.vue";
 import UsageInfo from "@/components/TicketOrders/UsageInfo.vue";
 import PrivacyAgreementModal from "@/components/TicketOrders/PrivacyAgreementModal.vue";
+import { useTicketOrderStore } from "@/stores/ticketorderStore";
 
 const router = useRouter();
 const themeParkStore = useThemeParkStore();
 const accommodationStore = useAccommodationStore();
 const ticketStore = useTicketStore();
+const ticketOrderStore = useTicketOrderStore();
 const { themeParkId } = storeToRefs(themeParkStore);
 const {
   adultTicket,
@@ -173,7 +175,7 @@ const handleSubmit = async () => {
             impUid: response.imp_uid,
             orderId: orderId,
             paymentAmount: response.paid_amount || totalPrice.value,
-            paymentMethod: "EMAIL",
+            paymentMethod: "card",
             paymentDate: new Date().toISOString(), // ISO 형식의 날짜 문자열
           };
           console.log("Payment Request Data:", paymentRequest);
@@ -181,6 +183,10 @@ const handleSubmit = async () => {
           try {
             // 결제 정보 전송
             await apiClient.post(`/tickets/payment/${orderId}`, paymentRequest);
+            ticketOrderStore.ticketOrderResult = {
+              ...orderResponse.data.data, // 주문 응답 데이터
+              ...orderData, // 주문 생성에 사용된 데이터
+            };
             alert("결제가 완료되었습니다.");
             router.push({ name: "TicketResult" });
           } catch (error) {

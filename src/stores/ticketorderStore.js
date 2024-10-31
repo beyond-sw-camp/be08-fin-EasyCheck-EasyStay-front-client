@@ -7,6 +7,7 @@ export const useTicketOrderStore = defineStore("orderStore", {
     orders: [],
     loading: false,
     error: null,
+    ticketOrderResult: null, // 결제 성공 시 결과를 저장할 변수
   }),
 
   actions: {

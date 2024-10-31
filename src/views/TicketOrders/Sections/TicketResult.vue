@@ -8,52 +8,42 @@
       <div class="card mt-5">
         <div class="card-header bg-light d-flex justify-content-between">
           <span>구매 내역</span>
-          <span>주문 번호: {{ currentOrder?.orderId }}</span>
+          <span>주문 번호: {{ ticketOrderResult.orderId }}</span>
         </div>
         <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <span>입장권 구매</span>
-            <span>{{ currentOrder?.orderId }}</span>
-          </div>
+          <div class="d-flex justify-content-between mb-3"></div>
 
           <div class="table-responsive">
             <table class="table table-bordered mobile-table">
               <tbody>
                 <tr>
                   <th>지점</th>
-                  <td colspan="3">
-                    {{ ticketInfo?.themeParkName || "알 수 없음" }}
-                  </td>
+                  <td colspan="3">{{ themeParkName }}</td>
                 </tr>
                 <tr>
                   <th>티켓 이름</th>
-                  <td colspan="3">
-                    대인: {{ ticketInfo?.adultTicketName || "알 수 없음" }} /
-                    소인: {{ ticketInfo?.childTicketName || "알 수 없음" }}
-                  </td>
+                  <td colspan="3">{{ ticketOrderResult.ticketName }}</td>
                 </tr>
                 <tr>
                   <th>유효기간</th>
-                  <td colspan="3">
-                    {{ ticketInfo?.validFrom }} ~ {{ ticketInfo?.validTo }}
-                  </td>
+                  <td colspan="3">{{ validFrom }} ~ {{ validTo }}</td>
                 </tr>
                 <tr>
                   <th>대인 입장권</th>
-                  <td>{{ currentOrder?.adultTicketAmount }}매</td>
+                  <td>{{ ticketOrderResult.adultTicketAmount }}매</td>
                   <th>소인 입장권</th>
-                  <td>{{ currentOrder?.childTicketAmount }}매</td>
+                  <td>{{ ticketOrderResult.childTicketAmount }}매</td>
                 </tr>
                 <tr>
                   <th>구매자 이름</th>
-                  <td>{{ currentOrder?.buyerName }}</td>
+                  <td>{{ ticketOrderResult.buyerName }}</td>
                   <th>구매자 휴대전화</th>
-                  <td>{{ currentOrder?.buyerPhone }}</td>
+                  <td>{{ ticketOrderResult.buyerPhone }}</td>
                 </tr>
                 <tr>
                   <th>구매자 이메일</th>
                   <td colspan="3">
-                    {{ currentOrder?.buyerEmail || "미입력" }}
+                    {{ ticketOrderResult.buyerEmail || "미입력" }}
                   </td>
                 </tr>
               </tbody>
@@ -73,54 +63,39 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed } from "vue";
-import { useRoute } from "vue-router";
+import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useTicketOrderStore } from "@/stores/ticketorderStore";
+import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useTicketStore } from "@/stores/ticketStore";
 
+// 스토어에서 필요한 데이터 가져오기
 const ticketOrderStore = useTicketOrderStore();
-const { currentOrder } = storeToRefs(ticketOrderStore);
-
+const themeparkStore = useThemeParkStore();
 const ticketStore = useTicketStore();
-const { ticketInfo } = storeToRefs(ticketStore);
+const { ticketOrderResult } = storeToRefs(ticketOrderStore);
 
-const route = useRoute();
-
-const handleBeforeUnload = (e) => {
-  const message =
-    "페이지를 벗어나면 입력하신 정보가 모두 사라집니다. 계속하시겠습니까?";
-  e.returnValue = message;
-  return message;
-};
-
-onMounted(() => {
-  window.addEventListener("beforeunload", handleBeforeUnload);
-
-  const orderId = route.query.orderId;
-  if (orderId) {
-    ticketOrderStore.fetchOrderById(orderId);
-  } else {
-    console.error("Order ID가 없습니다.");
-  }
-
-  const ticketId = route.query.ticketId;
-  if (ticketId) {
-    ticketStore.fetchTicketInfoById(ticketId);
-  } else {
-    console.error("Ticket ID가 없습니다.");
-  }
+// ticketOrderResult의 ticketId를 사용해 티켓 유효기간 가져오기
+const validFrom = computed(() => {
+  const ticket = ticketStore.fetchAdultTicket(ticketOrderResult.value.ticketId);
+  return ticket?.validFromDate || "알 수 없음";
 });
 
-onUnmounted(() => {
-  window.removeEventListener("beforeunload", handleBeforeUnload);
+const validTo = computed(() => {
+  const ticket = ticketStore.fetchAdultTicket(ticketOrderResult.value.ticketId);
+  return ticket?.validToDate || "알 수 없음";
 });
 
+// 총 요금 포맷팅
 const formattedTotalPrice = computed(() => {
-  if (!currentOrder.value?.totalPrice) return "0";
-  return currentOrder.value.totalPrice
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const totalPrice = ticketOrderResult.value.totalPrice || 0;
+  return totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+});
+
+// 필요한 데이터를 로드하는 onMounted 훅
+onMounted(() => {
+  themeparkStore.fetchThemeParks();
+  ticketStore.fetchTickets();
 });
 </script>
 
