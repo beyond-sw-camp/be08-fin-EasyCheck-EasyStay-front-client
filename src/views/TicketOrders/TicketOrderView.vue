@@ -124,10 +124,23 @@ const handleSubmit = async () => {
   if (isFormValid.value) {
     try {
       const orderData = {
-        // your order details here...
+        buyerName: buyerName.value,
+        buyerPhone: buyerPhone.value,
+        buyerEmail: `${buyerEmail.value}@${buyerEmailDomain.value}`,
+        adultTicketAmount: adultTicketAmount.value,
+        childTicketAmount: childTicketAmount.value,
+        totalPrice: totalPrice.value,
+        themeParkId: themeParkId.value,
+        collectionAgreement: termsChecked1.value ? "Y" : "N",
+        ticketId: adultTicket.value?.id || childTicket.value?.id,
+        receiptMethod: "EMAIL",
+        quantity: adultTicketAmount.value + childTicketAmount.value,
       };
 
       const orderResponse = await apiClient.post(`/tickets/orders`, orderData);
+      console.log("Order Response Data:", orderResponse.data.data); // 응답 데이터 확인
+
+      // orderId 경로에 문제가 없는지 확인
       const orderId = orderResponse.data?.data?.orderId;
 
       if (!orderId) {
@@ -142,28 +155,34 @@ const handleSubmit = async () => {
       const paymentData = {
         pg: "html5_inicis",
         pay_method: "card",
-        merchant_uid: orderId,
+        merchant_uid: orderId, // 생성된 orderId가 유효한지 확인
         name: "입장권 구매",
         amount: totalPrice.value,
         buyer_name: buyerName.value || "",
         buyer_tel: buyerPhone.value || "",
         buyer_email: `${buyerEmail.value}@${buyerEmailDomain.value}` || "",
       };
+      console.log("Payment Data:", paymentData);
 
       IMP.request_pay(paymentData, async (response) => {
         if (response.success && response.imp_uid) {
+          // 성공 시 imp_uid 확인
+          console.log("결제 성공:", response); // 결제 성공 응답 확인
+
           const paymentRequest = {
             impUid: response.imp_uid,
             orderId: orderId,
             paymentAmount: response.paid_amount || totalPrice.value,
             paymentMethod: "EMAIL",
-            paymentDate: new Date().toISOString(),
+            paymentDate: new Date().toISOString(), // ISO 형식의 날짜 문자열
           };
+          console.log("Payment Request Data:", paymentRequest);
 
           try {
+            // 결제 정보 전송
             await apiClient.post(`/tickets/payment/${orderId}`, paymentRequest);
             alert("결제가 완료되었습니다.");
-            router.push({ name: "PurchaseCompleteView" });
+            router.push({ name: "TicketResult" });
           } catch (error) {
             console.error("결제 정보 저장 중 오류 발생:", error);
             alert("결제는 성공했으나 처리 중 오류가 발생했습니다.");
