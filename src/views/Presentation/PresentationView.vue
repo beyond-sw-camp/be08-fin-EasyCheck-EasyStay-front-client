@@ -3,9 +3,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "@/api";
 import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
-import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
-import NavbarDefault from "../../examples/navbars/NavbarDefault.vue";
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
 import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
@@ -27,11 +25,6 @@ const imageIndex = ref(0);
 let intervalId = null;
 
 const accommodations = ref([]);
-const availableRooms = ref([]);
-const selectedResort = ref(null);
-let checkInDate = null; // 체크인 날짜를 문자열로 저장
-let checkOutDate = null; // 체크아웃 날짜를 문자열로 저장
-let roomCount = null;
 const router = useRouter(); // useRouter 호출
 
 // 테스트용 추가 버튼 연결하고 주석 지우겠음
@@ -41,7 +34,7 @@ const logout = () => {
   alert("로그아웃 되었습니다.");
   router.push("/");
 };
-// 여기까지 
+// 여기까지
 
 const fetchAccommodations = async () => {
   try {
@@ -50,52 +43,6 @@ const fetchAccommodations = async () => {
   } catch (error) {
     console.error("리조트 목록을 가져오는 중 오류가 발생했습니다.", error);
   }
-};
-
-const onSearchRooms = async ({
-  resort,
-  checkInDate: inDate,
-  checkOutDate: outDate,
-  roomCount: count,
-}) => {
-  selectedResort.value = resort; // 선택한 리조트 저장
-  checkInDate = inDate; // 체크인 날짜 저장
-  checkOutDate = outDate; // 체크아웃 날짜 저장
-  roomCount = count; // 객실 수 저장
-
-  try {
-    const response = await apiClient.get("/reservation-room/available", {
-      params: {
-        accommodationId: resort,
-        checkinDate: inDate,
-        checkoutDate: outDate,
-        roomCount: count,
-      },
-    });
-    availableRooms.value = response.data;
-  } catch (error) {
-    console.error("객실 검색 중 오류가 발생했습니다.", error);
-  }
-};
-
-const onRoomSelected = (room) => {
-  if (!selectedResort.value || !checkInDate || !checkOutDate || !roomCount) {
-    console.error(
-      "리조트, 체크인 날짜, 체크아웃 날짜, 객실 수 정보가 누락되었습니다."
-    );
-    return;
-  }
-
-  router.push({
-    name: "ReservationPage",
-    query: {
-      roomId: room.roomId,
-      accommodationId: selectedResort.value, // 선택한 리조트 ID
-      checkInDate: checkInDate, // 선택한 체크인 날짜
-      checkOutDate: checkOutDate, // 선택한 체크아웃 날짜
-      roomCount: roomCount, // 선택한 객실 수
-    },
-  });
 };
 
 onMounted(fetchAccommodations);
@@ -149,18 +96,23 @@ onUnmounted(() => {
     clearInterval(intervalId);
   }
 });
+
+// const onSearchRooms = (searchData) => {
+//   // Navigate to ReservationView with searchData as query parameters
+//   router.push({
+//     name: "ReservationView", // Make sure this matches your route name
+//     query: {
+//       resort: searchData.resort,
+//       checkInDate: searchData.checkInDate,
+//       checkOutDate: searchData.checkOutDate,
+//       roomCount: searchData.roomCount,
+//     },
+//   });
+// };
 </script>
 
 <template>
   <div>
-    <div class="position-sticky z-index-sticky top-0">
-      <div class="row">
-        <div class="col-12">
-          <NavbarDefault :sticky="true" />
-        </div>
-      </div>
-    </div>
-
     <Header>
       <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
         <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
@@ -192,7 +144,6 @@ onUnmounted(() => {
       <div class="roomSearchForm-container">
         <div class="container p-0">
           <RoomSearchForm class="m-auto" :accommodations="accommodations" @search="onSearchRooms" />
-          <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
         </div>
       </div>
     </Header>

@@ -1,63 +1,173 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
-import { RouterLink, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
-import apiClient from "@/api";
+import { useRouter } from "vue-router";
+import { onMounted, ref, computed } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
-import { useNoticeStore } from "@/stores/notice";
+import { mypageStore } from "@/stores/mypageStore";
+import { useReservationStore } from "@/stores/reservationStore";
+import { usePaymentStore } from "@/stores/paymentStore";
+
 import easystayImage from '@/assets/img/easystay.png';
 import setMaterialInput from "@/assets/js/material-input";
 
-// example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 
-const error = ref(null);
 const router = useRouter();
 const userStore = userLoginStore();
-const noticeStore = useNoticeStore();
+const mypage = mypageStore();
+const reservationStore = useReservationStore();
+const paymentStore = usePaymentStore();
 
-const branchQuery = ref(noticeStore.query.branch);
+// 상태 변수
+const error = ref(null);
+const accommodations = ref([]);
+const reservations = ref([]);
+const filteredReservations = ref([]);
+const branchQuery = ref('');
+const checkInDate = ref('');
+const checkOutDate = ref('');
+
+// 페이지네이션 변수
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
+// 검색바 - 시설 조회
+const fetchAccommodations = async () => {
+  await mypage.fetchAccommodations();
+  accommodations.value = mypage.accommodations;
+};
+
+// 검색바 - 지점 선택 변경 처리
+const updateBranch = () => {
+  mypage.branchQuery = branchQuery.value;
+};
+
+// 검색바 - 검색 함수
+const searchReservations = () => {
+  if (!accommodations.value || accommodations.value.length === 0) {
+    console.error("시설 정보가 없습니다.");
+    return;
+  }
+
+  // 지점 이름, 체크인, 체크아웃 날짜 필터
+  if (branchQuery.value || checkInDate.value || checkOutDate.value) {
+    filteredReservations.value = reservations.value.filter(reservation => {
+      return (
+        reservation.accommodationName.includes(branchQuery.value) &&
+        new Date(reservation.checkinDate) >= new Date(checkInDate.value) &&
+        new Date(reservation.checkoutDate) <= new Date(checkOutDate.value)
+      );
+    });
+  } else {
+    // 검색 조건이 없을 경우 모든 예약 보여줌
+    filteredReservations.value = [...reservations.value];
+  }
+
+  // 페이지네이션 초기화
+  currentPage.value = 1;
+
+  console.log("필터링된 예약:", filteredReservations.value);
+};
+
+// 페이지네이션
+const totalPages = computed(() => {
+  return Math.ceil(filteredReservations.value.length / itemsPerPage);
+});
+
+const paginatedReservations = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredReservations.value.slice(start, start + itemsPerPage);
+});
+
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
+// 결제 상태 값 매핑
+const paymentStatusMapping = {
+  COMPLETE: "결제 완료",
+  INCOMPLETE: "결제 미완료",
+  REFUND: "환불 완료",
+};
+
+// 결제 방법 값 매핑
+const paymentMethodMapping = {
+  VBANK: "무통장 입금",
+  CARD: "카드",
+};
+
+// 예약 내역 조회
+const fetchReservationsWithDetails = async () => {
+  try {
+    await userStore.getUserData();
+    const userId = userStore.userData.id;
+
+    await paymentStore.fetchAllPayments();
+    const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
+
+    await reservationStore.fetchReservationRoomLists();
+    const allReservations = reservationStore.reservations;
+
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    };
+
+    reservations.value = allPayments.map(payment => {
+      const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
+
+      return {
+        accommodationName: payment.accommodationName || "정보 없음",
+        checkinDate: formatDate(payment.checkinDate),
+        checkoutDate: formatDate(payment.checkoutDate),
+        typeName: reservation ? reservation.typeName : "정보 없음",
+        reservationDate: formatDate(payment.paymentDate),
+        payment: {
+          method: paymentMethodMapping[payment.method] || "정보 없음",
+          completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
+        },
+        totalPrice: payment.amount || "정보 없음",
+      };
+    });
+
+    filteredReservations.value = [...reservations.value];
+    console.log("최종 예약 정보:", reservations.value);
+
+  } catch (error) {
+    console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
+  }
+};
 
 onMounted(async () => {
   setMaterialInput();
 
-  // 사용자 정보 가져오기
   const token = localStorage.getItem("accessToken");
-  console.log("token: ", token);
-
   if (token) {
     try {
       await userStore.getUserData();
     } catch (err) {
       error.value = "사용자 정보를 가져오는 데 실패했습니다.";
-      console.error("API 오류:", err);
     }
   } else {
     alert("로그인이 필요합니다.");
     router.push("/users/login");
   }
 
-  await noticeStore.fetchAccommodations();
-});
+  await fetchAccommodations();
+  await fetchReservationsWithDetails();
 
-const updateBranch = () => {
-  noticeStore.setQueryBranch(branchQuery.value);
-};
+  // 현재 날짜 설정
+  const today = new Date().toISOString().split('T')[0];
+  checkInDate.value = today;
+  checkOutDate.value = today;
+});
 
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0 w-100">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-90" loading="lazy" style="padding-top: 80px;">
       <span class="mask bg-white opacity-6"></span>
@@ -74,16 +184,14 @@ const updateBranch = () => {
                 <!-- 검색바 추가 -->
                 <div class="row mt-4">
                   <div class="col-12 text-center">
-
                     <div class="d-flex justify-content-center align-items-center mb-3">
-
                       <div class="d-flex align-items-center me-3">
                         <label for="resort-select" class="form-label me-2 mb-0" style="white-space: nowrap;">지점
                           선택</label>
                         <select id="resort-select" v-model="branchQuery" class="form-select me-2"
                           @change="updateBranch">
                           <option value="" disabled>지점을 선택하세요</option>
-                          <option v-for="branch in noticeStore.accommodations" :key="branch.id" :value="branch.name">
+                          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
                             {{ branch.name }}
                           </option>
                         </select>
@@ -91,71 +199,83 @@ const updateBranch = () => {
 
                       <div class="d-flex align-items-center me-3">
                         <label for="stayDuration" class="me-2 mb-0" style="white-space: nowrap;">투숙 기간</label>
-                        <MaterialInput type="date" v-model="checkInDate" id="checkIn"
+                        <MaterialInput type="date" v-model="checkInDate"
                           class="form-control me-2 input-group-outline" />
                         <span class="mx-2">~</span>
-                        <MaterialInput type="date" v-model="checkOutDate" id="checkOut"
-                          class="form-control input-group-outline" />
+                        <MaterialInput type="date" v-model="checkOutDate" class="form-control input-group-outline" />
                       </div>
 
-                      <MaterialButton @click="searchReservations" class="btn btn-primary ms-2 mt-2">검색
+                      <MaterialButton @click="searchReservations" class="btn btn-primary ms-2 mt-3"
+                        style="background: linear-gradient(to right, #ff7e5f, #feb47b)">
+                        검색
                       </MaterialButton>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="row justify-content-center text-black fs-6 mb-4">
-            <div class="text-center mt-3">
-              <h5 class="custom-font">EASY STAY's membership offers special value.</h5>
-              <div v-if="error" class="text-danger">{{ error }}</div>
-              <div v-else>
-                <!-- 사용자 정보 표시 -->
-                <div>환영합니다, {{ userStore.userData.name }}님!</div>
-                <div>회원 ID: {{ userStore.userData.email }}</div>
-              </div>
-            </div>
-          </div>
-
-
           <!-- 객실 예약 내역 -->
-          <div class="col-12 mt-4">
+          <div class=" col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>예약 ID</th>
                   <th>지점</th>
-                  <th>투숙 시작일</th>
-                  <th>투숙 종료일</th>
-                  <th>상태</th>
+                  <th>체크인</th>
+                  <th>체크아웃</th>
+                  <th>객실 이름</th>
+                  <th>결제 날짜</th>
+                  <th>결제 방법</th>
+                  <th>결제 상태</th>
+                  <th>총 가격</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="reservation in reservations" :key="reservation.id">
-                  <td>{{ reservation.id }}</td>
-                  <td>{{ reservation.branch }}</td>
-                  <td>{{ reservation.checkInDate }}</td>
-                  <td>{{ reservation.checkOutDate }}</td>
-                  <td>{{ reservation.status }}</td>
+                <tr v-if="paginatedReservations.length === 0">
+                  <td colspan="10" class="text-center">예약이 없습니다.</td>
+                </tr>
+                <tr v-for="reservation in paginatedReservations" :key="reservation.id">
+                  <td>{{ reservation.accommodationName || '정보 없음' }}</td>
+                  <td>{{ reservation.checkinDate || '정보 없음' }}</td>
+                  <td>{{ reservation.checkoutDate || '정보 없음' }}</td>
+                  <td>{{ reservation.typeName || '정보 없음' }}</td>
+                  <td>{{ reservation.reservationDate || '정보 없음' }}</td>
+                  <td>{{ reservation.payment?.method || '정보 없음' }}</td>
+                  <td>{{ reservation.payment?.completionStatus || '정보 없음' }}</td>
+                  <td>{{ reservation.totalPrice !== undefined ? reservation.totalPrice : '정보 없음' }}</td>
                 </tr>
               </tbody>
             </table>
+
+            <!-- 페이지네이션 버튼 추가 -->
+            <div class="pagination d-flex justify-content-center align-items-center">
+              <MaterialButton variant="outline" @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
+                class="pagination-button">
+                이전
+              </MaterialButton>
+              <span class="mx-2 mb-3">페이지 {{ currentPage }} / {{ totalPages }}</span>
+              <MaterialButton variant="outline" @click="changePage(currentPage + 1)"
+                :disabled="currentPage === totalPages" class="pagination-button">
+                다음
+              </MaterialButton>
+            </div>
           </div>
-
-
         </div>
       </div>
     </div>
   </Header>
 </template>
 
-<style>
-.custom-font {
-  font-family: 'Caveat', cursive;
+<style scoped>
+.pagination {
+  margin-top: 20px;
+}
+
+.pagination-button {
+  padding: 5px 10px;
+  font-size: 0.7rem;
 }
 </style>

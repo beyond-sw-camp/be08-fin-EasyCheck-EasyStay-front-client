@@ -4,18 +4,15 @@
       <button class="close-button" @click="handleClose">X</button>
       <h2>{{ attraction.name }}</h2>
       <img
-        v-if="attraction.imageUrls && attraction.imageUrls.length > 0"
-        :src="attraction.imageUrls[0]"
+        v-if="attraction.imageUrl"
+        :src="attraction.imageUrl"
         alt="Attraction Image"
         class="modal-image"
       />
       <p class="modal-description">{{ attraction.introduction }}</p>
       <h3>이용 기준</h3>
       <ul class="standard-use-list">
-        <li
-          v-for="(item, index) in formattedStandardUse"
-          :key="index"
-        >
+        <li v-for="(item, index) in formattedStandardUse" :key="index">
           {{ item }}
         </li>
       </ul>
@@ -62,8 +59,9 @@ const formattedStandardUse = computed(() => {
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000;
+  padding-top: 12vh;
 }
 
 .modal-content {
@@ -72,7 +70,10 @@ const formattedStandardUse = computed(() => {
   border-radius: 10px;
   position: relative;
   max-width: 500px;
-  width: 100%;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1060;
 }
 
 .close-button {

@@ -1,45 +1,44 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { mypageStore } from "@/stores/mypageStore";
 
 // example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-
-//Vue Material Kit 2 components
-import MaterialInput from "@/components/MaterialInput.vue";
-// import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
+
+const router = useRouter();
+const isAgreed = ref(false);
+const mypage = mypageStore();
 
 onMounted(() => {
   setMaterialInput();
 });
 
-const router = useRouter();
 
 function goToMain() {
   router.push('/');
 }
 
-function goToResignComplete() {
-  router.push('/users/resignComplete');
-}
+const handleDeactivate = async () => {
+  if (!isAgreed.value) {
+    alert("회원 탈퇴에 동의하셔야 합니다.");
+    return;
+  }
+
+  try {
+    await mypage.deactivateUserAction();
+    alert('회원 탈퇴가 완료되었습니다.');
+    router.push('/users/resignComplete');
+  } catch (error) {
+    alert('탈퇴 중 오류가 발생했습니다: ' + error.message);
+  }
+};
 
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-80 custom-login-container" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -65,7 +64,6 @@ function goToResignComplete() {
         소중한 고객님, 저희 호텔/리조트를 이용해 주셔서 감사합니다. <br>
         고객님의 편안한 이용을 위해 최선을 다해 왔습니다. 하지만 탈퇴를 원하신다면, 아래의 내용을 반드시 확인해 주시기 바랍니다.<br><br>
 
-
         <h6>탈퇴 절차</h6>
         회원 탈퇴를 원하실 경우, 아래의 '탈퇴' 버튼을 클릭해 주세요. <br>
         탈퇴 신청 후, 고객님의 계정은 즉시 비활성화되며, 등록된 모든 정보는 영구적으로 삭제됩니다. <br><br>
@@ -87,16 +85,22 @@ function goToResignComplete() {
         </p>
         <hr class="my-2" style="border-top: 3px solid #000;" />
 
+        <div class="form-check mt-3">
+          <input type="checkbox" class="form-check-input" id="agreeCheckbox" v-model="isAgreed" />
+          <label class="form-check-label text-black" for="agreeCheckbox">
+            회원 탈퇴에 동의합니다.
+          </label>
+        </div>
+
         <!-- 버튼 -->
         <div class="text-center mt-5">
           <MaterialButton @click="goToMain" class="btn btn-light">
             취소
           </MaterialButton>
-          <MaterialButton @click="goToResignComplete" class="btn btn-dark ms-2">
+          <MaterialButton @click="handleDeactivate" class="btn btn-dark ms-2">
             탈퇴
           </MaterialButton>
         </div>
-
 
       </div>
     </div>

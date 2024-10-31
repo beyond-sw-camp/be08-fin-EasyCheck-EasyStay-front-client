@@ -1,66 +1,85 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
-import { useOrderStore } from "./orderStore";
 
-export const usePaymentStore = defineStore("paymentStore", {
+export const useTicketPaymentStore = defineStore("ticketPayment", {
   state: () => ({
-    currentPayment: null,
-    loading: false,
+    paymentStatus: null,
+    paymentHistory: [],
     error: null,
+    payments: [],
   }),
 
   actions: {
-    async processPayment(orderId, totalPrice) {
-      this.loading = true;
-      const { IMP } = window;
-      IMP.init("imp18668427");
+    // 결제 처리
+    async processPayment(orderId, paymentRequest) {
+      try {
+        const response = await apiClient.post(
+          `/tickets/payment/${orderId}`,
+          paymentRequest
+        );
+        this.paymentStatus = response.data;
+        return this.paymentStatus;
+      } catch (error) {
+        this.error = "결제 처리 중 오류가 발생했습니다.";
+        console.error(error);
+        throw error;
+      }
+    },
 
-      IMP.request_pay(
-        {
-          pg: "html5_inicis",
-          pay_method: "card",
-          merchant_uid: `ORD${new Date().getTime()}`,
-          name: "EasyStay",
-          amount: totalPrice,
-          buyer_email: "example@example.com",
-          buyer_name: "테스터",
-          buyer_tel: "010-1234-5678",
-          buyer_addr: "서울특별시 강남구",
-          buyer_postcode: "12345",
-        },
-        async (rsp) => {
-          if (rsp.success) {
-            try {
-              const response = await apiClient.post(
-                `/api/v1/tickets/payment/${orderId}`,
-                {
-                  impUid: rsp.imp_uid,
-                  method: "CARD",
-                  amount: totalPrice,
-                }
-              );
+    // 결제 취소
+    async cancelPayment(orderId) {
+      try {
+        const response = await apiClient.patch(
+          `/tickets/payment/${orderId}/cancel`
+        );
+        this.paymentStatus = response.data;
+        return this.paymentStatus;
+      } catch (error) {
+        this.error = "결제 취소 중 오류가 발생했습니다.";
+        console.error(error);
+        throw error;
+      }
+    },
 
-              this.currentPayment = response.data;
+    // 결제 상태 조회
+    async getPaymentStatus(orderId) {
+      try {
+        const response = await apiClient.get(
+          `/tickets/payment/${orderId}/status`
+        );
+        this.paymentStatus = response.data;
+        return this.paymentStatus;
+      } catch (error) {
+        this.error = "결제 상태 조회 중 오류가 발생했습니다.";
+        console.error(error);
+        throw error;
+      }
+    },
 
-              const orderStore = useOrderStore();
-              await orderStore.completeOrder(orderId);
+    // 결제 내역 조회
+    async getPaymentHistory() {
+      try {
+        const response = await apiClient.get("/tickets/payment/history");
+        this.paymentHistory = response.data;
+        return this.paymentHistory;
+      } catch (error) {
+        this.error = "결제 내역 조회 중 오류가 발생했습니다.";
+        console.error(error);
+        throw error;
+      }
+    },
 
-              alert("결제 성공!");
-              this.loading = false;
-
-              return true;
-            } catch (error) {
-              this.loading = false;
-              this.error = error;
-              console.error("결제 정보 저장 오류:", error);
-              alert("결제 정보 저장 중 오류가 발생했습니다.");
-            }
-          } else {
-            this.loading = false;
-            alert("결제 실패: " + rsp.error_msg);
-          }
-        }
-      );
+    // 모든 결제 내역 조회
+    async getAllTicketPayments() {
+      try {
+        const response = await apiClient.get("/tickets/payment");
+        console.log("API 응답:", response.data);
+        this.payments = response.data;
+      } catch (error) {
+        this.error = "결제 내역 조회 중 오류가 발생했습니다.";
+        console.error(error);
+        throw error;
+      }
     },
   },
 });

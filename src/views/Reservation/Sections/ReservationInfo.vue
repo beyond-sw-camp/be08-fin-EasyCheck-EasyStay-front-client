@@ -9,33 +9,40 @@
         </div>
         <div class="info-cell">
           <div class="info-label">예약 구분</div>
-          <div class="info-value">개실예약</div>
+          <div class="info-value">객실예약</div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">예약 지점</div>
-          <div class="info-value">롯데리조트속초</div>
+          <div class="info-value">{{ accommodationName }}</div>
         </div>
         <div class="info-cell">
           <div class="info-label">투숙 객실</div>
-          <div class="info-value">호텔 디럭스 더블</div>
+          <div class="info-value">
+            {{ selectedRoom?.roomType }} - {{ selectedRoom?.roomName }}
+          </div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">투숙 기간</div>
-          <div class="info-value">2024.09.21(토) - 2024.09.22(일) / 1박</div>
+          <div class="info-value">
+            {{ formattedCheckinDate }} - {{ formattedCheckoutDate }} /
+            {{ stayDuration }}박
+          </div>
         </div>
         <div class="info-cell">
           <div class="info-label">투숙 인원</div>
-          <div class="info-value">성인 2명 / 소인 0명</div>
+          <div class="info-value">
+            성인 {{ adultCount }}명 / 소인 {{ childCount }}명
+          </div>
         </div>
       </div>
       <div class="info-row">
         <div class="info-cell">
           <div class="info-label">객실 수</div>
-          <div class="info-value">1실</div>
+          <div class="info-value">{{ roomCount }}실</div>
         </div>
         <div class="info-cell">
           <div class="info-label">쿠폰 적용</div>
@@ -45,16 +52,27 @@
     </div>
     <div class="total-price">
       <span class="price-label">총 금액 (VAT 포함)</span>
-      <span class="price-value">비회원가 398,000 원</span>
-      <button class="price-detail-btn">요금별 금액</button>
+      <span class="price-value">{{ userRole }}가 {{ totalPrice }} 원</span>
     </div>
     <div class="agreement-section">
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked1" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked1"
+          @change="
+            (e) => reservationStore.setAgreementChecked1(e.target.checked)
+          "
+        />
         <span>(필수) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
       <label class="agreement-item">
-        <input type="checkbox" v-model="agreementChecked2" />
+        <input
+          type="checkbox"
+          :checked="agreementChecked2"
+          @change="
+            (e) => reservationStore.setAgreementChecked2(e.target.checked)
+          "
+        />
         <span>(필수) 예약 규정 확인 및 동의 전문보기</span>
       </label>
       <label class="agreement-item">
@@ -62,25 +80,31 @@
         <span>(선택) 개인정보 수집 및 이용동의 전문보기</span>
       </label>
     </div>
-    <div class="action-buttons">
-      <button class="cancel-btn">취소</button>
-      <button class="reserve-btn" :disabled="!allAgreementsChecked">
-        결제하기
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { storeToRefs } from "pinia";
+import { userLoginStore } from "@/stores/loginStore";
+import { useReservationStore } from "@/stores/reservationStore";
 
-const agreementChecked1 = ref(false);
-const agreementChecked2 = ref(false);
-const agreementChecked3 = ref(false);
+const userStore = userLoginStore();
+const reservationStore = useReservationStore();
 
-const allAgreementsChecked = computed(
-  () => agreementChecked1.value && agreementChecked2.value
-);
+const { userRole, agreementChecked1, agreementChecked2 } =
+  storeToRefs(userStore);
+
+const {
+  roomCount,
+  totalPrice,
+  adultCount,
+  childCount,
+  stayDuration,
+  selectedRoom,
+  accommodationName,
+  formattedCheckinDate,
+  formattedCheckoutDate,
+} = storeToRefs(reservationStore);
 </script>
 
 <style lang="scss" scoped>
@@ -159,37 +183,6 @@ const allAgreementsChecked = computed(
 
       input[type="checkbox"] {
         margin-right: 10px;
-      }
-    }
-  }
-
-  .action-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin: 4rem 0;
-
-    button {
-      flex: 1;
-      padding: 15px;
-      font-size: 18px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &.cancel-btn {
-        background-color: #f8f8f8;
-        color: #333;
-        margin-right: 10px;
-      }
-
-      &.reserve-btn {
-        background-color: #e74c3c;
-        color: #fff;
-
-        &:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
       }
     }
   }

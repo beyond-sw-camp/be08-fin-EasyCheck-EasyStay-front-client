@@ -10,7 +10,8 @@ export const useAccommodationStore = defineStore("accommodationStore", {
   getters: {
     allAccommodations: (state) => state.accommodations,
     accommodationById: (state) => state.accommodation,
-    thumbnailUrls: (state) => state.accommodation?.thumbnailUrls || [],
+    accommodationId: (state) => state.accommodation.id,
+    thumbnailUrls: (state) => state.accommodation?.thumbnailUrls,
   },
 
   actions: {

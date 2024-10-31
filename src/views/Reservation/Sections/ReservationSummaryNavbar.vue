@@ -1,31 +1,6 @@
-<script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { storeToRefs } from "pinia";
-import { useReservationStore } from "@/stores/reservationStore.js";
-
-const reservationStore = useReservationStore();
-
-const { roomCount, stayDuration, accommodationName } =
-  storeToRefs(reservationStore);
-
-const isMobileView = ref(window.innerWidth < 768);
-
-const checkMobileView = () => {
-  isMobileView.value = window.innerWidth < 768;
-};
-
-onMounted(() => {
-  window.addEventListener("resize", checkMobileView);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", checkMobileView);
-});
-</script>
-
 <template>
   <nav
-    class="navbar navbar-expand-lg navbar-dark fixed-top py-2"
+    class="navbar navbar-expand-lg navbar-dark py-2"
     :class="{ 'mobile-view': isMobileView }"
   >
     <div class="container-fluid">
@@ -56,9 +31,9 @@ onUnmounted(() => {
                 >투숙 기간</span
               >
               <h6 class="mb-0">
-                2024.10.18
+                {{ formattedCheckinDate }}
                 <span class="badge rounded-pill">{{ stayDuration }}박</span>
-                2024.10.19
+                {{ formattedCheckoutDate }}
               </h6>
               <i
                 class="bi bi-pencil-square text-secondary ms-2"
@@ -91,7 +66,7 @@ onUnmounted(() => {
               <span class="navbar-text me-2 text-light" v-if="isMobileView"
                 >총 금액(VAT 포함)</span
               >
-              <h6 class="mb-0 text-danger">0 원</h6>
+              <h6 class="mb-0 text-danger">{{ totalPrice }} 원</h6>
             </div>
           </div>
         </div>
@@ -100,10 +75,43 @@ onUnmounted(() => {
   </nav>
 </template>
 
+<script setup>
+import { ref, onMounted, onUnmounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const {
+  roomCount,
+  totalPrice,
+  stayDuration,
+  accommodationName,
+  formattedCheckinDate,
+  formattedCheckoutDate,
+} = storeToRefs(reservationStore);
+
+const isMobileView = ref(window.innerWidth < 768);
+
+const checkMobileView = () => {
+  isMobileView.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+  window.addEventListener("resize", checkMobileView);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobileView);
+});
+</script>
+
 <style lang="scss" scoped>
 .navbar {
   padding: 0;
   background-color: #2b2b2b;
+  width: 100%;
+  // position과 관련된 스타일 제거
 }
 
 .navbar-item {

@@ -1,38 +1,7 @@
-<script setup>
-import AccommodationNavs from "./Sections/AccommodationNavs.vue";
-import ReservationCalendar from "./Sections/ReservationCalendar.vue";
-import ReservationSummary from "./Sections/ReservationSummary.vue";
-import ReservationSummaryNavbar from "./Sections/ReservationSummaryNavbar.vue";
-import RoomSelectionGrid from "./Sections/RoomSelectionGrid.vue";
-import ReservationForm from "./Sections/ReservationForm.vue";
-import ReservationInfo from "./Sections/ReservationInfo.vue";
-
-import { onMounted, onUnmounted } from "vue";
-import { storeToRefs } from "pinia";
-import { useReservationStore } from "@/stores/reservationStore.js";
-
-const reservationStore = useReservationStore();
-
-const { showRoomSelectionGrid, showReservationForm, showReservationInfo } =
-  storeToRefs(reservationStore);
-
-onMounted(async () => {
-  // 숙박시설들 불러오기
-  await reservationStore.fetchAndInitAccommodationNavs();
-});
-
-onMounted(() => {
-  reservationStore.initCheckInCheckOut();
-});
-
-onUnmounted(() => {
-  // unmount시 불러온거 초기화
-  reservationStore.resetAccommodationList();
-});
-</script>
-
 <template>
-  <reservation-summary-navbar />
+  <div class="position-sticky z-index-sticky top-9">
+    <reservation-summary-navbar />
+  </div>
   <main class="main-content">
     <div class="container">
       <h3 class="text-black">객실 예약</h3>
@@ -53,14 +22,46 @@ onUnmounted(() => {
         <room-selection-grid v-if="showRoomSelectionGrid" />
       </div>
       <div class="mt-4">
-        <reservation-form v-if="showReservationForm" />
-      </div>
-      <div class="mt-4">
-        <reservation-info v-if="showReservationInfo" />
+        <reservation-form v-if="showReservationForm">
+          <reservation-info />
+        </reservation-form>
       </div>
     </div>
   </main>
 </template>
+
+<script setup>
+import AccommodationNavs from "./Sections/AccommodationNavs.vue";
+import ReservationCalendar from "./Sections/ReservationCalendar.vue";
+import ReservationSummary from "./Sections/ReservationSummary.vue";
+import ReservationSummaryNavbar from "./Sections/ReservationSummaryNavbar.vue";
+import RoomSelectionGrid from "./Sections/RoomSelectionGrid.vue";
+import ReservationForm from "./Sections/ReservationForm.vue";
+import ReservationInfo from "./Sections/ReservationInfo.vue";
+
+import { storeToRefs } from "pinia";
+import { onMounted, onUnmounted } from "vue";
+import { useReservationStore } from "@/stores/reservationStore.js";
+
+const reservationStore = useReservationStore();
+
+const { showRoomSelectionGrid, showReservationForm } =
+  storeToRefs(reservationStore);
+
+onMounted(async () => {
+  // 숙박시설들 불러오기
+  await reservationStore.fetchAndInitAccommodationNavs();
+});
+
+onMounted(() => {
+  reservationStore.initCheckInCheckOut();
+});
+
+onUnmounted(() => {
+  // unmount시 불러온거 초기화
+  reservationStore.resetAccommodationList();
+});
+</script>
 
 <style lang="scss" scoped>
 .main-content {

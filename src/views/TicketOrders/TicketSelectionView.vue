@@ -1,7 +1,8 @@
 <template>
-  <NavbarDefault :sticky="true" />
-  <div class="ticket-selection container my-5">
-    <h2 class="mb-4">{{ themeParkName }} 이용권 선택</h2>
+  <div class="ticket-selection container my-5 mt-8">
+    <h2 v-if="accommodation" class="mb-4">
+      {{ accommodation.name || "알 수 없음" }} 이용권 선택
+    </h2>
     <div class="ticket-list row">
       <div
         v-for="ticketGroup in groupedTickets"
@@ -18,7 +19,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.adultTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.adultTicket.price) }}원
                   (회원가)
                 </span>
@@ -28,7 +29,7 @@
                 <span class="normal-price"
                   >{{ ticketGroup.childTicket.price }}원</span
                 >
-                <span v-if="isLoggedIn" class="final-price">
+                <span :class="{ 'final-price': isLoggedIn }" v-if="isLoggedIn">
                   {{ getDiscountedPrice(ticketGroup.childTicket.price) }}원
                   (회원가)
                 </span>
@@ -47,86 +48,96 @@
         </div>
       </div>
     </div>
+    <div class="price-info-section my-5">
+      <PriceInfoWrapper v-if="guidePageName" :guidePageName="guidePageName" />
+    </div>
+
+    <!-- 맨 위로 이동 버튼 -->
+    <button v-if="showScrollButton" class="scroll-to-top" @click="scrollToTop">
+      ▲
+    </button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
-import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useTicketStore } from "@/stores/ticketStore";
-import { useThemeParkStore } from "@/stores/themeParkStore";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-import dayjs from "dayjs";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { useThemeParkStore } from "@/stores/themeparkStore";
+import { userLoginStore } from "@/stores/loginStore";
+import PriceInfoWrapper from "@/views/TicketOrders/PriceInfos/PriceInfoWrapper.vue";
 
-const props = defineProps({
-  themeParkId: {
-    type: [String, Number],
-    required: true,
-  },
-  themeParkName: {
-    type: String,
-    required: true,
-  },
-});
-
-const groupedTickets = ref([]);
+// 라우팅
+const route = useRoute();
 const router = useRouter();
+
+// pinia 스토어
+const authStore = userLoginStore();
 const ticketStore = useTicketStore();
+const accommodationStore = useAccommodationStore();
 const themeParkStore = useThemeParkStore();
-const isLoggedIn = ref(false);
 
-onMounted(async () => {
-  const themeParkId = Number(props.themeParkId);
-  await ticketStore.fetchTickets(themeParkId);
+// 상태 및 getter
+const { isLoggedIn } = storeToRefs(authStore);
+const { groupedTickets } = storeToRefs(ticketStore);
+const { accommodation } = storeToRefs(accommodationStore);
+const { themePark } = storeToRefs(themeParkStore);
 
-  if (ticketStore.tickets && ticketStore.tickets.data) {
-    const today = dayjs();
-    const validTickets = ticketStore.tickets.data.filter((ticket) => {
-      const saleStart = dayjs(ticket.saleStartDate);
-      const saleEnd = dayjs(ticket.saleEndDate);
-      return today.isAfter(saleStart) && today.isBefore(saleEnd);
-    });
+// guidePageName 동기화
+const guidePageName = computed(() => themePark.value?.guidePageName);
 
-    console.log("Valid Tickets:", validTickets);
-
-    groupedTickets.value = ticketStore.groupTicketsByType(validTickets);
-  } else {
-    console.error("Tickets data is missing or invalid.");
-  }
-
-  checkLoginStatus();
-});
-
+// 요금 할인 적용
 const getDiscountedPrice = (price) => {
   const discountRate = 0.8;
   return Math.floor(price * discountRate);
 };
 
+// 티켓 구매 처리
 const handlePurchase = (ticketGroup) => {
-  const themeParkId = Number(ticketGroup.themeParkId);
-
-  console.log("Attempting to set theme park with ID:", themeParkId);
-
-  themeParkStore.setCurrentThemeParkById(themeParkId);
-
   if (!isLoggedIn.value) {
-    router.push({ path: "/users/login" });
-  } else {
-    router.push({
-      name: "TicketOrderView",
-      params: {
-        adultTicket: JSON.stringify(ticketGroup.adultTicket),
-        childTicket: JSON.stringify(ticketGroup.childTicket),
-        themeParkId: themeParkId,
-        themeParkName: props.themeParkName,
-      },
-    });
+    router.push({ name: "login" });
+    return;
   }
+  ticketStore.selectTicket(ticketGroup);
+  router.replace({ name: "TicketOrder" });
 };
 
-const checkLoginStatus = () => {
-  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+// 테마파크 및 티켓 정보 조회
+onMounted(async () => {
+  const themeParkId = route.query.themeParkId;
+  if (themeParkId) {
+    await themeParkStore.fetchThemeParkById(
+      route.query.accommodationId,
+      themeParkId
+    );
+    await ticketStore.fetchTickets(themeParkId);
+  }
+});
+
+// 맨 위로 이동 버튼 상태
+const showScrollButton = ref(false);
+
+// 스크롤 위치 감시
+const handleScroll = () => {
+  showScrollButton.value = window.scrollY > 300;
 };
+
+// 맨 위로 이동 함수
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+// 컴포넌트가 마운트될 때 스크롤 이벤트 리스너 추가
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+// 컴포넌트가 언마운트될 때 스크롤 이벤트 리스너 제거
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <style scoped>
@@ -143,11 +154,6 @@ const checkLoginStatus = () => {
 
 .ticket-card:hover {
   transform: scale(1.05);
-}
-
-.card-img-top {
-  height: 200px;
-  object-fit: cover;
 }
 
 .card-prices {
@@ -177,5 +183,30 @@ const checkLoginStatus = () => {
 
 .card-price {
   font-size: 1.2rem;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background-color: rgba(0, 123, 255, 0.6); /* 반투명한 배경 */
+  color: white;
+  border: none;
+  border-radius: 50%; /* 완전한 원형 */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 가벼운 그림자 */
+}
+
+.scroll-to-top:hover {
+  background-color: rgba(0, 123, 255, 0.85); /* 마우스오버 시 색상 강조 */
+  transform: scale(1.1); /* 약간 확대 */
 }
 </style>

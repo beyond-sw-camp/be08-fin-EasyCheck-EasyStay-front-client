@@ -12,13 +12,10 @@
                 class="input-group-outline"
                 placeholder="구매자 이름"
                 size="lg"
-                v-model="buyerName"
+                v-model="localFormData.buyerName"
                 :readonly="isLoggedIn"
               />
             </div>
-            <span v-if="!isBuyerNameValid" class="error-message">
-              이름을 입력해 주세요.
-            </span>
           </div>
 
           <div class="form-group">
@@ -28,13 +25,10 @@
                 class="input-group-outline"
                 placeholder="휴대전화 번호"
                 size="lg"
-                v-model="buyerPhone"
+                v-model="localFormData.buyerPhone"
                 :readonly="isLoggedIn"
               />
             </div>
-            <span v-if="!isBuyerPhoneValid" class="error-message">
-              올바른 휴대전화 번호를 입력해 주세요.
-            </span>
           </div>
 
           <div class="form-group email-group">
@@ -44,7 +38,7 @@
                 class="input-group-outline"
                 placeholder="이메일 아이디"
                 size="lg"
-                v-model="buyerEmail"
+                v-model="localFormData.buyerEmail"
                 :readonly="isLoggedIn"
                 style="flex: 1"
               />
@@ -53,65 +47,67 @@
                 class="input-group-outline"
                 placeholder="이메일 도메인"
                 size="lg"
-                v-model="buyerEmailDomain"
+                v-model="localFormData.buyerEmailDomain"
                 :readonly="isLoggedIn"
                 style="flex: 1"
               />
             </div>
-            <span v-if="!isEmailValid" class="error-message">
-              유효한 이메일 주소를 입력해 주세요.
-            </span>
           </div>
         </div>
       </fieldset>
+    </div>
+
+    <h4 class="desc-title mt-4">취소 및 환불 규정 안내</h4>
+    <div class="form-check-group">
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="terms1"
+          v-model="localFormData.termsChecked1"
+          class="form-check-input"
+          required
+        />
+        <label for="terms1" class="form-check-label">
+          (필수) 개인정보 수집 및 이용동의
+          <a class="text-line" @click.prevent="openModal('필수')">전문보기</a>
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          type="checkbox"
+          id="terms2"
+          v-model="localFormData.termsChecked2"
+          class="form-check-input"
+        />
+        <label for="terms2" class="form-check-label">
+          (선택) 개인정보 수집 및 이용동의
+          <a class="text-line" @click.prevent="openModal('선택')">전문보기</a>
+        </label>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch, computed } from "vue";
+import { reactive, watch } from "vue";
+import { useAttrs } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 
-const props = defineProps({
-  buyerName: String,
-  buyerPhone: String,
-  buyerEmail: String,
-  buyerEmailDomain: String,
-  isLoggedIn: Boolean,
-});
+const attrs = useAttrs();
+const localFormData = reactive({ ...attrs.modelValue });
+const isLoggedIn = attrs.isLoggedIn || false;
 
-const emit = defineEmits([
-  "update:buyerName",
-  "update:buyerPhone",
-  "update:buyerEmail",
-  "update:buyerEmailDomain",
-]);
+watch(
+  () => localFormData,
+  (newValue) => {
+    attrs["onUpdate:modelValue"](newValue);
+  },
+  { deep: true }
+);
 
-const buyerName = ref(props.buyerName);
-const buyerPhone = ref(props.buyerPhone);
-const buyerEmail = ref(props.buyerEmail);
-const buyerEmailDomain = ref(props.buyerEmailDomain);
-
-// 유효성 검사를 위한 computed properties
-const isBuyerNameValid = computed(() => buyerName.value.trim() !== "");
-const isBuyerPhoneValid = computed(() => /^\d{10,11}$/.test(buyerPhone.value)); // 10자리 또는 11자리의 숫자만 허용
-const isEmailValid = computed(() => {
-  const email = `${buyerEmail.value.trim()}@${buyerEmailDomain.value.trim()}`;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-});
-
-watch(buyerName, (newValue) => {
-  emit("update:buyerName", newValue);
-});
-watch(buyerPhone, (newValue) => {
-  emit("update:buyerPhone", newValue);
-});
-watch(buyerEmail, (newValue) => {
-  emit("update:buyerEmail", newValue);
-});
-watch(buyerEmailDomain, (newValue) => {
-  emit("update:buyerEmailDomain", newValue);
-});
+const openModal = (type) => {
+  attrs["onOpenModal"](type);
+};
 </script>
 
 <style scoped>
@@ -137,9 +133,37 @@ watch(buyerEmailDomain, (newValue) => {
   align-self: center;
 }
 
-.error-message {
-  color: red;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
+.form-check-group {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.6rem;
+  align-items: flex-start;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input {
+  margin-top: 0;
+  margin-right: 0.5rem;
+  transform: translateY(1px);
+}
+
+.form-check-label {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+.text-line {
+  text-decoration: underline;
+}
+
+.desc-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
 }
 </style>

@@ -1,16 +1,15 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 
-// Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
+import { userLoginStore } from "@/stores/loginStore";
 
-// Initialize MaterialInput on mount
 onMounted(() => {
   setMaterialInput();
 });
+
+const loginStore = userLoginStore();
 
 // 약관 동의
 const isChecked = ref(false);
@@ -25,6 +24,7 @@ const consentItems2 = ref([
   { label: '통신사 이용약관 동의 (필수)', checked: false },
 ]);
 
+// 전체 동의 클릭 시 모두 체크
 function toggleAll() {
   consentItems.value.forEach(item => {
     item.checked = isChecked.value;
@@ -35,21 +35,22 @@ function toggleAll() {
   });
 }
 
+// 전체 약관 동의 여부 확인
+const isAllChecked = computed(() => {
+  return consentItems.value.every(item => item.checked) &&
+    consentItems2.value.every(item => item.checked);
+});
+
 // 전화번호
+const selectedPhonePrefix = ref('010');
+const phoneMiddle = ref('');
+const phoneSuffix = ref('');
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
     { id: 'phonePrefix1', text: '02' },
-    { id: 'phonePrefix2', text: '031' },
-    { id: 'phonePrefix3', text: '032' },
-    { id: 'phonePrefix4', text: '033' },
-    { id: 'phonePrefix5', text: '041' },
-    { id: 'phonePrefix6', text: '042' },
-    { id: 'phonePrefix7', text: '043' },
-    { id: 'phonePrefix8', text: '044' },
-    { id: 'phonePrefix9', text: '051' },
-    { id: 'phonePrefix10', text: '052' },
-    { id: 'phonePrefix11', text: '053' },
+    { id: 'phonePrefix2', text: '010' },
+    { id: 'phonePrefix3', text: '051' },
   ],
 });
 
@@ -63,44 +64,137 @@ const carrierOptions = ref([
   { value: 'carrier6', text: 'LGU+알뜰폰' },
 ]);
 
-const selectedCarrier = ref('');
-const selectedPhonePrefix = ref('010');
+// 인증번호 요청
+// 인증번호 클릭 시 아래로
+const isVerificationRequested = ref('false');
 
-// 우편번호 검색 핸들러
-const postcode = ref('');
-const roadAddress = ref('');
-const jibunAddress = ref('');
-const detailAddress = ref('');
-const extraAddress = ref('');
+const authenticatePhone = async () => {
+  // 약관 동의 여부 체크
+  if (!isAllChecked.value) {
+    alert("모든 약관에 동의해야 인증번호를 요청할 수 있습니다.");
+    return; // 약관 동의가 안 되면 요청하지 않음
+  }
 
-const searchZipCode = () => {
-  new daum.Postcode({
-    oncomplete: function (data) {
-      postcode.value = data.zonecode; // 올바른 키를 사용
-      roadAddress.value = data.roadAddress; // 도로명주소
-      jibunAddress.value = data.jibunAddress; // 지번주소
-      detailAddress.value = ''; // 상세주소 초기화
-      extraAddress.value = ''; // 참고항목 초기화
-    },
-  }).open();
+  isVerificationRequested.value = true;
+
+  // 상태 업데이트
+  loginStore.setPhoneNumbers(selectedPhonePrefix.value, phoneMiddle.value, phoneSuffix.value);
+
+  try {
+    await loginStore.handlePhoneAuthentication();
+    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
+  } catch (error) {
+    console.error('Error during phone authentication:', error.message);
+    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
+  }
 };
 
-const fileName = ref(''); // 선택된 파일 이름을 저장할 변수
+// 인증 번호 확인
+const verificationCode = ref('');
 
-const updateFileName = (event) => {
-  if (event.target.files.length > 0) {
-    fileName.value = event.target.files[0].name; // 선택된 파일 이름 저장
-  } else {
-    fileName.value = ''; // 파일이 선택되지 않았을 때 초기화
+const requestVerification = async () => {
+  const phoneNumber = `${selectedPhonePrefix.value}${phoneMiddle.value}${phoneSuffix.value}`;
+  console.log('Phone Number: ', phoneNumber);
+  console.log('Entered verification code: ', loginStore.verificationCode); // 스토어의 값 사용
+
+  try {
+    const message = await loginStore.verifyCode(phoneNumber, loginStore.verificationCode);
+    console.log(message);
+  } catch (error) {
+    console.error('Error during verification:', error.message);
   }
+};
+
+
+const selectedDomain = ref('');
+const isCustomDomain = ref(false);
+
+const onDomainChange = () => {
+  if (selectedDomain.value === 'etc') {
+    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
+  } else {
+    isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
+    loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
+  }
+};
+
+const updateEmailSuffix = () => {
+  if (selectedDomain !== 'etc') {
+    loginStore.signUpformData.emailSuffix = selectedDomain;
+  }
+
+  const email = createEmail(); // 이메일 생성
+  console.log('Generated Email:', email);
+  loginStore.signUpformData.email = email; // 이메일 값 저장
+};
+
+// 이메일 합치기
+const createEmail = () => {
+  const emailPrefix = loginStore.signUpformData.emailPrefix || '';
+  const emailSuffix = loginStore.signUpformData.emailSuffix || '';
+
+  // prefix와 suffix가 비어있는 경우에 대해 처리
+  if (!emailPrefix || !emailSuffix) {
+    console.error('이메일 구성 오류: prefix 또는 suffix가 비어있습니다.');
+    return '이메일을 제대로 입력하세요'; // 오류 메시지
+  }
+
+  return `${emailPrefix}@${emailSuffix}`;
 };
 </script>
 
-
 <template>
   <div class="align-items-start" loading="lazy">
+    <div class="mt-0 mb-5">
+      <h6 class="text-black">회원권 종류 설명</h6>
+      <ul>
+        <li><strong>스탠다드 회원권:</strong> 기본 숙박 혜택 및 일부 시설 이용 가능.</li>
+        <li><strong>프리미엄 회원권:</strong> 모든 시설 이용 가능 및 추가 할인 혜택.</li>
+      </ul>
+    </div>
 
-    <table class="table">
+    <!-- 약관 동의 -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="form-check text-start mt-2">
+          <input class="form-check-input custom-checkbox" type="checkbox" id="privacyConsent" v-model="isChecked"
+            @change="toggleAll" />
+          <label class="form-check-label fw-bold text-black fs-7 mb-0" for="privacyConsent">
+            휴대폰 본인확인 전체동의
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border-top: 2px solid #ccc;" />
+
+    <div class="row mb-3">
+      <div class="col-5" v-for="(item, index) in consentItems" :key="index">
+        <div class="form-check text-start">
+          <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent1_' + index"
+            v-model="item.checked" />
+          <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent1_' + index">
+            {{ item.label }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border-top: 2px solid #ccc;" />
+
+    <div class="row mb-4">
+      <div class="col-5" v-for="(item, index) in consentItems2" :key="index">
+        <div class="form-check text-start">
+          <input class="form-check-input custom-checkbox" type="checkbox" :id="'privacyConsent2_' + index"
+            v-model="item.checked" />
+          <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent2_' + index">
+            {{ item.label }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <table class="table mt-5">
       <tbody>
         <!-- 인증정보 입력 -->
         <tr>
@@ -111,48 +205,13 @@ const updateFileName = (event) => {
           </td>
         </tr>
 
-        <!-- 아이디 -->
+        <!-- 이름 -->
         <tr>
-          <td class="fw-bold fs-8">아이디</td>
+          <td class="fw-bold fs-8">성함</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="username"
-                :label="{ text: '아이디', class: 'form-label' }" type="text" />
-            </div>
-          </td>
-        </tr>
-
-        <!-- 비밀번호 -->
-        <tr>
-          <td class="fw-bold fs-8">비밀번호</td>
-          <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="password"
-                :label="{ text: '비밀번호', class: 'form-label' }" type="password" />
-            </div>
-          </td>
-        </tr>
-
-        <!-- 법인명 -->
-        <tr>
-          <td class="fw-bold fs-8">법인명</td>
-          <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0" id="name" :label="{ text: '법인명', class: 'form-label' }"
-                type="text" />
-            </div>
-          </td>
-        </tr>
-
-        <!-- 사업자 번호 -->
-        <tr>
-          <td class="fw-bold fs-8">사업자 번호</td>
-          <td>
-            <div class="d-flex align-items-center col-5">
-              <MaterialInput class="input-group-outline mb-0 me-2" id="birth"
-                :label="{ text: '사업자 번호', class: 'form-label' }" type="text" />
-              <span class="align-self-center fs-5">- </span>
-              <MaterialInput class="input-group-outline mb-0 me-2" id="gender" type="text" />
+              <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0" id="name"
+                :label="{ text: '성함', class: 'form-label' }" type="text" />
             </div>
           </td>
         </tr>
@@ -163,7 +222,7 @@ const updateFileName = (event) => {
           <td>
             <div class="d-flex align-items-center col-5">
               <!-- 통신사 -->
-              <select id="carrier" class="form-select me-2" v-model="selectedCarrier">
+              <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 20%;">
                 <option value="" disabled selected>통신사 선택</option>
                 <option v-for="carrier in carrierOptions" :key="carrier.value" :value="carrier.value">
                   {{ carrier.text }}
@@ -171,46 +230,64 @@ const updateFileName = (event) => {
               </select>
 
               <!-- 전화번호 -->
-              <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix">
+              <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix"
+                @change="handleInputChange" style="width: 15%;">
                 <option v-for="input in phoneFields.inputs" :key="input.id" :value="input.text">
                   {{ input.text }}
                 </option>
               </select>
 
-              <MaterialInput class="input-group-outline mb-0 me-2" id="phoneMiddle" type="text" maxlength="4" />
-              <MaterialInput class="input-group-outline mb-0" id="phoneSuffix" type="text" maxlength="4" />
+              <MaterialInput @input="handleInputChange" class="input-group-outline mb-0 me-2" v-model="phoneMiddle"
+                type="text" style="width: 25%;" />
+              <MaterialInput @input="handleInputChange" class="input-group-outline mb-0" v-model="phoneSuffix"
+                type="text" style="width: 25%; margin-right: 10px;" />
+
+              <!-- 인증 요청 버튼 -->
+              <button class="btn btn-black custom-btn mt-3" @click="authenticatePhone">
+                인증 요청
+              </button>
             </div>
           </td>
         </tr>
 
-        <!-- 주소 -->
-        <tr>
-          <td class="fw-bold fs-8">주소</td>
-          <td>
-            <div class="d-flex align-items-stretch col-4">
-              <MaterialInput v-model="postcode" class="input-group-outline mb-0 me-2" placeholder="우편번호"
-                style="flex: 1;" />
-              <button type="button" class="btn btn-outline-primary mb-0" @click="searchZipCode">주소 검색</button>
-            </div>
-            <div class="mt-2 col-5">
-              <MaterialInput v-model="roadAddress" class="input-group-outline mb-2" placeholder="도로명주소" />
-              <MaterialInput v-model="jibunAddress" class="input-group-outline mb-2" placeholder="지번주소" />
-              <MaterialInput v-model="detailAddress" class="input-group-outline mb-2" placeholder="상세주소" />
-            </div>
-          </td>
-        </tr>
+        <!-- 인증번호 입력란 -->
+        <transition name="slide-fade">
+          <tr v-if="isVerificationRequested">
+            <td class="fw-bold fs-8">인증번호</td>
+            <td>
+              <div class="d-flex align-items-center justify-content-start col-5">
+                <MaterialInput class="input-group-outline mb-0" v-model="loginStore.verificationCode" type="text"
+                  placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
+                <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
+              </div>
+            </td>
+          </tr>
+        </transition>
 
-        <!-- 인증 서류 -->
+        <!-- 이메일 -->
         <tr>
-          <td class="fw-bold fs-8">인증 서류</td>
+          <td class="fw-bold fs-8 col-1">이메일</td>
           <td>
             <div class="d-flex align-items-center col-5">
-              <label for="fileUpload" class="custom-file-upload">
-                <i class="fas fa-upload"></i> 파일 선택
-              </label>
-              <input type="file" id="fileUpload" class="form-control-file d-none"
-                accept=".pdf, .doc, .docx, .jpg, .jpeg, .png" @change="updateFileName" />
-              <span v-if="fileName" class="ms-2">{{ fileName }}</span> <!-- 파일 이름 표시 -->
+              <MaterialInput v-model="loginStore.signUpformData.emailPrefix" required class="input-group-outline mb-0"
+                id="emailPrefix" :label="{ text: '이메일', class: 'form-label' }" type="text" style="flex: 1;" />
+              <span class="mx-1">@</span>
+
+              <template v-if="isCustomDomain">
+                <MaterialInput v-model="loginStore.signUpformData.emailSuffix" class="input-group-outline mb-0 ms-2"
+                  id="emailSuffix" type="text" style="flex: 1;" placeholder="도메인 입력" />
+              </template>
+
+              <template v-else>
+                <select v-model="selectedDomain" class="form-select ms-2" @change="onDomainChange" style="flex: 1;">
+                  <option value="" disabled selected>도메인 선택</option>
+                  <option value="gmail.com">gmail.com</option>
+                  <option value="naver.com">naver.com</option>
+                  <option value="daum.net">daum.net</option>
+                  <option value="etc">기타</option>
+                </select>
+              </template>
+
             </div>
           </td>
         </tr>
@@ -219,6 +296,7 @@ const updateFileName = (event) => {
     </table>
 
     <hr style="border-top: 2px solid #ccc;" />
+
 
   </div>
 </template>
@@ -240,10 +318,12 @@ const updateFileName = (event) => {
 }
 
 .custom-file-upload:hover {
-  background-color: #0056b3; /* 호버 시 색상 변경 */
+  background-color: #0056b3;
+  /* 호버 시 색상 변경 */
 }
 
 .form-control-file {
-  display: none; /* 기본 인풋 숨김 */
+  display: none;
+  /* 기본 인풋 숨김 */
 }
 </style>

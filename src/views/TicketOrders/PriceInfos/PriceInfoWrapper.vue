@@ -1,7 +1,7 @@
 <template>
   <suspense>
     <template #default>
-      <component :is="guideComponent" />
+      <component :is="priceInfoComponent || 'div'" />
     </template>
     <template #fallback>
       <div class="spinner-overlay">
@@ -21,9 +21,9 @@ const props = defineProps({
   },
 });
 
-const guideComponent = computed(() => {
+const priceInfoComponent = computed(() => {
   const availableComponents = import.meta.glob(
-    "@/views/ThemeParks/UsageGuides/*.vue"
+    "@/views/TicketOrders/PriceInfos/*.vue"
   );
 
   const componentPath = availableComponents[`./${props.guidePageName}.vue`];

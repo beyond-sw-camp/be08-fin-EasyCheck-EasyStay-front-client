@@ -5,13 +5,15 @@
       <div v-for="room in rooms" :key="room.id" class="col">
         <div class="card h-100">
           <img
-            :src="room.image"
+            :src="room.thumbnailImgUrl"
             class="card-img-top rounded-0"
             :alt="room.name"
           />
           <div class="card-body rounded-0">
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <h5 class="card-title">{{ room.name }}</h5>
+              <h5 class="card-title">
+                {{ room.roomType }} - {{ room.roomName }}
+              </h5>
               <button class="btn btn-outline-secondary btn-sm">+</button>
             </div>
             <p class="card-text fw-bold small">{{ room.description }}</p>
@@ -29,20 +31,20 @@
           <div class="card-footer bg-transparent border-top-0">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <small class="text-muted text-decoration-line-through"
-                  >{{ room.originalPrice.toLocaleString() }}원</small
-                >
-                <span class="text-danger fw-bold ms-2"
-                  >{{ room.discountedPrice.toLocaleString() }}원~</span
-                >
+                <small class="text-muted text-decoration-line-through">
+                  {{ room.normalPrice.toLocaleString() }}원
+                </small>
+                <span class="text-danger fw-bold ms-2">
+                  {{ room.corpPrice.toLocaleString() }}원~
+                </span>
               </div>
             </div>
             <button
               class="btn w-100 mt-2"
-              :class="room.isSelected ? 'btn-primary' : 'btn-outline-primary'"
+              :class="getRoomSelectionClass(room)"
               @click="toggleRoomSelection(room)"
             >
-              {{ room.isSelected ? "객실 선택됨" : "객실 선택" }}
+              {{ getRoomSelectionText(room) }}
             </button>
           </div>
         </div>
@@ -53,20 +55,39 @@
 
 <script setup>
 import RoomTypeNavs from "@/views/Rooms/Sections/RoomTypeNavs.vue";
-
 import { storeToRefs } from "pinia";
 import { useReservationStore } from "@/stores/reservationStore.js";
+import { userLoginStore } from "@/stores/loginStore.js";
 
 const reservationStore = useReservationStore();
 
-const { availableRoomList } = storeToRefs(reservationStore);
+const userStore = userLoginStore();
 
-console.log(availableRoomList);
+const { availableRoomList: rooms, selectedRoom } =
+  storeToRefs(reservationStore);
 
-const rooms = availableRoomList;
+const isRoomSelected = (room) => {
+  return selectedRoom.value?.roomId === room.roomId;
+};
 
-const toggleRoomSelection = (room) => {
-  room.isSelected = !room.isSelected;
+const getRoomSelectionClass = (room) => ({
+  "btn-primary": isRoomSelected(room),
+  "btn-outline-primary": !isRoomSelected(room),
+  "selected-room-btn": isRoomSelected(room),
+});
+
+const getRoomSelectionText = (room) =>
+  isRoomSelected(room) ? "객실 선택됨" : "객실 선택";
+
+const toggleRoomSelection = async (room) => {
+  if (isRoomSelected(room)) {
+    reservationStore.closeReservationForm();
+    reservationStore.resetReservationRoom();
+  } else {
+    await userStore.fetchUserInfo();
+    reservationStore.selectReservationRoom(room);
+    reservationStore.openReservationForm();
+  }
 };
 </script>
 
@@ -94,5 +115,22 @@ const toggleRoomSelection = (room) => {
 
 .card-text.small {
   font-size: 0.8rem;
+}
+
+.selected-room-btn {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid currentColor;
+    border-radius: inherit;
+    opacity: 0.5;
+  }
 }
 </style>

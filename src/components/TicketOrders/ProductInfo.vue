@@ -1,26 +1,35 @@
 <template>
   <div class="card p-4 mb-5">
-    <h4 class="mb-3">{{ themeParkName }} 구매상품 정보</h4>
+    <h4 class="mb-3">구매상품 정보</h4>
     <div class="table-responsive">
       <table class="table table-bordered">
         <tbody>
           <tr>
             <td class="label-cell">지점</td>
             <td class="content-cell">
-              <span>{{ themeParkName }}</span>
+              <span>{{ themePark?.name || "알 수 없음" }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">티켓 이름</td>
+            <td class="content-cell">
+              <span>
+                {{ adultTicket?.ticketName || "알 수 없음" }} /
+                {{ childTicket?.ticketName || "알 수 없음" }}
+              </span>
             </td>
           </tr>
           <tr>
             <td class="label-cell">유효기간</td>
             <td class="content-cell">
-              <span
-                >{{ formatDate(adultTicket.validFromDate) }} ~
-                {{ formatDate(adultTicket.validToDate) }}</span
-              >
+              <span>
+                {{ formatDate(adultTicket?.validFromDate) }} ~
+                {{ formatDate(adultTicket?.validToDate) }}
+              </span>
               <br />
-              <small class="text-muted"
-                >* 유효기간 중 언제든지 사용 가능한 상품입니다.</small
-              >
+              <small class="text-muted">
+                * 유효기간 중 언제든지 사용 가능한 상품입니다.
+              </small>
             </td>
           </tr>
           <tr>
@@ -30,57 +39,35 @@
                 <div class="quantity-group">
                   <label class="quantity-label">대인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementAdult"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementAdult">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="adultCount"
-                      class="form-control quantity-input"
-                      v-model="adultCount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementAdult"
-                    >
+                    <input type="number" id="adultCount" class="form-control quantity-input" v-model="adultTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementAdult">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
-                  <small class="text-muted price-info"
-                    >대인 / 온라인회원가 {{ adultTicket.price }}원</small
-                  >
+                  <small class="text-muted price-info">
+                    대인 / {{ adultTicket?.price || 0 }}원
+                  </small>
                 </div>
 
                 <div class="quantity-group">
                   <label class="quantity-label">소인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementChild"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementChild">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="childCount"
-                      class="form-control quantity-input"
-                      v-model="childCount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementChild"
-                    >
+                    <input type="number" id="childCount" class="form-control quantity-input" v-model="childTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementChild">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
-                  <small class="text-muted price-info"
-                    >소인 / 온라인회원가 {{ childTicket.price }}원</small
-                  >
+                  <small class="text-muted price-info">
+                    소인 / {{ childTicket?.price || 0 }}원
+                  </small>
                 </div>
               </div>
             </td>
@@ -88,7 +75,7 @@
           <tr>
             <td class="label-cell">총 금액 (VAT 포함)</td>
             <td class="content-cell total-price">
-              <strong class="total-amount">{{ formattedTotalPrice }}</strong>
+              <strong class="total-amount">{{ totalPrice }}</strong>
             </td>
           </tr>
         </tbody>
@@ -98,36 +85,32 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps } from "vue";
+import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
 
-const props = defineProps({
-  adultTicket: Object,
-  childTicket: Object,
-  themeParkName: String,
-});
+import { useTicketStore } from "@/stores/ticketStore";
+import { useThemeParkStore } from "@/stores/themeparkStore";
 
-const adultCount = ref(0);
-const childCount = ref(0);
+// pinia 스토어
+const ticketStore = useTicketStore();
+const themeParkStore = useThemeParkStore();
 
-const incrementAdult = () => adultCount.value++;
-const decrementAdult = () => {
-  if (adultCount.value > 0) adultCount.value--;
-};
-
-const incrementChild = () => childCount.value++;
-const decrementChild = () => {
-  if (childCount.value > 0) childCount.value--;
-};
-
-const formattedTotalPrice = computed(() => {
-  const adultTotal = adultCount.value * (props.adultTicket?.price || 0);
-  const childTotal = childCount.value * (props.childTicket?.price || 0);
-  return `₩ ${(adultTotal + childTotal).toLocaleString()}`;
-});
+// pinia state, getters
+const { themePark } = storeToRefs(themeParkStore);
+const { adultTicket, childTicket, totalPrice, adultTicketAmount, childTicketAmount } = storeToRefs(ticketStore);
 
 const formatDate = (date) => {
-  return dayjs(date).format("YYYY-MM-DD");
+  return date ? dayjs(date).format("YYYY-MM-DD") : "알 수 없음";
+};
+
+const incrementAdult = () => adultTicketAmount.value++;
+const decrementAdult = () => {
+  if (adultTicketAmount.value > 0) adultTicketAmount.value--;
+};
+
+const incrementChild = () => childTicketAmount.value++;
+const decrementChild = () => {
+  if (childTicketAmount.value > 0) childTicketAmount.value--;
 };
 </script>
 
@@ -185,10 +168,6 @@ const formatDate = (date) => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.bi {
-  font-size: 24px;
 }
 
 .quantity-input {

@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import { userLoginStore } from '@/stores/loginStore';
-
 // Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
 
@@ -17,14 +16,27 @@ onMounted(() => {
 const isChecked = ref(false);
 
 const consentItems = ref([
-  { label: '개인정보 이용 동의 (필수)', checked: false },
-  { label: '고유식별 정보 처리 동의 (필수)', checked: false },
+  { label: '개인정보 이용 동의 (필수)', checked: false, details: '상세 내용 1' },
+  { label: '고유식별 정보 처리 동의 (필수)', checked: false, details: '상세 내용 2' },
 ]);
 
 const consentItems2 = ref([
-  { label: '서비스 이용약관 동의 (필수)', checked: false },
-  { label: '통신사 이용약관 동의 (필수)', checked: false },
+  { label: '서비스 이용약관 동의 (필수)', checked: false, details: '상세 내용 3' },
+  { label: '통신사 이용약관 동의 (필수)', checked: false, details: '상세 내용 4' },
 ]);
+
+// 모달 관련 상태 및 함수 정의
+const isModalVisible = ref(false);
+const modalContent = ref("");
+const modalTitle = ref("");
+
+const openModal = (details, title) => {
+  console.log("Opening modal with details:", details); // 로그 추가
+  modalContent.value = details;
+  modalTitle.value = title;
+  isModalVisible.value = true;
+};
+
 
 const toggleAll = () => {
   const isCheckedValue = isChecked.value;
@@ -91,10 +103,10 @@ const authenticatePhone = async () => {
 
   try {
     await loginStore.handlePhoneAuthentication();
-    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
+    alert("인증번호 요청이 성공적으로 전송되었습니다.");
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
-    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
+    alert("인증번호 요청 중 오류가 발생했습니다.");
   }
 };
 
@@ -238,6 +250,7 @@ watch(() => loginStore.signUpformData.password, validatePassword);
           v-model="item.checked" />
         <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent1_' + index">
           {{ item.label }}
+          <button type="button" class="btn btn-link" @click="openModal(item.details, '약관 1 상세 정보')">자세히 보기</button>
         </label>
       </div>
     </div>
@@ -252,10 +265,12 @@ watch(() => loginStore.signUpformData.password, validatePassword);
           v-model="item.checked" />
         <label class="form-check-label fw-bold text-muted fs-7" :for="'privacyConsent2_' + index">
           {{ item.label }}
+          <button type="button" class="btn btn-link" @click="openModal(item.details, '약관 2 상세 정보')">자세히 보기</button>
         </label>
       </div>
     </div>
   </div>
+
   <hr style="border-top: 2px solid #ccc;" />
   <div class="align-items-start" loading="lazy">
     <table class="table">
@@ -414,6 +429,10 @@ watch(() => loginStore.signUpformData.password, validatePassword);
       </tbody>
     </table>
   </div>
+
+  <consentModal :isVisible="isModalVisible" @update:isVisible="isModalVisible = $event" :content="modalContent"
+    :title="modalTitle" />
+
 </template>
 
 <style scoped>
