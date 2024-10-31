@@ -3,8 +3,8 @@
     <div class="modal-content">
       <span class="close-button" @click="$emit('close')">&times;</span>
       <h2>{{ title }}</h2>
-      <div v-html="content"></div>
-      <MaterialButton @click="$emit('close')">확인</MaterialButton>
+      <div v-html="content" class="modal-body"></div>
+      <MaterialButton @click="$emit('close')" class="confirm-button">확인</MaterialButton>
     </div>
   </div>
 </template>
@@ -43,17 +43,29 @@ const emit = defineEmits(['close']);
   width: 90%;
   max-width: 500px;
   max-height: 90%;
-  /* 최대 높이 설정 */
-  overflow-y: auto;
-  /* 내용이 길 경우 스크롤 가능하게 설정 */
+  overflow-y: hidden;
+  /* 스크롤을 숨김 */
   display: flex;
   flex-direction: column;
-  /* 세로 방향으로 정렬 */
+}
+
+.modal-body {
+  flex-grow: 1;
+  /* 내용이 많아질 경우 공간을 차지하게 설정 */
+  overflow-y: auto;
+  /* 내용이 많을 경우 스크롤 가능 */
 }
 
 .close-button {
   cursor: pointer;
   float: right;
   font-size: 24px;
+}
+
+.confirm-button {
+  margin-top: 20px;
+  /* 버튼과 내용 사이에 공간 추가 */
+  align-self: flex-end;
+  /* 버튼을 오른쪽 정렬 */
 }
 </style>

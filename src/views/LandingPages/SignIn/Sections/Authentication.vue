@@ -2,14 +2,16 @@
 import { onMounted, ref, computed } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 import { userLoginStore } from "@/stores/loginStore";
-import setMaterialInput from "@/assets/js/material-input";
+
 import Modal from "./Modal.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
+
+import setMaterialInput from "@/assets/js/material-input";
 
 onMounted(() => {
   setMaterialInput();
 });
 
+// 약관 자세히 보기 내용
 const consentItems = ref([
   {
     label: '개인정보 이용 동의 (필수)',
@@ -91,9 +93,7 @@ const consentItems = ref([
   },
 ]);
 
-// 약관 동의
-const isChecked = ref(false);
-
+// 약관 모두 동의
 const toggleAll = () => {
   const isCheckedValue = isAllChecked.value; // 전체 체크 상태
   consentItems.value.forEach(item => {
@@ -103,16 +103,23 @@ const toggleAll = () => {
 
 const isAllChecked = computed({
   get() {
-    return consentItems.value.every(item => item.checked); // 모든 항목이 체크되어 있으면 true
+    // 모든 항목이 체크되어 있으면 true
+    return consentItems.value.every(item => item.checked);
   },
   set(value) {
+    // 전체 체크박스가 체크/해제되면 개별 항목도 업데이트
     consentItems.value.forEach(item => {
-      item.checked = value; // 전체 체크박스가 체크/해제되면 개별 항목도 업데이트
+      item.checked = value;
     });
   }
 });
 
 // 전화번호
+const selectedCarrier = ref('');
+const selectedPhonePrefix = ref('010');
+const phoneMiddle = ref('');
+const phoneSuffix = ref('');
+
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
@@ -123,11 +130,6 @@ const phoneFields = ref({
     { id: 'phonePrefix11', text: '053' },
   ],
 });
-
-const selectedCarrier = ref('');
-const selectedPhonePrefix = ref('010');
-const phoneMiddle = ref('');
-const phoneSuffix = ref('');
 
 const carrierOptions = ref([
   { value: 'carrier1', text: 'SKT' },
@@ -185,16 +187,19 @@ function onAuthenticationSuccess() {
   alert("인증에 성공했습니다!");
 }
 
+// 자세히 보기 모달창 변수
 const isModalVisible = ref(false);
 const modalTitle = ref('');
 const modalContent = ref('');
 
+// 모달창 열기
 const showModal = (title, content) => {
   modalTitle.value = title;
   modalContent.value = content;
   isModalVisible.value = true;
 };
 
+// 모달창 닫기
 const closeModal = () => {
   isModalVisible.value = false;
 };
@@ -247,7 +252,7 @@ const closeModal = () => {
       <tr>
         <td class="fw-bold fs-8">성함</td>
         <td>
-          <div class="d-flex align-items-center col-5">
+          <div class="d-flex align-items-center col-9">
             <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0 custom-check-btn"
               id="name" :label="{ text: '성함', class: 'form-label' }" type="text" />
           </div>
@@ -258,7 +263,7 @@ const closeModal = () => {
       <tr>
         <td class="fw-bold fs-8">전화번호</td>
         <td>
-          <div class="d-flex align-items-center col-5">
+          <div class="d-flex align-items-center col-9">
             <!-- 통신사 -->
             <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 20%;">
               <option value="" disabled selected>통신사 선택</option>
@@ -290,7 +295,7 @@ const closeModal = () => {
         <tr v-if="isVerificationRequested">
           <td class="fw-bold fs-8">인증번호</td>
           <td>
-            <div class="d-flex align-items-center justify-content-start col-5">
+            <div class="d-flex align-items-center justify-content-start col-9">
               <MaterialInput class="input-group-outline mb-0" v-model="verificationCode" type="text"
                 placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
               <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
