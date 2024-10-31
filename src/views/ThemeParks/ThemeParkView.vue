@@ -13,6 +13,7 @@ import { useAccommodationStore } from "@/stores/accommodationStore";
 import { useThemeParkStore } from "@/stores/themeparkStore";
 import { onMounted, watch, ref, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
 // pinia 스토어
 const themeParkStore = useThemeParkStore();
