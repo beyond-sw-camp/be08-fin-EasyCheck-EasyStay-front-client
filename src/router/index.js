@@ -62,6 +62,7 @@ import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
 import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
 import RoomReservationList from "@/views/Mypage/RoomReservationList/RoomReservationList.vue";
 import ThemeparkReservationList from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationList.vue";
+import RoomReservationDetailView from "@/views/Mypage/RoomReservationList/RoomReservationDetailView.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
@@ -431,6 +432,11 @@ const router = createRouter({
       path: "/ticketrefund",
       name: "TicketRefund",
       component: TicketRefund,
+    },
+    {
+      path: "/users/roomReservationLists/details/:id",
+      name: "RoomReservationDetailView",
+      component: RoomReservationDetailView,
     },
   ],
 });

@@ -383,5 +383,26 @@ export const useReservationStore = defineStore("reservationStore", {
         alert("예약 내역을 불러오는 데 실패했습니다.");
       }
     },
+
+    // 예약 취소
+    async cancelReservation(id) {
+      const reservationRoomUpdateRequest = {
+        reservationStatus: "CANCELED",
+      };
+
+      try {
+        await apiClient.put(
+          `/reservation-room/${id}`,
+          reservationRoomUpdateRequest
+        );
+        alert("예약이 취소되었습니다.");
+        await this.fetchReservationRoomLists();
+      } catch (error) {
+        console.error("예약 취소 실패:", error);
+        this.reservationError =
+          error.response?.data || "예약 취소 중 오류 발생";
+        alert(this.reservationError);
+      }
+    },
   },
 });

@@ -27,6 +27,7 @@ const filteredReservations = ref([]);
 const branchQuery = ref('');
 const checkInDate = ref('');
 const checkOutDate = ref('');
+const selectedReservation = ref(null); // 선택된 예약 정보를 저장할 변수
 
 // 페이지네이션 변수
 const currentPage = ref(1);
@@ -108,8 +109,12 @@ const fetchReservationsWithDetails = async () => {
     await paymentStore.fetchAllPayments();
     const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
 
+    console.log("결제 내역:", allPayments);
+
     await reservationStore.fetchReservationRoomLists();
     const allReservations = reservationStore.reservations;
+
+    console.log("예약 내역: ", allReservations);
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -128,6 +133,7 @@ const fetchReservationsWithDetails = async () => {
         payment: {
           method: paymentMethodMapping[payment.method] || "정보 없음",
           completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
+          id: payment.id
         },
         totalPrice: payment.amount || "정보 없음",
       };
@@ -139,6 +145,14 @@ const fetchReservationsWithDetails = async () => {
   } catch (error) {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
+};
+
+// 예약 상세보기 선택
+const selectReservation = (reservation) => {
+  const id = reservation.payment.id;
+  console.log(reservation.payment.id); // 예약 ID를 콘솔에 출력
+  selectedReservation.value = reservation; // 선택된 예약 정보 저장
+  router.push({ name: "RoomReservationDetailView", params: { id } });
 };
 
 onMounted(async () => {
@@ -220,7 +234,7 @@ onMounted(async () => {
           <div class=" col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
-            <table class="table table-striped">
+            <table class="table table-reservation">
               <thead>
                 <tr>
                   <th>지점</th>
@@ -235,9 +249,10 @@ onMounted(async () => {
               </thead>
               <tbody>
                 <tr v-if="paginatedReservations.length === 0">
-                  <td colspan="10" class="text-center">예약이 없습니다.</td>
+                  <td colspan="8" class="text-center">예약이 없습니다.</td>
                 </tr>
-                <tr v-for="reservation in paginatedReservations" :key="reservation.id">
+                <tr v-for="reservation in paginatedReservations" :key="reservation.id"
+                  @click="selectReservation(reservation)">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
                   <td>{{ reservation.checkinDate || '정보 없음' }}</td>
                   <td>{{ reservation.checkoutDate || '정보 없음' }}</td>
@@ -277,5 +292,15 @@ onMounted(async () => {
 .pagination-button {
   padding: 5px 10px;
   font-size: 0.7rem;
+}
+
+.table-reservation tbody tr {
+  cursor: pointer;
+  /* 포인터 모양으로 변경 */
+}
+
+.table-reservation tbody tr:hover {
+  background-color: #f5f5f5cc;
+  /* 호버 시 배경 색상 변경 */
 }
 </style>
