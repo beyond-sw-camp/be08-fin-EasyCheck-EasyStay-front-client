@@ -93,6 +93,12 @@ const handleReservationClick = () => {
 onMounted(() => {
   // loadScrollState();
   window.addEventListener("scroll", handleScroll);
+
+  // 페이지 전환 시 메뉴를 닫는 로직
+  router.beforeEach((to, from, next) => {
+    isMenuVisible.value = false; // 메뉴를 닫기
+    next(); // 라우팅 진행
+  });
 });
 
 onBeforeUnmount(() => {
@@ -211,6 +217,7 @@ watch(
               >Reservation
             </button>
           </li>
+
           <!-- 네비게이션 토글 버튼 -->
           <li class="nav-item mx-2">
             <button
@@ -224,16 +231,22 @@ watch(
                 <span class="navbar-toggler-bar bar3"></span>
               </span>
             </button>
-            <div id="nav-menu" class="nav-menu" v-show="isMenuVisible">
+
+            <div
+              id="nav-menu"
+              class="nav-menu"
+              :class="{ active: isMenuVisible }"
+              v-show="isMenuVisible"
+            >
               <div class="menu-grid">
                 <div class="grid-header">
                   <div
-                    class="col-md- col-sm-6 col-6 mb-4"
+                    class="col-md-6 col-sm-6 col-6 mb-4 text-center"
                     v-for="{ name, items } of menus"
                     :key="name"
                   >
                     <h6 class="text-sm text-white">{{ name }}</h6>
-                    <ul class="flex-column ms-n3 nav">
+                    <ul class="nav-list justify-content-center">
                       <li
                         class="nav-item"
                         v-for="item of items"
@@ -277,10 +290,10 @@ watch(
   font-size: 1.2rem !important;
 }
 
-.nav-link,
+/* .nav-link,
 .reservation-btn {
   font-size: 1rem !important;
-}
+} */
 
 .navbar .nav-link:hover {
   opacity: 0.7;
@@ -319,20 +332,36 @@ watch(
   right: 0;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
-  padding: 20px;
+  padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease-in-out;
   z-index: 9999; /* 화면 맨 앞에 고정 */
   justify-content: center;
+  text-align: center;
+}
+
+.nav-menu.active {
+  background-color: rgba(0, 0, 0, 0.7);
+  margin-top: 17.046874px; /* 메뉴가 네비게이션 바 아래로 이동 */
+  padding-top: 30px; /* 상단 패딩을 줄여서 높이 조정 */
 }
 
 .menu-grid {
   display: grid;
+  padding: 1px;
+  top: 10px;
   left: 10;
   right: 10;
   place-items: center;
   grid-template-columns: repeat(3, 1fr); /* 3열로 나누기 */
-  grid-gap: 8px; /* 항목 간의 간격 */
+  grid-gap: 5px; /* 항목 간의 간격 */
+  justify-content: center;
+  text-align: center;
+  align-items: flex-start; /* 상단 정렬 */
+}
+.menu-grid > div {
+  /* 그리드 항목을 감싸고 있는 div에 적용 */
+  margin-top: 50px; /* 항목을 아래로 띄우기 위해 마진 추가 */
 }
 
 .grid-header {
@@ -356,7 +385,7 @@ watch(
   left: 50%; /* 가운데 정렬 */
   transform: translateX(-50%); /* 가운데 정렬 */
   width: 80%; /* 경계선 길이 */
-  height: 2px; /* 경계선 두께 */
+  height: 1px; /* 경계선 두께 */
   background-color: white; /* 경계선 색 */
 }
 
@@ -372,5 +401,13 @@ watch(
 
 .menu-grid a:hover {
   background-color: rgba(255, 255, 255, 0.3); /* 호버 시 배경색 변경 */
+}
+
+.nav-list {
+  padding-left: 0 !important;
+}
+
+.nav-item {
+  list-style-type: none !important;
 }
 </style>
