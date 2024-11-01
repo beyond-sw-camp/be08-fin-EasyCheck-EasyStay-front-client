@@ -4,7 +4,6 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-1">
       <div v-for="room in availableRooms" :key="room.roomId" class="col">
         <div class="card h-100">
-          <!-- 이전 이미지, 카드 바디 부분 동일 -->
           <img
             :src="room.thumbnailImgUrl"
             class="card-img-top rounded-0"
@@ -28,18 +27,10 @@
 
             <p class="card-text fw-bold small">{{ room.description }}</p>
             <p class="card-text fw-bold">
-              <<<<<<< HEAD
               <small class="text-muted">
                 기준 인원: {{ room.standardOccupancy }} / 최대 인원:
                 {{ room.maxOccupancy }}
               </small>
-              =======
-              <small class="text-muted"
-                >기준 인원:{{ room.standardOccupancy }} / 최대 인원:{{
-                  room.maxOccupancy
-                }}</small
-              >
-              >>>>>>> develop
             </p>
             <p class="card-text fw-bold small">
               잔여 객실({{ room.remainingRoom }})
@@ -53,10 +44,10 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <small class="text-muted text-decoration-line-through">
-                  {{ formatPrice(room.normalPrice) }}원
+                  {{ formatPrice(room?.expensiveSeasonPrice) }}원
                 </small>
                 <span class="text-danger fw-bold ms-2">
-                  {{ formatPrice(room.corpPrice) }}원~
+                  {{ formatPrice(room?.currentSeasonPrice) }}원~
                 </span>
               </div>
             </div>
@@ -78,14 +69,17 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 import RoomTypeNavs from "@/views/Rooms/Sections/RoomTypeNavs.vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 import { userLoginStore } from "@/stores/loginStore.js";
 
+const router = useRouter();
 const reservationStore = useReservationStore();
 const userStore = userLoginStore();
 
 const { availableRooms, selectedRoom } = storeToRefs(reservationStore);
+const { isLoggedIn } = storeToRefs(userStore);
 
 // Computed
 const isRoomSelected = (room) => selectedRoom.value?.roomId === room.roomId;
@@ -100,7 +94,7 @@ const getRoomButtonText = (room) =>
   isRoomSelected(room) ? "객실 선택됨" : "객실 선택";
 
 // Methods
-const formatPrice = (price) => price.toLocaleString();
+const formatPrice = (price) => price?.toLocaleString();
 
 const handleDetailView = (room) => {
   console.log("객실 상세 보기:", room.roomName);
@@ -108,24 +102,35 @@ const handleDetailView = (room) => {
 
 const handleRoomSelection = async (room) => {
   try {
+    // 이미 선택된 객실 클릭 시
     if (isRoomSelected(room)) {
-      // 같은 객실 다시 선택 시 선택 취소 및 폼 닫기
       reservationStore.setUIState({
         showForm: false,
         showInfo: false,
         showGrid: true,
       });
       reservationStore.resetReservationRoom();
-    } else {
-      // 새로운 객실 선택
-      await userStore.fetchUserInfo();
-      reservationStore.selectRoom(room);
-      reservationStore.setUIState({
-        showForm: true,
-        showInfo: true,
-        showGrid: true,
-      });
+      return;
     }
+
+    // 로그인 체크
+    if (!isLoggedIn.value) {
+      const currentPath = router.currentRoute.value.fullPath;
+      router.push({
+        name: "login",
+        query: { redirect: currentPath },
+      });
+      return;
+    }
+
+    // 로그인 상태일 때 정상 처리
+    await userStore.fetchUserInfo();
+    reservationStore.selectRoom(room);
+    reservationStore.setUIState({
+      showForm: true,
+      showInfo: true,
+      showGrid: true,
+    });
   } catch (error) {
     console.error("객실 선택 처리 실패:", error);
     // TODO: 에러 처리
@@ -134,7 +139,6 @@ const handleRoomSelection = async (room) => {
 </script>
 
 <style lang="scss" scoped>
-// 이전 스타일 동일
 .card {
   background: #fbfbfb;
 

@@ -96,13 +96,10 @@ export const useReservationStore = defineStore("reservationStore", {
 
     // 가격 관련 getter
     totalPrice: (state) => {
-      const userStore = userLoginStore();
-      const basePrice =
-        userStore.userInfo?.userRole === "CORP_USER"
-          ? state.selectedRoom?.corpPrice
-          : state.selectedRoom?.normalPrice;
-
-      const price = basePrice * state.roomCount * state.stayDuration || 0;
+      const price =
+        state.selectedRoom?.currentSeasonPrice *
+          state.roomCount *
+          state.stayDuration || 0;
 
       return new Intl.NumberFormat("ko-KR", {
         style: "currency",
@@ -111,11 +108,10 @@ export const useReservationStore = defineStore("reservationStore", {
     },
 
     totalPriceNumber: (state) => {
-      const userStore = userLoginStore();
       const basePrice =
-        userStore.userInfo?.userRole === "CORP_USER"
-          ? state.selectedRoom?.corpPrice
-          : state.selectedRoom?.normalPrice;
+        state.selectedRoom?.currentSeasonPrice *
+          state.roomCount *
+          state.stayDuration || 0;
 
       return basePrice * state.roomCount * state.stayDuration || 0;
     },
@@ -236,6 +232,15 @@ export const useReservationStore = defineStore("reservationStore", {
     },
 
     // API 호출 액션들
+    async fetchAccommodationById(id) {
+      try {
+        const response = await apiClient.get(`/accommodations/${id}`);
+        this.accommodation = response.data;
+      } catch (error) {
+        console.error("숙박시설 조회 실패:", error);
+        this.accommodation = null;
+      }
+    },
     async fetchAccommodations() {
       try {
         const response = await apiClient.get("/accommodations");
@@ -293,6 +298,9 @@ export const useReservationStore = defineStore("reservationStore", {
           "/reservation-room",
           reservationData
         );
+        console.log("예약 성공");
+        console.log(response.data);
+
         this.reservationResult = response.data;
         return response.data;
       } catch (error) {
@@ -409,8 +417,6 @@ export const useReservationStore = defineStore("reservationStore", {
       this.agreementChecked1 = false;
       this.agreementChecked2 = false;
       this.agreementChecked3 = false;
-      this.reservationResult = null;
-      this.reservationStatus = null;
     },
 
     // 동의 관련 액션
