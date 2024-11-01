@@ -1,16 +1,18 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { ref, toRefs, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
 import { usePaymentStore } from "@/stores/paymentStore";
 import { useReservationStore } from "@/stores/reservationStore";
+import { useRoute } from "vue-router";
+import { refundPayment } from "@/components/Payment/Payment.vue";
+
 import KakaoMap from "@/components/map/KakaoMap.vue";
 
 import Header from "@/examples/Header.vue";
 
 import setMaterialInput from "@/assets/js/material-input";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -20,17 +22,10 @@ onMounted(() => {
 const userStore = userLoginStore();
 const paymentStore = usePaymentStore();
 const reservationStore = useReservationStore();
-
+const router = useRouter();
 // 상태 변수
-const error = ref(null);
-const accommodations = ref([]);
 const reservations = ref([]);
-
 const filteredReservations = ref([]);
-const checkInDate = ref('');
-const checkOutDate = ref('');
-
-const { currentReservation } = toRefs(reservationStore);
 
 const centerCoordinate = ref({
   lat: 37.4972146715141,
@@ -46,8 +41,8 @@ const paymentStatusMapping = {
 
 // 결제 방법 값 매핑
 const paymentMethodMapping = {
-  VBANK: "무통장 입금",
-  CARD: "카드",
+  vbank: "무통장 입금",
+  card: "카드",
 };
 
 
@@ -72,6 +67,9 @@ const fetchReservationsWithDetails = async () => {
       const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
 
       return {
+        ...reservation,
+        reservationId: payment.reservationRoomId,
+        impUid: payment.impUid,
         completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
         reservationDate: formatDate(payment.paymentDate),
         accommodationName: payment.accommodationName || "정보 없음",
@@ -81,12 +79,13 @@ const fetchReservationsWithDetails = async () => {
         roomCount: reservation ? reservation.totalRoomCount : 0,
         adult: reservation ? reservation.adultCount : 0,
         child: reservation ? reservation.childCount : 0,
+        paymentMethod: paymentStatusMapping[payment.completionStatus],
         // 결제자 이름, 전화번호
-        userName: payment.userName,
-        userPhone: payment.userPhone,
+        userName: reservation ? reservation.userName : "정보 없음",
+        userPhone: reservation ? reservation.userPhone : "정보 없음",
         // 투숙자 이름, 전화번호
-        representativeName: reservation ? reservation.representativeName : "정보 없음",
-        representativePhone: reservation ? reservation.representativePhone : "정보 없음"
+        representativeName: reservation ? reservation.userName : "정보 없음",
+        representativePhone: reservation ? reservation.userPhone : "정보 없음"
       };
     });
 
@@ -99,18 +98,43 @@ const fetchReservationsWithDetails = async () => {
   }
 };
 
-const handleCancelReservation = () => {
-  if (currentReservation.value) {
-    reservationStore.cancelReservation(currentReservation.value.id);
-  } else {
-    alert("취소할 예약이 없습니다.");
+const route = useRoute();
+const orderId = ref(route.params.id); // 예약 ID를 저장할 ref (이 값을 페이지에서 가져오세요)
+
+const handleRefund = async () => {
+  if (reservations.value.length === 0) {
+    alert("예약 정보가 없습니다.");
+    return;
+  }
+
+  // 현재 예약 정보를 가져오는 방식
+  const reservationId = reservations.value[0]?.reservationId; // 예시로 첫 번째 예약의 reservationId를 사용
+  const reservation = reservations.value.find(res => res.reservationId === reservationId); // reservationId로 예약 정보 찾기
+
+  if (!reservation || !reservation.impUid) {
+    alert("유효한 결제 정보를 찾을 수 없습니다.");
+    return;
+  }
+
+  const confirmRefund = confirm("정말 환불하시겠습니까?");
+  if (!confirmRefund) {
+    return; // 사용자가 취소를 선택하면 함수 종료
+  }
+
+  try {
+    await refundPayment(reservation.id, reservation.impUid); // reservationId와 impUid 사용
+    alert('정상적으로 환불되었습니다.');
+    await reservationStore.fetchReservationRoomLists(); // 예약 목록 새로 고침
+    router.push("/users/roomReservationLists");
+  } catch (error) {
+    console.error("환불 처리 중 오류 발생:", error);
   }
 };
 
 </script>
 
 <template>
-  <Header class="content">
+  <Header class="content mt-4">
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
       <div class="container custom-login-container my-auto position-relative">
@@ -242,8 +266,9 @@ const handleCancelReservation = () => {
 
           <!-- 예약 취소 버튼 -->
           <div class="cancel-button-container mb-5">
-            <button class="btn btn-danger" @click="handleCancelReservation">예약 취소</button>
+            <button class="btn btn-danger" @click="handleRefund">환불하기</button>
           </div>
+
 
           <h4>오시는 길 안내</h4>
           <div class="col-lg-10 col-md-8 col-12 mb-5" style="height: 500px; width: 100%;">

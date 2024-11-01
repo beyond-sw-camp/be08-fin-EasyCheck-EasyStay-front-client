@@ -96,8 +96,8 @@ const paymentStatusMapping = {
 
 // 결제 방법 값 매핑
 const paymentMethodMapping = {
-  VBANK: "무통장 입금",
-  CARD: "카드",
+  vbank: "무통장 입금",
+  card: "카드",
 };
 
 // 예약 내역 조회
@@ -118,8 +118,11 @@ const fetchReservationsWithDetails = async () => {
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
+      // UTC에서 로컬 시간으로 변환
+      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return localDate.toISOString().split('T')[0];
     };
+
 
     reservations.value = allPayments.map(payment => {
       const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
@@ -129,7 +132,7 @@ const fetchReservationsWithDetails = async () => {
         checkinDate: formatDate(payment.checkinDate),
         checkoutDate: formatDate(payment.checkoutDate),
         typeName: reservation ? reservation.typeName : "정보 없음",
-        reservationDate: formatDate(payment.paymentDate),
+        paymentDate: formatDate(payment.paymentDate),
         payment: {
           method: paymentMethodMapping[payment.method] || "정보 없음",
           completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
@@ -257,7 +260,7 @@ onMounted(async () => {
                   <td>{{ reservation.checkinDate || '정보 없음' }}</td>
                   <td>{{ reservation.checkoutDate || '정보 없음' }}</td>
                   <td>{{ reservation.typeName || '정보 없음' }}</td>
-                  <td>{{ reservation.reservationDate || '정보 없음' }}</td>
+                  <td>{{ reservation.paymentDate || '정보 없음' }}</td>
                   <td>{{ reservation.payment?.method || '정보 없음' }}</td>
                   <td>{{ reservation.payment?.completionStatus || '정보 없음' }}</td>
                   <td>{{ reservation.totalPrice !== undefined ? reservation.totalPrice : '정보 없음' }}</td>

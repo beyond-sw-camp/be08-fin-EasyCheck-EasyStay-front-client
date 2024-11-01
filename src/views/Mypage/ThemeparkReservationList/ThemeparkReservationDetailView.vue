@@ -1,0 +1,343 @@
+<!-- eslint-disable prettier/prettier -->
+<script setup>
+import { ref, onMounted } from "vue";
+import { userLoginStore } from '@/stores/loginStore';
+import { useTicketPaymentStore } from "@/stores/ticketpaymentStore";
+import KakaoMap from "@/components/map/KakaoMap.vue";
+
+import Header from "@/examples/Header.vue";
+
+import setMaterialInput from "@/assets/js/material-input";
+
+onMounted(() => {
+  setMaterialInput();
+  fetchTicketOrdersWithDetails();
+});
+
+const userStore = userLoginStore();
+const paymentStore = useTicketPaymentStore();
+
+// 상태 변수
+const reservations = ref([]);
+const filteredReservations = ref([]);
+const selectedReservation = ref(null);
+
+const centerCoordinate = ref({
+  lat: 37.4972146715141,
+  lng: 126.927607128836
+});
+
+// 결제 상태 값 매핑
+const paymentStatusMapping = {
+  COMPLETE: "결제 완료",
+  INCOMPLETE: "결제 미완료",
+  REFUND: "환불 완료",
+};
+
+// 결제 방법 값 매핑
+const paymentMethodMapping = {
+  vbank: "무통장 입금",
+  card: "카드",
+};
+
+// 'YYYY-MM-DD' 형식으로 변환
+const formatDate = (dateString) => {
+  if (!dateString) {
+    console.error("유효하지 않은 날짜 값:", dateString);
+    return "정보 없음"; // 기본값 반환
+  }
+
+  const date = new Date(dateString);
+
+  // 날짜 유효성 검사
+  if (isNaN(date.getTime())) {
+    console.error("유효하지 않은 날짜 값:", dateString);
+    return "정보 없음"; // 기본값 반환
+  }
+
+  return date.toISOString().split('T')[0];
+};
+
+// 예약 내역 조회
+const fetchTicketOrdersWithDetails = async () => {
+  try {
+    await userStore.getUserData();
+    const userId = userStore.userData.id;
+    const userName = userStore.userData.name;
+    const userPhone = userStore.userData.phone;
+
+    await paymentStore.getAllTicketPayments();
+    const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
+
+    reservations.value = allPayments.map(payment => {
+      return {
+        // 예약 정보
+        orderId: payment.orderId,
+        status: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
+        reservationDate: formatDate(payment.paymentDate) || "정보 없음",
+        accommodationName: payment.accommodationName || "정보 없음",
+        themeparkName: payment.themeParkName,
+        validFromDate: formatDate(payment.validFromDate),
+        validToDate: formatDate(payment.validToDate),
+        quantity: payment.quantity,
+
+        // 결제 정보
+        method: paymentMethodMapping[payment.paymentMethod] || "정보 없음",
+        paymentDate: formatDate(payment.paymentDate),
+        paymentStatus: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
+        price: payment.paymentAmount,
+
+        // 결제자 정보
+        userName: userName || "정보 없음",
+        userPhone: userPhone || "정보 없음"
+      };
+    });
+
+    filteredReservations.value = [...reservations.value];
+    console.log("최종 예약 정보:", reservations.value);
+
+  } catch (error) {
+    console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
+  }
+};
+
+// 예약 취소
+const handleCancelReservation = async () => {
+  if (!selectedReservation.value) {
+    alert("취소할 예약이 없습니다.");
+    return;
+  }
+
+  const orderId = selectedReservation.value.orderId; // 선택된 예약의 orderId를 가져옵니다.
+
+  try {
+    await paymentStore.cancelPayment(orderId); // API 호출
+    alert("예약이 취소되었습니다.");
+    await fetchTicketOrdersWithDetails(); // 예약 목록 다시 불러오기
+  } catch (error) {
+    alert("예약 취소에 실패했습니다.");
+  }
+};
+
+</script>
+
+<template>
+  <Header class="content mt-4">
+    <div class="page-header align-items-start min-vh-100" loading="lazy">
+      <span class="mask bg-white opacity-6"></span>
+      <div class="container custom-login-container my-auto position-relative">
+        <div class="row">
+          <div class="col-12">
+            <div class="bg-white shadow-succes py-3 mb-5 text-start">
+              <h2 class="text-black mb-0">예약 상세내역</h2>
+              <h5 class="text-black-50 fw-normal mt-4">예약 변경 및 예약 취소 시 위약금 또는 패널티가 부과될 수 있습니다.</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="tables-container">
+          <div class="reservation-table">
+            <h4 class="text-left">예약 정보</h4>
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">예약 상태</th>
+                  <td>{{ reservations[0]?.status || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">예약 날짜</th>
+                  <td>{{ reservations[0]?.reservationDate || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">예약 지점</th>
+                  <td>{{ reservations[0]?.accommodationName || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">테마파크명</th>
+                  <td>{{ reservations[0]?.themeparkName || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">사용 시작 기간</th>
+                  <td>{{ reservations[0]?.validFromDate || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">사용 종료 기간</th>
+                  <td>{{ reservations[0]?.validToDate || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">수량</th>
+                  <td>{{ reservations[0]?.quantity || '정보 없음' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="payment-table">
+            <h4 class="text-left">결제 정보</h4>
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">결제 방법</th>
+                  <td>{{ reservations[0]?.method || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">결제 날짜</th>
+                  <td>{{ reservations[0]?.paymentDate || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">결제 상태</th>
+                  <td>{{ reservations[0]?.paymentStatus || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">총 가격</th>
+                  <td>{{ reservations[0]?.price || '정보 없음' }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4 class="text-left mt-5">결제자 정보</h4>
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">이름</th>
+                  <td>{{ reservations[0]?.userName || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">전화번호</th>
+                  <td>{{ reservations[0]?.userPhone || '정보 없음' }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+        <!-- 유의사항 및 요금 정책 -->
+        <div class="notice-section mt-5">
+          <h4 class="mb-4">유의사항</h4>
+
+          <h6>요금 정책</h6>
+          <ul>
+            <li>모든 요금에는 세금과 봉사료가 포함되어 있습니다.</li>
+            <li>티켓 요금은 성인, 아동, 노인에 따라 달라질 수 있으며, 특정 시즌에 따라 변동이 있을 수 있습니다.</li>
+            <li>티켓 구매 후, 취소 및 환불 정책을 꼭 확인하시기 바랍니다.</li>
+          </ul>
+
+          <h6>취소 규정</h6>
+          <ul>
+            <li>티켓 취소는 사용일 7일 전까지 가능합니다. 사용일 6일 전부터 취소 수수료가 부과됩니다.</li>
+            <li>티켓 변경은 사용일 6일 이내에는 불가능하며, 이에 따른 환불이나 변경은 고객센터로 문의해주시기 바랍니다.</li>
+            <li>예약하신 날짜에 방문하지 않거나 위의 지정 기간 이후에 취소한 경우, 환불이 불가능할 수 있습니다.</li>
+          </ul>
+
+          <h6>입장 안내</h6>
+          <ul>
+            <li>입장은 오전 9시부터 가능하며, 입장 시간이 지연될 경우 미리 연락해 주시기 바랍니다.</li>
+            <li>주말 및 공휴일에는 대기 시간이 발생할 수 있으니, 여유 있게 방문하시기 바랍니다.</li>
+          </ul>
+        </div>
+
+        <!-- 예약 취소 버튼 -->
+        <div class="cancel-button-container mb-5">
+          <button class="btn btn-danger" @click="handleCancelReservation">예약 취소</button>
+        </div>
+
+        <h4>오시는 길 안내</h4>
+        <div class="col-lg-10 col-md-8 col-12 mb-5" style="height: 500px; width: 100%;">
+          <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true" />
+        </div>
+      </div>
+    </div>
+  </Header>
+</template>
+
+
+<style scoped>
+.tables-container {
+  display: flex;
+  gap: 20px;
+  /* 테이블 간의 간격 */
+  align-items: stretch;
+}
+
+.reservation-table,
+.payment-table {
+  flex: 1;
+  /* 각 테이블이 남은 공간을 균등하게 차지하도록 설정 */
+}
+
+.table {
+  width: 40%;
+  border-collapse: collapse;
+  /* 경계 겹침 방지 */
+  margin-bottom: 20px;
+}
+
+/* 모든 셀의 하단 경계 설정 */
+.table th,
+.table td {
+  padding: 8px;
+  /* 셀 패딩 추가 */
+  text-align: left;
+  /* 텍스트 왼쪽 정렬 */
+  border-bottom: 1px solid #ddd;
+  /* 기본적으로 연한 가로선 추가 */
+}
+
+/* 헤더 스타일 */
+.table th {
+  background-color: #f2f2f2;
+  /* 헤더 배경 색상 설정 */
+}
+
+/* 모든 열의 첫 번째 셀에 대한 상단 경계 추가 */
+.table tr:first-child th {
+  border-top: 1px solid #423e3e;
+  /* 첫 번째 행의 모든 헤더 두껍게 설정 */
+}
+
+.table tr:first-child td {
+  border-top: 1px solid #423e3e;
+  /* 첫 번째 행의 모든 데이터 셀 두껍게 설정 */
+}
+
+/* 외곽 세로선 제거 */
+.table {
+  border-left: none;
+  /* 왼쪽 외곽선 제거 */
+  border-right: none;
+  /* 오른쪽 외곽선 제거 */
+}
+
+/* 나머지 세로선 연하게 설정 */
+.table th,
+.table td {
+  border-right: 1px solid #ddd;
+  /* 연한 세로선 추가 */
+}
+
+.table td:last-child,
+.table th:last-child {
+  border-right: none;
+  /* 마지막 열의 세로선 제거 */
+}
+
+/* 첫 번째 셀의 하단 테두리 제거 */
+.table tr:last-child td {
+  border-bottom: none;
+  /* 마지막 행의 셀 하단 경계 제거 */
+}
+
+.content {
+  padding-top: 60px;
+  /* 헤더 높이에 맞춰 조정 */
+}
+
+.cancel-button-container {
+  display: flex;
+  justify-content: center;
+  /* 오른쪽으로 정렬 */
+  margin-top: 20px;
+  /* 필요에 따라 여백 조정 */
+}
+</style>
