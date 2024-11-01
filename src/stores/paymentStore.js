@@ -53,18 +53,5 @@ export const usePaymentStore = defineStore("paymentStore", {
         console.error("결제 내역 조회 실패:", error);
       }
     },
-
-    // 결제 취소 함수
-    async cancelPayment(id, paymentUpdateRequest) {
-      this.loading = true;
-      try {
-        await apiClient.put(`/payment/${id}`, paymentUpdateRequest);
-        this.loading = false;
-      } catch (error) {
-        this.loading = false;
-        this.error = error;
-        console.error("결제 취소 실패:", error);
-      }
-    },
   },
 });

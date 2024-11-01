@@ -21,6 +21,7 @@ const ticketpaymentStore = useTicketPaymentStore();
 const error = ref(null);
 const accommodations = ref([]);
 const reservations = ref([]);
+const selectedReservation = ref(null);
 const filteredReservations = ref([]);
 const branchQuery = ref('');
 const checkInDate = ref('');
@@ -86,9 +87,22 @@ const changePage = (page) => {
     currentPage.value = page;
   }
 };
+
 // 'YYYY-MM-DD' 형식으로 변환
 const formatDate = (dateString) => {
+  if (!dateString) {
+    console.error("유효하지 않은 날짜 값:", dateString);
+    return "정보 없음"; // 기본값 반환
+  }
+
   const date = new Date(dateString);
+
+  // 날짜 유효성 검사
+  if (isNaN(date.getTime())) {
+    console.error("유효하지 않은 날짜 값:", dateString);
+    return "정보 없음"; // 기본값 반환
+  }
+
   return date.toISOString().split('T')[0];
 };
 
@@ -97,6 +111,12 @@ const paymentStatusMapping = {
   COMPLETED: "결제 완료",
   INCOMPLETE: "결제 미완료",
   REFUND: "환불 완료",
+};
+
+// 결제 방법 값 매핑
+const paymentMethodMapping = {
+  vbank: "무통장 입금",
+  card: "카드",
 };
 
 // 티켓 예약 내역 조회
@@ -121,6 +141,7 @@ const fetchTicketOrdersWithDetails = async () => {
     console.log("로그인한 사용자의 결제 정보:", userPayments);
 
     reservations.value = userPayments.map(payment => ({
+      orderId: payment.orderId || "정보 없음",
       accommodationName: payment.accommodationName || "정보 없음",
       themeParkName: payment.themeParkName || "정보 없음",
       ticketName: payment.ticketName || "정보 없음",
@@ -129,7 +150,7 @@ const fetchTicketOrdersWithDetails = async () => {
       validFromDate: formatDate(payment.validFromDate),
       validToDate: formatDate(payment.validToDate),
       paymentDate: formatDate(payment.paymentDate),
-      paymentMethod: payment.paymentMethod || "정보 없음",
+      paymentMethod: paymentMethodMapping[payment.paymentMethod] || "정보 없음",
       paymentStatus: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
     }));
 
@@ -138,6 +159,14 @@ const fetchTicketOrdersWithDetails = async () => {
   } catch (error) {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
+};
+
+// 예약 상세보기 선택
+const selectReservation = (reservation) => {
+  const id = reservation.orderId;
+  console.log(reservation.orderId);
+  selectedReservation.value = reservation;
+  router.push({ name: "ThemeparkReservationDetailView", params: { id } });
 };
 
 onMounted(async () => {
@@ -223,7 +252,7 @@ onMounted(async () => {
           <div class=" col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
-            <table class="table table-striped">
+            <table class="table table-reservation">
               <thead>
                 <tr class="text-bold">
                   <th>지점</th>
@@ -242,7 +271,8 @@ onMounted(async () => {
                 <tr v-if="paginatedReservations.length === 0">
                   <td colspan="10" class="text-center">예약이 없습니다.</td>
                 </tr>
-                <tr v-else v-for="(reservation, index) in paginatedReservations" :key="index">
+                <tr v-else v-for="(reservation, index) in paginatedReservations" :key="index"
+                  @click="selectReservation(reservation)">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
                   <td>{{ reservation.themeParkName || '정보 없음' }}</td>
                   <td>{{ reservation.ticketName || '정보 없음' }}</td>
@@ -298,5 +328,15 @@ onMounted(async () => {
 .pagination-button:disabled {
   border-color: #ccc;
   color: #ccc;
+}
+
+.table-reservation tbody tr {
+  cursor: pointer;
+  /* 포인터 모양으로 변경 */
+}
+
+.table-reservation tbody tr:hover {
+  background-color: #f5f5f5cc;
+  /* 호버 시 배경 색상 변경 */
 }
 </style>

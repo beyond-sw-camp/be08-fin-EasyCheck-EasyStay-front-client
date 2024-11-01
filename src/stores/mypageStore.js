@@ -43,13 +43,21 @@ export const mypageStore = defineStore("mypageStore", {
     },
 
     // 개인정보 수정
-    async updateUserData(email, phone, addr, addrDetail) {
+    async updateUserData(phone, addr, addrDetail) {
       const loginStore = userLoginStore();
       await loginStore.getUserData();
+      const userData = loginStore.userData;
+
+      console.log({
+        email: userData.email,
+        phone,
+        addr,
+        addrDetail,
+      });
 
       try {
         const response = await apiClient.put("/users", {
-          email,
+          email: userData.email,
           phone,
           addr,
           addrDetail,

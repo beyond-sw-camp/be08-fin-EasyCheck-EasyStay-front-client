@@ -63,6 +63,7 @@ import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
 import RoomReservationList from "@/views/Mypage/RoomReservationList/RoomReservationList.vue";
 import ThemeparkReservationList from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationList.vue";
 import RoomReservationDetailView from "@/views/Mypage/RoomReservationList/RoomReservationDetailView.vue";
+import ThemeparkReservationDetailView from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationDetailView.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
@@ -437,6 +438,11 @@ const router = createRouter({
       path: "/users/roomReservationLists/details/:id",
       name: "RoomReservationDetailView",
       component: RoomReservationDetailView,
+    },
+    {
+      path: "/users/themeparkReservationLists/details/:id",
+      name: "ThemeparkReservationDetailView",
+      component: ThemeparkReservationDetailView,
     },
   ],
 });
