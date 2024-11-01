@@ -1,5 +1,5 @@
 <template>
-  <section class="py-6">
+  <section class="py-6 mt-5">
     <div class="container">
       <h3>{{ roomType?.name }}</h3>
       <room-type-navs />

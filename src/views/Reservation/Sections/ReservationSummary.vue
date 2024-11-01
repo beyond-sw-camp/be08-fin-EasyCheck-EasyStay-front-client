@@ -1,21 +1,24 @@
 <template>
   <div class="reservation-summary card">
     <div class="card-body">
+      <!-- 날짜 범위 섹션 -->
       <div
         class="date-range d-flex justify-content-between align-items-center mb-3"
       >
         <div class="date-box text-center">
-          <h3 class="mb-0">{{ checkinDate }}</h3>
-          <small>{{ checkinMonth }}월 {{ checkinDayKo }}</small>
+          <h3 class="mb-0">{{ checkinInfo.date }}</h3>
+          <small>{{ checkinInfo.month }}월 {{ checkinInfo.dayKo }}</small>
         </div>
         <div class="nights d-flex flex-column align-items-center">
           <span class="badge bg-transparent">{{ stayDuration }}박</span>
         </div>
         <div class="date-box text-center">
-          <h3 class="mb-0">{{ checkoutDate }}</h3>
-          <small>{{ checkoutMonth }}월 {{ checkoutDayKo }}</small>
+          <h3 class="mb-0">{{ checkoutInfo.date }}</h3>
+          <small>{{ checkoutInfo.month }}월 {{ checkoutInfo.dayKo }}</small>
         </div>
       </div>
+
+      <!-- 객실 수 조절 섹션 -->
       <div
         class="room-count d-flex justify-content-between align-items-center mb-3"
       >
@@ -24,7 +27,8 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="reservationStore.decreaseRoomCount"
+            @click="decreaseRoomCount"
+            :disabled="roomCount <= 1"
           >
             -
           </button>
@@ -32,13 +36,20 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="reservationStore.increaseRoomCount"
+            @click="increaseRoomCount"
+            :disabled="roomCount >= maxRoomCount"
           >
             +
           </button>
         </div>
       </div>
-      <button class="btn btn-danger w-100" @click="onClickSearch">
+
+      <!-- 검색 버튼 -->
+      <button
+        class="btn btn-danger w-100"
+        @click="handleSearch"
+        :disabled="!isSearchable"
+      >
         객실 검색
       </button>
     </div>
@@ -47,24 +58,45 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { computed } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
 const reservationStore = useReservationStore();
 
-const {
-  checkinMonth,
-  checkinDayKo,
-  checkinDate,
-  checkoutMonth,
-  checkoutDayKo,
-  checkoutDate,
-  stayDuration,
-  roomCount,
-} = storeToRefs(reservationStore);
+// Store에서 필요한 상태 가져오기
+const { checkinInfo, checkoutInfo, stayDuration, roomCount } =
+  storeToRefs(reservationStore);
 
-const onClickSearch = async () => {
-  reservationStore.fetchReservationAvailableRooms();
-  reservationStore.setShowRoomSelectionGrid(true);
+// 상수
+const MAX_ROOM_COUNT = 10;
+
+// Computed 속성
+const maxRoomCount = computed(() => MAX_ROOM_COUNT);
+const isSearchable = computed(() => {
+  return checkinInfo.value && checkoutInfo.value && roomCount.value > 0;
+});
+
+// Methods
+const decreaseRoomCount = () => {
+  if (roomCount.value > 1) {
+    reservationStore.roomCount--;
+  }
+};
+
+const increaseRoomCount = () => {
+  if (roomCount.value < MAX_ROOM_COUNT) {
+    reservationStore.roomCount++;
+  }
+};
+
+const handleSearch = async () => {
+  try {
+    await reservationStore.fetchAvailableRooms();
+    reservationStore.setUIState({ showGrid: true });
+  } catch (error) {
+    console.error("객실 검색 실패:", error);
+    // TODO: 에러 처리 추가
+  }
 };
 </script>
 
@@ -85,15 +117,16 @@ const onClickSearch = async () => {
     }
     small {
       font-size: 0.8rem;
-      color: #6c757d; // 직접 색상 지정
+      color: #6c757d;
     }
   }
+
   .nights {
     .badge {
       font-size: 0.9rem;
       padding: 0.5em 1em;
-      background-color: #ced4da; // 직접 색상 지정
-      color: #495057; // 직접 색상 지정
+      background-color: #ced4da;
+      color: #495057;
     }
   }
 }
@@ -102,6 +135,7 @@ const onClickSearch = async () => {
   span {
     font-size: 0.9rem;
   }
+
   .input-group {
     .btn {
       padding: 0.375rem 0.75rem;
@@ -117,7 +151,12 @@ const onClickSearch = async () => {
 }
 
 .btn-danger {
-  background-color: #dc3545; // 직접 색상 지정
-  border-color: #dc3545; // 직접 색상 지정
+  background-color: #dc3545;
+  border-color: #dc3545;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 }
 </style>

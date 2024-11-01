@@ -1,5 +1,9 @@
 <script setup>
 import logoDark from "@/assets/img/logo-ct-dark.png";
+import { onMounted, ref } from "vue";
+import { useAccommodationStore } from "@/stores/accommodationStore";
+import { RouterLink } from "vue-router";
+
 defineProps({
   brand: {
     type: Object,
@@ -39,93 +43,45 @@ defineProps({
       },
     ],
   },
-  menus: {
-    type: Array,
-    name: String,
-    items: {
-      type: Array,
-      name: String,
-      href: String,
-    },
-    default: () => [
-      {
-        name: "RESORTS",
-        items: [
-          {
-            name: "설악 쏘라노",
-            href: "",
-          },
-          {
-            name: "거제 벨버디어",
-            href: "",
-          },
-          {
-            name: "산정호수 안시",
-            href: "",
-          },
-        ],
-      },
-      {
-        name: "HOTELS",
-        items: [
-          {
-            name: "시그니엘",
-            href: "",
-          },
-          {
-            name: "더 플라자",
-            href: "",
-          },
-          {
-            name: "파라다이스 시티",
-            href: "",
-          },
-        ],
-      },
-      {
-        name: "THEME PARKS",
-        items: [
-          {
-            name: "워터파크",
-            href: "",
-          },
-          {
-            name: "아쿠아리움",
-            href: "",
-          },
-          {
-            name: "미술관",
-            href: "",
-          },
-        ],
-      },
-      {
-        name: "DEVELOPER",
-        items: [
-          {
-            name: "Yongun Gye",
-            href: "https://github.com/yongun2",
-          },
-          {
-            name: "Nahyeon Kim",
-            href: "https://github.com/NAHYEON0713",
-          },
-          {
-            name: "Hoyeon Yun",
-            href: "https://github.com/hoyeon96",
-          },
-          {
-            name: "Jihoon Lim",
-            href: "https://github.com/limjihoon99",
-          },
-          {
-            name: "Jinjoo Jeong",
-            href: "https://github.com/jeongjinjoo",
-          },
-        ],
-      },
+});
+
+// accommodationStore 사용 및 메뉴 기본 값 설정
+const accommodationStore = useAccommodationStore();
+const menus = ref([
+  { name: "RESORTS", items: [] },
+  { name: "HOTELS", items: [] },
+  {
+    name: "THEME PARKS",
+    items: [
+      { name: "워터파크", href: "" },
+      { name: "아쿠아리움", href: "" },
+      { name: "미술관", href: "" },
     ],
   },
+  {
+    name: "DEVELOPER",
+    items: [
+      { name: "Yongun Gye", href: "https://github.com/yongun2" },
+      { name: "Nahyeon Kim", href: "https://github.com/NAHYEON0713" },
+      { name: "Hoyeon Yun", href: "https://github.com/hoyeon96" },
+      { name: "Jihoon Lim", href: "https://github.com/limjihoon99" },
+      { name: "Jinjoo Jeong", href: "https://github.com/jeongjinjoo" },
+    ],
+  },
+]);
+
+// API 호출 및 메뉴 항목 설정
+onMounted(async () => {
+  await accommodationStore.fetchAccommodations();
+
+  // API로부터 불러온 accommodations를 Resort와 Hotel로 분류
+  menus.value[0].items = accommodationStore.accommodations
+    .filter((item) => item.accommodationType === "RESORT")
+    .map((resort) => ({ name: resort.name, href: `/accommodation/${resort.id}` }));
+
+  menus.value[1].items = accommodationStore.accommodations
+    .filter((item) => item.accommodationType === "HOTEL")
+    .map((hotel) => ({ name: hotel.name, href: `/accommodation/${hotel.id}` }));
 });
 </script>
 
@@ -163,17 +119,15 @@ defineProps({
             </ul>
           </div>
         </div>
-        <div
-          class="col-md-2 col-sm-6 col-6 mb-4"
-          v-for="{ name, items } of menus"
-          :key="name"
-        >
+
+        <!-- 동적으로 생성된 메뉴 목록 -->
+        <div class="col-md-2 col-sm-6 col-6 mb-4" v-for="{ name, items } of menus" :key="name">
           <h6 class="text-sm text-white">{{ name }}</h6>
           <ul class="flex-column ms-n3 nav">
-            <li class="nav-item" v-for="item of items" :key="item.name">
-              <a class="nav-link text-white" :href="item.href" target="_blank">
+            <li class="nav-item" v-for="item in items" :key="item.name">
+              <RouterLink :to="item.href" class="nav-link text-white">
                 {{ item.name }}
-              </a>
+              </RouterLink>
             </li>
           </ul>
         </div>

@@ -16,6 +16,9 @@ const userInfo = ref({
   password: '',
   name: '',
   phone: '',
+  selectedPhonePrefix: '',
+  phoneMiddle: '',
+  phoneSuffix: '',
   addr: '',
   addr_detail: '',
   roadAddress: '',
@@ -43,29 +46,6 @@ onMounted(async () => {
   setMaterialInput();
   await loadUserData();
 });
-
-// 약관 동의
-const isChecked = ref(false);
-
-const consentItems = ref([
-  { label: '개인정보 이용 동의 (필수)', checked: false },
-  { label: '고유식별 정보 처리 동의 (필수)', checked: false },
-]);
-
-const consentItems2 = ref([
-  { label: '서비스 이용약관 동의 (필수)', checked: false },
-  { label: '통신사 이용약관 동의 (필수)', checked: false },
-]);
-
-function toggleAll() {
-  consentItems.value.forEach(item => {
-    item.checked = isChecked.value;
-  });
-
-  consentItems2.value.forEach(item => {
-    item.checked = isChecked.value;
-  });
-}
 
 // 전화번호
 const phoneFields = ref({
@@ -107,14 +87,22 @@ const searchZipCode = () => {
   }).open();
 };
 
-
 const emit = defineEmits(['update']);
 
 // 개인정보 수정 메서드
+// 개인정보 수정 메서드
 const updateUserData = async () => {
   try {
+    // 전화번호 합치기
+    userInfo.value.phone = `${userInfo.value.selectedPhonePrefix}${userInfo.value.phoneMiddle}${userInfo.value.phoneSuffix}`;
+
+    console.log("업데이트할 사용자 정보:", {
+      phone: userInfo.value.phone,
+      roadAddress: userInfo.value.roadAddress,
+      detailAddress: userInfo.value.detailAddress
+    });
+
     await mypage.updateUserData(
-      userInfo.value.email,
       userInfo.value.phone,
       userInfo.value.roadAddress,
       userInfo.value.detailAddress
@@ -125,6 +113,7 @@ const updateUserData = async () => {
     error.value = err.message;
   }
 };
+
 
 const handleButtonClick = () => {
   updateUserData();

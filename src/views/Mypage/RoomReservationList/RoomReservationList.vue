@@ -27,6 +27,7 @@ const filteredReservations = ref([]);
 const branchQuery = ref('');
 const checkInDate = ref('');
 const checkOutDate = ref('');
+const selectedReservation = ref(null); // 선택된 예약 정보를 저장할 변수
 
 // 페이지네이션 변수
 const currentPage = ref(1);
@@ -95,8 +96,8 @@ const paymentStatusMapping = {
 
 // 결제 방법 값 매핑
 const paymentMethodMapping = {
-  VBANK: "무통장 입금",
-  CARD: "카드",
+  vbank: "무통장 입금",
+  card: "카드",
 };
 
 // 예약 내역 조회
@@ -108,13 +109,20 @@ const fetchReservationsWithDetails = async () => {
     await paymentStore.fetchAllPayments();
     const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
 
+    console.log("결제 내역:", allPayments);
+
     await reservationStore.fetchReservationRoomLists();
     const allReservations = reservationStore.reservations;
 
+    console.log("예약 내역: ", allReservations);
+
     const formatDate = (dateString) => {
       const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
+      // UTC에서 로컬 시간으로 변환
+      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return localDate.toISOString().split('T')[0];
     };
+
 
     reservations.value = allPayments.map(payment => {
       const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
@@ -124,10 +132,11 @@ const fetchReservationsWithDetails = async () => {
         checkinDate: formatDate(payment.checkinDate),
         checkoutDate: formatDate(payment.checkoutDate),
         typeName: reservation ? reservation.typeName : "정보 없음",
-        reservationDate: formatDate(payment.paymentDate),
+        paymentDate: formatDate(payment.paymentDate),
         payment: {
           method: paymentMethodMapping[payment.method] || "정보 없음",
           completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
+          id: payment.id
         },
         totalPrice: payment.amount || "정보 없음",
       };
@@ -139,6 +148,14 @@ const fetchReservationsWithDetails = async () => {
   } catch (error) {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
+};
+
+// 예약 상세보기 선택
+const selectReservation = (reservation) => {
+  const id = reservation.payment.id;
+  console.log(reservation.payment.id); // 예약 ID를 콘솔에 출력
+  selectedReservation.value = reservation; // 선택된 예약 정보 저장
+  router.push({ name: "RoomReservationDetailView", params: { id } });
 };
 
 onMounted(async () => {
@@ -220,7 +237,7 @@ onMounted(async () => {
           <div class=" col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
-            <table class="table table-striped">
+            <table class="table table-reservation">
               <thead>
                 <tr>
                   <th>지점</th>
@@ -235,14 +252,15 @@ onMounted(async () => {
               </thead>
               <tbody>
                 <tr v-if="paginatedReservations.length === 0">
-                  <td colspan="10" class="text-center">예약이 없습니다.</td>
+                  <td colspan="8" class="text-center">예약이 없습니다.</td>
                 </tr>
-                <tr v-for="reservation in paginatedReservations" :key="reservation.id">
+                <tr v-for="reservation in paginatedReservations" :key="reservation.id"
+                  @click="selectReservation(reservation)">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
                   <td>{{ reservation.checkinDate || '정보 없음' }}</td>
                   <td>{{ reservation.checkoutDate || '정보 없음' }}</td>
                   <td>{{ reservation.typeName || '정보 없음' }}</td>
-                  <td>{{ reservation.reservationDate || '정보 없음' }}</td>
+                  <td>{{ reservation.paymentDate || '정보 없음' }}</td>
                   <td>{{ reservation.payment?.method || '정보 없음' }}</td>
                   <td>{{ reservation.payment?.completionStatus || '정보 없음' }}</td>
                   <td>{{ reservation.totalPrice !== undefined ? reservation.totalPrice : '정보 없음' }}</td>
@@ -277,5 +295,15 @@ onMounted(async () => {
 .pagination-button {
   padding: 5px 10px;
   font-size: 0.7rem;
+}
+
+.table-reservation tbody tr {
+  cursor: pointer;
+  /* 포인터 모양으로 변경 */
+}
+
+.table-reservation tbody tr:hover {
+  background-color: #f5f5f5cc;
+  /* 호버 시 배경 색상 변경 */
 }
 </style>

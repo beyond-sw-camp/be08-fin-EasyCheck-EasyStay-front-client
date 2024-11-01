@@ -24,65 +24,82 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+// 상태 타입별로 그룹화
 export const useReservationStore = defineStore("reservationStore", {
   state: () => ({
-    roomCount: 1,
-    roomId: null,
+    // 숙박시설 관련 상태
+    accommodation: null, // 현재 선택된 숙박시설
+    accommodations: [], // 모든 숙박시설 목록
+
+    // 날짜 관련 상태
     checkIn: null,
     checkOut: null,
-    accommodationId: null,
-    accommodationName: "",
+
+    // 객실 관련 상태
+    roomCount: 1,
+    selectedRoom: null,
+    availableRooms: [],
+
+    // 투숙객 관련 상태
     adultCount: 0,
     childCount: 0,
 
+    // UI 상태
+    showReservationForm: false,
+    showReservationInfo: false,
+    showRoomSelectionGrid: false,
+
+    // 예약/결제 관련 상태
+    reservationResult: null,
+    reservationStatus: null, // 'pending' | 'success' | 'error' | null
+    paymentMethod: "vbank",
+    isPaymentSuccess: false,
+    isPaymentFailed: false,
+
+    // 약관 동의 상태
     agreementChecked1: false,
     agreementChecked2: false,
     agreementChecked3: false,
-
-    // 예약 하기위한 폼 토글
-    showReservationForm: false,
-    // 예약 요약 토글
-    showReservationInfo: false,
-    // 예약 가능 객실 토글
-    showRoomSelectionGrid: false,
-    // 숙박시설 리스트
-    accommodationList: [],
-    // 체크인 체크아웃 날짜에 예약 가능한 방 정보
-    availableRoomList: [],
-
-    // 모든 예약 내역 조회하기
-    reservations: [],
-
-    // 객실 예약시 선택한 방 정보
-    selectedRoom: null,
-
-    // 예약 관련 상태 추가
-    reservationStatus: null, // 'pending' | 'success' | 'error' | null
-    reservationError: null,
-    currentReservation: null,
-
-    reservationResult: null,
-
-    // 결제 관련
-    paymentMehod: "vbank",
   }),
 
   getters: {
-    allAgreementsChecked: (state) =>
-      state.agreementChecked1 && state.agreementChecked2,
+    // 숙박시설 관련 getter
+    currentAccommodationId: (state) => state.accommodation?.id,
+    currentAccommodationName: (state) => state.accommodation?.name,
     accommodationTabs: (state) =>
-      state.accommodationList.map((accommodation) => ({
-        accommodationId: accommodation.id,
-        name: accommodation.name,
+      state.accommodations.map((acc) => ({
+        accommodationId: acc.id,
+        name: acc.name,
       })),
 
-    totalPrice: (state) => {
-      const basePrice =
-        state.userInfo?.userRole === "CORP_USER"
-          ? state.selectedRoom?.corpPrice
-          : state.selectedRoom?.normalPrice;
+    // 날짜 관련 getter
+    formattedCheckinDate: (state) => formatDate(state.checkIn),
+    formattedCheckoutDate: (state) => formatDate(state.checkOut),
+    stayDuration: (state) =>
+      state.checkIn && state.checkOut
+        ? Math.floor((state.checkOut - state.checkIn) / (1000 * 60 * 60 * 24))
+        : 0,
 
-      const price = basePrice * state.roomCount * state.stayDuration || 0;
+    // 체크인 정보
+    checkinInfo: (state) => ({
+      date: state.checkIn?.getDate(),
+      month: state.checkIn?.getMonth() + 1,
+      dayKo: state.checkIn ? DAYS_KO[state.checkIn.getDay()] : null,
+    }),
+
+    // 체크아웃 정보
+    checkoutInfo: (state) => ({
+      date: state.checkOut?.getDate(),
+      month: state.checkOut?.getMonth() + 1,
+      dayKo: state.checkOut ? DAYS_KO[state.checkOut.getDay()] : null,
+    }),
+
+    // 가격 관련 getter
+    totalPrice: (state) => {
+      const price =
+        state.selectedRoom?.currentSeasonPrice *
+          state.roomCount *
+          state.stayDuration || 0;
 
       return new Intl.NumberFormat("ko-KR", {
         style: "currency",
@@ -90,129 +107,180 @@ export const useReservationStore = defineStore("reservationStore", {
       }).format(price);
     },
 
-    // 숫자만 있는 가격 (결제 API용)
     totalPriceNumber: (state) => {
       const basePrice =
-        state.userInfo?.userRole === "CORP_USER"
-          ? state.selectedRoom?.corpPrice
-          : state.selectedRoom?.normalPrice;
+        state.selectedRoom?.currentSeasonPrice *
+          state.roomCount *
+          state.stayDuration || 0;
 
       return basePrice * state.roomCount * state.stayDuration || 0;
     },
 
-    // 날짜 포맷팅 getter 통합
-    formattedCheckinDate: (state) => formatDate(state.checkIn),
-    formattedCheckoutDate: (state) => formatDate(state.checkOut),
-
-    // 체크인 관련 getter 통합
-    checkinInfo: (state) => ({
-      date: state.checkIn?.getDate(),
-      month: state.checkIn?.getMonth(),
-      dayKo: state.checkIn ? DAYS_KO[state.checkIn.getDay()] : null,
-    }),
-
-    // 체크아웃 관련 getter 통합
-    checkoutInfo: (state) => ({
-      date: state.checkOut?.getDate(),
-      month: state.checkOut?.getMonth(),
-      dayKo: state.checkOut ? DAYS_KO[state.checkOut.getDay()] : null,
-    }),
-
-    // 기존 getter들을 새로운 통합 getter를 사용하도록 수정 (하위 호환성 유지)
-    checkinDate: (state) => state.checkIn?.getDate(),
-    checkinMonth: (state) => state.checkIn?.getMonth(),
-    checkinDayKo: (state) =>
-      state.checkIn ? DAYS_KO[state.checkIn.getDay()] : null,
-    checkoutDate: (state) => state.checkOut?.getDate(),
-    checkoutMonth: (state) => state.checkOut?.getMonth(),
-    checkoutDayKo: (state) =>
-      state.checkOut ? DAYS_KO[state.checkOut.getDay()] : null,
-
-    stayDuration: (state) =>
-      Math.floor((state.checkOut - state.checkIn) / (1000 * 60 * 60 * 24)),
-    // 전체 투숙 인원
+    // 기타 getter
     totalGuests: (state) => state.adultCount + state.childCount,
+    allAgreementsChecked: (state) =>
+      state.agreementChecked1 && state.agreementChecked2,
   },
+
   actions: {
-    openReservationForm() {
-      this.showReservationForm = true;
-    },
-    closeReservationForm() {
-      this.showReservationForm = false;
-    },
-    // 예약 동의여부
-    setAgreementChecked1(value) {
-      this.agreementChecked1 = value;
-    },
-    setAgreementChecked2(value) {
-      this.agreementChecked2 = value;
-    },
-    selectReservationRoom(room) {
-      this.selectedRoom = room;
-      this.adultCount = room.standardOccupancy;
-    },
-    resetReservationRoom() {
-      this.selectedRoom = null;
-    },
-    setShowRoomSelectionGrid(isOpen) {
-      this.showRoomSelectionGrid = isOpen;
-    },
-    setAccommodationId(accommodationId) {
-      this.accommodationId = accommodationId;
-    },
-    setAccommodationName(name) {
-      this.accommodationName = name;
-    },
-    setRoomId(roomId) {
-      this.roomId = roomId;
-    },
-    setCheckinDate(checkinDate) {
-      this.checkIn = checkinDate;
-    },
-    setCheckoutDate(checkOutDate) {
-      this.checkOut = checkOutDate;
-    },
-    setRoomCount(count) {
-      this.roomCount = count;
-    },
-    resetAccommodationList() {
-      this.accommodationList = [];
-    },
-    increaseRoomCount() {
-      if (this.roomCount < 4) {
-        this.roomCount += 1;
+    // 초기화 관련 액션
+    initializeReservation(checkInDate = null, checkOutDate = null) {
+      // 날짜 초기화
+      if (!checkInDate && !checkOutDate) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        this.checkIn = today;
+        this.checkOut = tomorrow;
+      } else {
+        this.checkIn = new Date(checkInDate);
+        this.checkOut = new Date(checkOutDate);
       }
-    },
-    decreaseRoomCount() {
-      if (this.roomCount > 1) {
-        this.roomCount -= 1;
-      }
-    },
-    initCheckInCheckOut() {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
 
-      this.checkIn = today;
-      this.checkOut = tomorrow;
-    },
-
-    resetRoomSelection() {
-      this.showRoomSelectionGrid = false;
-      this.availableRoomList = [];
-    },
-
-    resetReservationForm() {
-      this.showReservationForm = false;
+      // 기본값 초기화
+      this.roomCount = 1;
       this.adultCount = 0;
       this.childCount = 0;
     },
-    // 예약 API 호출
-    async createReservation(form) {
-      console.log(`예약 호출 roomId = ${form}`);
+
+    async initializeReservationWithQuery({
+      accommodationId,
+      checkInDate,
+      checkOutDate,
+    }) {
+      try {
+        if (accommodationId) {
+          await this.fetchAccommodationById(accommodationId);
+        } else {
+          this.initCurrentAccommodation();
+        }
+
+        this.initializeReservation(checkInDate, checkOutDate);
+      } catch (error) {
+        console.error("예약 초기화 실패:", error);
+        // 기본값으로 폴백
+        this.initCurrentAccommodation();
+        this.initializeReservation();
+      }
+    },
+
+    updateDateRange({ checkIn, checkOut }) {
+      this.checkIn = checkIn;
+      this.checkOut = checkOut;
+
+      // UI 상태 초기화
+      this.setShowRoomSelectionGrid(false);
+      this.resetReservationRoom();
+    },
+
+    // UI 상태 관리 액션
+    setUIState({ showForm = false, showInfo = false, showGrid = false }) {
+      this.showReservationForm = showForm;
+      this.showReservationInfo = showInfo;
+      this.showRoomSelectionGrid = showGrid;
+    },
+
+    // 객실 선택 관련 액션
+    selectRoom(room) {
+      this.selectedRoom = room;
+      this.adultCount = room.standardOccupancy;
+      this.setUIState({ showForm: true, showInfo: true });
+    },
+
+    // 날짜 관련 액션들
+    setCheckinDate(date) {
+      this.checkIn = new Date(date);
+    },
+
+    setCheckoutDate(date) {
+      this.checkOut = new Date(date);
+    },
+
+    // ReservationCalendar에서 사용할 수 있도록 setShowRoomSelectionGrid 액션 추가
+    setShowRoomSelectionGrid(show) {
+      this.showRoomSelectionGrid = show;
+    },
+
+    // 객실 초기화를 위한 resetReservationRoom 액션 추가
+    resetReservationRoom() {
+      this.selectedRoom = null;
+    },
+
+    // 초기화 관련
+    initCurrentAccommodation() {
+      if (this.accommodations.length > 0) {
+        this.accommodation = this.accommodations[0];
+      }
+    },
+
+    // 인원 관리 액션
+    updateGuestCount({ type, increment }) {
+      const count = type === "adult" ? "adultCount" : "childCount";
+      const currentTotal = this.totalGuests;
+      const maxOccupancy = this.selectedRoom?.maxOccupancy || 0;
+
+      if (increment) {
+        if (currentTotal < maxOccupancy) {
+          this[count]++;
+        }
+      } else {
+        if (this[count] > (type === "adult" ? 1 : 0)) {
+          this[count]--;
+        }
+      }
+    },
+
+    // API 호출 액션들
+    async fetchAccommodationById(id) {
+      try {
+        const response = await apiClient.get(`/accommodations/${id}`);
+        this.accommodation = response.data;
+      } catch (error) {
+        console.error("숙박시설 조회 실패:", error);
+        this.accommodation = null;
+      }
+    },
+    async fetchAccommodations() {
+      try {
+        const response = await apiClient.get("/accommodations");
+        this.accommodations = response.data;
+        if (response.data.length > 0) {
+          this.accommodation = response.data[0];
+        }
+      } catch (error) {
+        console.error("숙박시설 조회 실패:", error);
+        this.accommodations = [];
+      }
+    },
+
+    async fetchAvailableRooms() {
+      if (!this.accommodation?.id || !this.checkIn || !this.checkOut) {
+        return;
+      }
 
       try {
-        const response = await apiClient.post("/reservation-room", {
+        const response = await apiClient.get("/reservation-room/available", {
+          params: {
+            accommodationId: this.accommodation.id,
+            checkinDate: this.formattedCheckinDate,
+            checkoutDate: this.formattedCheckoutDate,
+          },
+        });
+        this.availableRooms = response.data;
+      } catch (error) {
+        console.error("객실 조회 실패:", error);
+        this.availableRooms = [];
+      }
+    },
+    // 예약 생성 및 결제 관련 액션
+    async createReservation(reservationForm) {
+      if (!this.selectedRoom?.roomId) {
+        throw new Error("객실이 선택되지 않았습니다.");
+      }
+
+      try {
+        const reservationData = {
           roomId: this.selectedRoom.roomId,
           reservationDate: new Date().toISOString(),
           checkinDate: this.formattedCheckinDate,
@@ -220,167 +288,166 @@ export const useReservationStore = defineStore("reservationStore", {
           reservationStatus: "RESERVATION",
           totalPrice: this.totalPriceNumber,
           paymentStatus: "UNPAID",
-          ...form,
           adultCount: this.adultCount,
           childCount: this.childCount,
           totalRoomCount: this.roomCount,
-        });
-        this.reservationResult = response.data;
-        console.log("예약 결과");
+          ...reservationForm,
+        };
+
+        const response = await apiClient.post(
+          "/reservation-room",
+          reservationData
+        );
+        console.log("예약 성공");
         console.log(response.data);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    async fetchAndInitAccommodationNavs() {
-      try {
-        const response = await apiClient.get("/accommodations");
-        this.accommodationList = response.data;
-        this.setAccommodationId(response.data[0].id);
-        this.setAccommodationName(response.data[0].name);
-      } catch (err) {
-        console.log(err);
-        this.accommodationList = [];
+
+        this.reservationResult = response.data;
+        return response.data;
+      } catch (error) {
+        console.error("예약 생성 실패:", error);
+        throw error;
       }
     },
 
-    async fetchReservationAvailableRooms() {
-      try {
-        const response = await apiClient.get("/reservation-room/available", {
-          params: {
-            accommodationId: this.accommodationId,
-            checkinDate: formatDate(this.checkIn),
-            checkoutDate: formatDate(this.checkOut),
-          },
-        });
+    async processPayment(paymentMethod) {
+      const userStore = userLoginStore();
+      const userData = userStore.userInfo;
 
-        this.availableRoomList = response.data;
-      } catch (err) {
-        this.availableRoomList = [];
-        console.log(err);
+      const paymentConfig = this.getPaymentConfig(paymentMethod, userData);
+
+      try {
+        return await this.executePayment(paymentConfig);
+      } catch (error) {
+        console.error("결제 처리 실패:", error);
+        await this.handlePaymentFailure();
+        throw error;
       }
     },
-    // IMP 호출
-    async callImpRequestPay(method) {
+
+    getPaymentConfig(method, userData) {
+      const baseConfig = {
+        pg: "html5_inicis",
+        pay_method: method,
+        merchant_uid: `ORD${new Date().getTime()}`,
+        name: `EasyStay 결제`,
+        amount: this.totalPriceNumber,
+        buyer_email: userData?.email || "이메일 정보 없음",
+        buyer_name: userData?.name || "이름 정보 없음",
+        buyer_tel: userData?.phone || "전화번호 정보 없음",
+        buyer_addr: userData?.addr || "주소 정보 없음",
+        buyer_postcode: userData?.postcode || "우편번호 정보 없음",
+      };
+
+      if (method === "vbank") {
+        return {
+          ...baseConfig,
+          vbank_due: this.getVbankDueDate(),
+          bank: "우리은행",
+          accountHolder: userData?.name || "이름 정보 없음",
+        };
+      }
+
+      return baseConfig;
+    },
+
+    async executePayment(paymentConfig) {
       return new Promise((resolve, reject) => {
         IMP.init("imp18668427");
 
-        const userStore = userLoginStore();
-
-        const userData = userStore.userInfo;
-
-        IMP.request_pay(
-          {
-            pg: "html5_inicis", // 결제 서비스 제공사
-            pay_method: method, // 선택한 결제 방법
-            merchant_uid: `ORD${new Date().getTime()}`, // 고유 주문 번호
-            name: `EasyStay 결제`,
-            amount: this.totalPriceNumber,
-
-            // 로그인한 사용자 정보로 업데이트된 결제 정보
-            buyer_email: userData.email || "이메일 정보 없음",
-            buyer_name: userData.name || "이름 정보 없음",
-            buyer_tel: userData.phone || "전화번호 정보 없음",
-            buyer_addr: userData.addr || "주소 정보 없음",
-            buyer_postcode: userData.postcode || "우편번호 정보 없음",
-
-            // 가상계좌 선택 시 추가 정보
-            vbank_due:
-              this.paymentMethod === "vbank"
-                ? this.getVbankDueDate()
-                : undefined,
-            bank: method === "vbank" ? "우리은행" : undefined,
-            accountHolder:
-              method === "vbank"
-                ? userData.name || "이름 정보 없음"
-                : undefined,
-          },
-          async (rsp) => {
-            if (rsp.success) {
-              alert("결제 성공!");
-              console.log("결제 성공:", rsp);
-
-              // 결제 성공 후 결제 내역을 서버에 저장
-              const payRequest = {
-                impUid: rsp.imp_uid,
-                reservationId: this.reservationResult.id,
-                method: this.paymentMehod,
-                amount: this.totalPriceNumber,
-                paymentDate: new Date().toISOString(),
-                completionStatus: "COMPLETE",
-                depositDeadline:
-                  method === "vbank" ? this.getVbankDueDate() : null,
-                bank: method === "vbank" ? "우리은행" : null,
-                accountHolder:
-                  this.paymentMethod === "vbank"
-                    ? userData.name || "이름 정보 없음"
-                    : null,
-              };
-              console.log(payRequest);
-
-              try {
-                await apiClient.post("/payment", payRequest);
-                alert("결제 내역이 데이터베이스에 저장되었습니다.");
-                this.isPaymentSuccess = true;
-                this.isPaymentFailed = false;
-                resolve(true);
-                return true;
-              } catch (error) {
-                console.error("결제 내역 저장 실패:", error);
-                alert("결제 내역을 저장하는 중 오류가 발생했습니다.");
-                this.isPaymentSuccess = false;
-                this.isPaymentFailed = true;
-                resolve(false);
-              }
-            } else {
-              alert("결제 실패: " + rsp.error_msg);
-              console.log("결제 실패:", rsp);
-
-              // 결제가 실패한 경우 예약 상태를 CANCELED로 업데이트
-              try {
-                await apiClient.put(
-                  `/reservation-room/${this.reservationResult?.id}`,
-                  {
-                    reservationStatus: "CANCELED",
-                  }
-                );
-                alert("예약 상태가 CANCELED로 업데이트되었습니다.");
-                resolve(false);
-              } catch (error) {
-                console.error("예약 상태 업데이트 실패:", error);
-                reject(error);
-                alert("예약 상태를 업데이트하는 중 오류가 발생했습니다.");
-              }
-              this.isPaymentSuccess = false;
-              this.isPaymentFailed = true;
+        IMP.request_pay(paymentConfig, async (response) => {
+          if (response.success) {
+            try {
+              await this.handlePaymentSuccess(response, paymentConfig);
+              resolve(true);
+            } catch (error) {
+              reject(error);
             }
+          } else {
+            await this.handlePaymentFailure();
+            resolve(false);
           }
-        );
+        });
       });
     },
-    getVbankDueDate() {
-      const today = new Date();
-      const dueDate = new Date(today.setDate(today.getDate() + 7)); // 7일 후로 설정
 
-      // ISO-8601 형식으로 변환 (예: 2024-10-31T05:43:00)
-      const isoDate = dueDate.toISOString().slice(0, 19); // "YYYY-MM-DDTHH:MM:SS" 형식으로 자름
-      console.log("vbank_due:", isoDate); // 로그로 확인
-      return isoDate;
+    async handlePaymentSuccess(response, paymentConfig) {
+      const paymentData = {
+        impUid: response.imp_uid,
+        reservationId: this.reservationResult.id,
+        method: paymentConfig.pay_method,
+        amount: this.totalPriceNumber,
+        paymentDate: new Date().toISOString(),
+        completionStatus: "COMPLETE",
+        ...(this.paymentMethod === "vbank" && {
+          depositDeadline: this.getVbankDueDate(),
+          bank: "우리은행",
+          accountHolder: userLoginStore().userInfo?.name || "이름 정보 없음",
+        }),
+      };
+
+      await apiClient.post("/payment", paymentData);
+      this.isPaymentSuccess = true;
+      this.isPaymentFailed = false;
     },
 
-    async fetchReservationRoomLists() {
-      try {
-        const response = await apiClient.get("/reservation-room", {
-          params: {
-            page: 0,
-            size: 5,
-          },
+    async handlePaymentFailure() {
+      if (this.reservationResult?.id) {
+        await apiClient.put(`/reservation-room/${this.reservationResult.id}`, {
+          reservationStatus: "CANCELED",
         });
+      }
+      this.isPaymentSuccess = false;
+      this.isPaymentFailed = true;
+    },
 
-        this.reservations = response.data;
+    getVbankDueDate() {
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 7);
+      return dueDate.toISOString().slice(0, 19);
+    },
+
+    // 리셋 관련 액션들
+    resetReservation() {
+      this.selectedRoom = null;
+      this.showReservationForm = false;
+      this.showReservationInfo = false;
+      this.showRoomSelectionGrid = false;
+      this.adultCount = 0;
+      this.childCount = 0;
+      this.agreementChecked1 = false;
+      this.agreementChecked2 = false;
+      this.agreementChecked3 = false;
+    },
+
+    // 동의 관련 액션
+    updateAgreements({
+      agreement1 = null,
+      agreement2 = null,
+      agreement3 = null,
+    }) {
+      if (agreement1 !== null) this.agreementChecked1 = agreement1;
+      if (agreement2 !== null) this.agreementChecked2 = agreement2;
+      if (agreement3 !== null) this.agreementChecked3 = agreement3;
+    },
+
+    // 예약 취소
+    async cancelReservation(id) {
+      const reservationRoomUpdateRequest = {
+        reservationStatus: "CANCELED",
+      };
+
+      try {
+        await apiClient.put(
+          `/reservation-room/${id}`,
+          reservationRoomUpdateRequest
+        );
+        alert("예약이 취소되었습니다.");
+        await this.fetchReservationRoomLists();
       } catch (error) {
-        console.error("예약 내역을 가져오는 중 오류 발생:", error);
-        alert("예약 내역을 불러오는 데 실패했습니다.");
+        console.error("예약 취소 실패:", error);
+        this.reservationError =
+          error.response?.data || "예약 취소 중 오류 발생";
+        alert(this.reservationError);
       }
     },
   },

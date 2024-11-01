@@ -81,13 +81,7 @@ const handleScroll = () => {
 
 const handleReservationClick = () => {
   console.log("로그인 상태:", useUserLoginStore.isLoggedIn);
-
-  if (!useUserLoginStore.isLoggedIn) {
-    alert("로그인을 하세요.");
-    router.push({ name: "login" });
-  } else {
-    router.push({ name: "Reservation" });
-  }
+  router.push({ name: "Reservation" });
 };
 
 onMounted(() => {
@@ -120,111 +114,62 @@ watch(
 </script>
 
 <template>
-  <nav
-    class="navbar navbar-expand-lg top-0 py-3"
-    :class="{
-      'z-index-3 w-100 position-absolute my-3': props.transparent,
-      'z-index-3 py-2 start-0 end-0 position-absolute': props.sticky,
-      'navbar-light bg-white py-3': !isScrolled && props.light,
-      'navbar-dark  z-index-3 py-3': props.dark || isScrolled || isMenuVisible, // 메뉴가 열렸을 때도 배경색 변경
-      'bg-transparent-black': isScrolled,
-    }"
-  >
+  <nav class="navbar navbar-expand-lg top-0 py-3" :class="{
+    'z-index-3 w-100 position-absolute my-3': props.transparent,
+    'z-index-3 py-2 start-0 end-0 position-absolute': props.sticky,
+    'navbar-light bg-white py-3': !isScrolled && props.light,
+    'navbar-dark  z-index-3 py-3': props.dark || isScrolled || isMenuVisible, // 메뉴가 열렸을 때도 배경색 변경
+    'bg-transparent-black': isScrolled,
+  }">
     <div class="container">
-      <RouterLink
-        class="navbar-brand"
-        :class="[
-          getTextColor(), // 수정된 부분
-          isScrolled
-            ? 'text-white font-weight-bolder ms-sm-3'
-            : 'text-dark font-weight-bolder ms-sm-3',
-        ]"
-        :to="{ name: 'presentation' }"
-        rel="tooltip"
-        title="Designed and Coded by EasyCheck"
-      >
+      <RouterLink class="navbar-brand" :class="[
+        getTextColor(), // 수정된 부분
+        isScrolled
+          ? 'text-white font-weight-bolder ms-sm-3'
+          : 'text-dark font-weight-bolder ms-sm-3',
+      ]" :to="{ name: 'presentation' }" rel="tooltip" title="Designed and Coded by EasyCheck">
         <img :src="LogoImg" alt="Logo" class="navbar-logo me-2" />
         EasyStay
       </RouterLink>
       <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
         <li class="nav-item mx-2">
-          <button
-            @click="handleReservationClick"
-            class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block"
-          >
-            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i
-            >Reservation
+          <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block">
+            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
           </button>
         </li>
       </ul>
-      <div
-        class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0"
-        id="navigation"
-      >
+      <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
         <ul class="navbar-nav navbar-nav-hover ms-auto align-items-center">
           <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
-            <RouterLink
-              :to="{ name: 'Mypage' }"
-              role="button"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
-              :class="getTextColor()"
-            >
-              <i
-                class="material-icons opacity-6 me-2 text-md"
-                :class="getTextColor()"
-                >person</i
-              >
+            <RouterLink :to="{ name: 'Mypage' }" role="button"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">person</i>
               MyPage
             </RouterLink>
           </li>
           <li v-else class="nav-item mx-2">
-            <RouterLink
-              :to="{ name: 'login' }"
-              role="button"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
-              :class="getTextColor()"
-            >
-              <i
-                class="material-icons opacity-6 me-2 text-md"
-                :class="getTextColor()"
-                >login</i
-              >
+            <RouterLink :to="{ name: 'login' }" role="button"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">login</i>
               Sign In / Sign Up
             </RouterLink>
           </li>
           <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
-            <RouterLink
-              :to="{ name: 'logout' }"
-              role="button"
-              @click="useUserLoginStore.logout"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
-              :class="getTextColor()"
-            >
-              <i
-                class="material-icons opacity-6 me-2 text-md"
-                :class="getTextColor()"
-                >logout</i
-              >
+            <RouterLink :to="{ name: 'logout' }" role="button" @click="useUserLoginStore.logout"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
+              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">logout</i>
               Sign Out
             </RouterLink>
           </li>
           <li class="nav-item mx-2">
-            <button
-              @click="handleReservationClick"
-              class="reservation-btn btn btn-sm mb-0 ms-auto"
-            >
-              <i class="material-icons opacity-6 me-2 text-md">calendar_today</i
-              >Reservation
+            <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto">
+              <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
             </button>
           </li>
 
           <!-- 네비게이션 토글 버튼 -->
           <li class="nav-item mx-2">
-            <button
-              class="navbar-toggler d-lg-block"
-              type="button"
-              @click="toggleMenu"
-            >
+            <button class="navbar-toggler d-lg-block" type="button" @click="toggleMenu">
               <span class="navbar-toggler-icon mt-2">
                 <span class="navbar-toggler-bar bar1"></span>
                 <span class="navbar-toggler-bar bar2"></span>
@@ -325,9 +270,11 @@ watch(
   height: 1.5px !important;
   background: white !important;
 }
+
 .nav-menu {
   position: absolute;
-  top: 100; /* 헤더 바로 아래에 위치 */
+  top: 100;
+  /* 헤더 바로 아래에 위치 */
   left: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.7);
@@ -335,7 +282,8 @@ watch(
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease-in-out;
-  z-index: 9999; /* 화면 맨 앞에 고정 */
+  z-index: 9999;
+  /* 화면 맨 앞에 고정 */
   justify-content: center;
   text-align: center;
 }
@@ -365,21 +313,29 @@ watch(
 }
 
 .grid-header {
-  display: contents; /* 그리드 레이아웃에 맞게 배치 */
-  font-weight: bold; /* 제목 강조 */
-  text-align: center; /* 제목 가운데 정렬 */
-  color: white; /* 제목 텍스트 색 */
-  margin-bottom: 20px; /* 제목과 메뉴 항목 간의 간격 */
+  display: contents;
+  /* 그리드 레이아웃에 맞게 배치 */
+  font-weight: bold;
+  /* 제목 강조 */
+  text-align: center;
+  /* 제목 가운데 정렬 */
+  color: white;
+  /* 제목 텍스트 색 */
+  margin-bottom: 20px;
+  /* 제목과 메뉴 항목 간의 간격 */
   justify-content: center;
 }
 
 .grid-header div {
-  position: relative; /* 경계선 위치 조정을 위해 상대적으로 설정 */
-  padding-top: 20px; /* 선과 텍스트 간의 간격 */
+  position: relative;
+  /* 경계선 위치 조정을 위해 상대적으로 설정 */
+  padding-top: 20px;
+  /* 선과 텍스트 간의 간격 */
 }
 
 .grid-header div::before {
-  content: ""; /* 경계선 생성 */
+  content: "";
+  /* 경계선 생성 */
   position: absolute;
   top: 0; /* 제목 위에 위치 */
   left: 50%; /* 가운데 정렬 */
@@ -392,15 +348,20 @@ watch(
 .menu-grid a {
   display: block;
   padding: 10px;
-  color: white; /* 항목 텍스트 색 */
-  text-align: center; /* 텍스트 가운데 정렬 */
-  border-radius: 5px; /* 항목 둥글게 만들기 */
-  transition: background-color 0.3s; /* 호버 효과를 위한 전환 */
+  color: white;
+  /* 항목 텍스트 색 */
+  text-align: center;
+  /* 텍스트 가운데 정렬 */
+  border-radius: 5px;
+  /* 항목 둥글게 만들기 */
+  transition: background-color 0.3s;
+  /* 호버 효과를 위한 전환 */
   justify-content: center;
 }
 
 .menu-grid a:hover {
-  background-color: rgba(255, 255, 255, 0.3); /* 호버 시 배경색 변경 */
+  background-color: rgba(255, 255, 255, 0.3);
+  /* 호버 시 배경색 변경 */
 }
 
 .nav-list {

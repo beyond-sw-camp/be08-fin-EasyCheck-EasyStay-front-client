@@ -1,78 +1,103 @@
 <template>
-  <div class="position-sticky z-index-sticky top-9">
-    <reservation-summary-navbar />
-  </div>
-  <main class="main-content">
-    <div class="container">
-      <h3 class="text-black">객실 예약</h3>
-      <p class="text-black fw-normal">
-        예약을 원하시는 리조트/호텔 지점, 투숙기간, 객실 수 입력 후 객실을
-        선택하세요
-      </p>
-      <accommodation-navs />
-      <div class="row mt-2">
-        <div class="col-12 col-md-7">
-          <reservation-calendar />
-        </div>
-        <div class="col-12 col-md-5">
-          <reservation-summary />
-        </div>
-      </div>
-      <div class="mt-8">
-        <room-selection-grid v-if="showRoomSelectionGrid" />
-      </div>
-      <div class="mt-4">
-        <reservation-form v-if="showReservationForm">
-          <reservation-info />
-        </reservation-form>
-      </div>
+  <div class="reservation-container">
+    <div class="position-sticky z-index-sticky top-9">
+      <reservation-summary-navbar />
     </div>
-  </main>
+    <main class="main-content">
+      <div class="container">
+        <reservation-header />
+        <accommodation-navs />
+        <div class="reservation-content row mt-2">
+          <div class="col-12 col-md-7">
+            <reservation-calendar />
+          </div>
+          <div class="col-12 col-md-5">
+            <reservation-summary />
+          </div>
+        </div>
+        <div class="mt-8">
+          <room-selection-grid v-if="showRoomSelectionGrid" />
+        </div>
+        <div class="mt-4">
+          <reservation-form v-if="showReservationForm">
+            <reservation-info />
+          </reservation-form>
+        </div>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script setup>
-import AccommodationNavs from "./Sections/AccommodationNavs.vue";
-import ReservationCalendar from "./Sections/ReservationCalendar.vue";
-import ReservationSummary from "./Sections/ReservationSummary.vue";
-import ReservationSummaryNavbar from "./Sections/ReservationSummaryNavbar.vue";
-import RoomSelectionGrid from "./Sections/RoomSelectionGrid.vue";
-import ReservationForm from "./Sections/ReservationForm.vue";
-import ReservationInfo from "./Sections/ReservationInfo.vue";
-
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
+import { computed, onMounted, onUnmounted } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
+// 컴포넌트 임포트
+import ReservationForm from "@/views/Reservation/Sections/ReservationForm.vue";
+import ReservationInfo from "@/views/Reservation/Sections/ReservationInfo.vue";
+import ReservationHeader from "@/views/Reservation/Sections/ReservationHeader.vue";
+import AccommodationNavs from "@/views/Reservation/Sections/AccommodationNavs.vue";
+import RoomSelectionGrid from "@/views/Reservation/Sections/RoomSelectionGrid.vue";
+import ReservationSummary from "@/views/Reservation/Sections/ReservationSummary.vue";
+import ReservationCalendar from "@/views/Reservation/Sections/ReservationCalendar.vue";
+import ReservationSummaryNavbar from "@/views/Reservation/Sections/ReservationSummaryNavbar.vue";
+
+// 스토어 및 라우트 설정
+const route = useRoute();
 const reservationStore = useReservationStore();
 
+// 상태 참조
 const { showRoomSelectionGrid, showReservationForm } =
   storeToRefs(reservationStore);
 
-onMounted(async () => {
-  // 숙박시설들 불러오기
-  await reservationStore.fetchAndInitAccommodationNavs();
-});
+// 쿼리 파라미터 computed
+const queryParams = computed(() => ({
+  accommodationId: route.query.accommodationId,
+  checkInDate: route.query.checkInDate,
+  checkOutDate: route.query.checkOutDate,
+}));
 
-onMounted(() => {
-  reservationStore.initCheckInCheckOut();
-});
+// 초기화 로직
+const initializeReservation = async () => {
+  await reservationStore.fetchAccommodations();
 
-onUnmounted(() => {
-  // unmount시 불러온거 초기화
-  reservationStore.resetAccommodationList();
-});
+  const { accommodationId, checkInDate, checkOutDate } = queryParams.value;
+
+  if (!accommodationId && !checkInDate && !checkOutDate) {
+    reservationStore.initializeReservation();
+  } else {
+    await reservationStore.initializeReservationWithQuery({
+      accommodationId,
+      checkInDate: checkInDate ? new Date(checkInDate) : null,
+      checkOutDate: checkOutDate ? new Date(checkOutDate) : null,
+    });
+  }
+};
+
+// 라이프사이클 훅
+onMounted(initializeReservation);
+onUnmounted(() => reservationStore.resetReservation());
 </script>
 
 <style lang="scss" scoped>
+.reservation-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .main-content {
-  padding-top: 180px; // 네브바의 높이에 맞춰 조정
+  padding-top: 180px;
+  flex: 1;
 
   @media (max-width: 767px) {
-    padding-top: 360px; // 모바일에서 네브바가 더 높아질 경우 조정
+    padding-top: 360px;
   }
 }
 
-.row {
+.reservation-content {
   @media (max-width: 767px) {
     flex-direction: column;
   }
