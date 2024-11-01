@@ -16,7 +16,7 @@
             <p class="card-text fw-bold">
               <small class="text-muted">기준 인원:{{ room.standardOccupancy }} / 최대 인원:{{
                 room.maxOccupancy
-              }}</small>
+                }}</small>
             </p>
             <p class="card-text fw-bold small">잔여 객실({{ room.remainingRoom }})</p>
             <p class="card-text">
@@ -27,10 +27,10 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <small class="text-muted text-decoration-line-through">
-                  {{ room.normalPrice.toLocaleString() }}원
+                  {{ room.expensiveSeasonPrice.toLocaleString() }}원
                 </small>
                 <span class="text-danger fw-bold ms-2">
-                  {{ room.corpPrice.toLocaleString() }}원~
+                  {{ room.currentSeasonPrice.toLocaleString() }}원~
                 </span>
               </div>
             </div>
