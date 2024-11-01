@@ -20,6 +20,7 @@ import { useRoomStore } from "@/stores/roomStore.js";
 import { useEventStore } from "@/stores/eventStore.js";
 import { useAccommodationStore } from "@/stores/accommodationStore.js";
 import { computed, onMounted } from "vue";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
 

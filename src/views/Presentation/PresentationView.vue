@@ -114,16 +114,29 @@ onUnmounted(() => {
 <template>
   <div>
     <Header>
-      <div class="page-header min-vh-100 position-relative" style="overflow: hidden">
-        <div class="background-image" :style="`background-image: url(${currentImage}); opacity: ${isFading ? 0 : 1
-          };`"></div>
+      <div
+        class="page-header min-vh-100 position-relative"
+        style="overflow: hidden"
+      >
+        <div
+          class="background-image"
+          :style="`background-image: url(${currentImage}); opacity: ${
+            isFading ? 0 : 1
+          };`"
+        ></div>
         <div class="container">
           <div class="row">
             <div class="col-lg-7 text-center mx-auto position-relative">
-              <h1 class="text-white pt-3 mt-n5 me-2" :style="{ display: 'inline-block ' }">
+              <h1
+                class="text-white pt-3 mt-n5 me-2"
+                :style="{ display: 'inline-block ' }"
+              >
                 EasyStay
               </h1>
-              <p class="lead text-white px-5 mt-3" :style="{ fontWeight: '500' }">
+              <p
+                class="lead text-white px-5 mt-3"
+                :style="{ fontWeight: '500' }"
+              >
                 You can stay here through EasyCheck.
               </p>
             </div>
@@ -134,8 +147,13 @@ onUnmounted(() => {
         <button class="btn-next" @click="nextImage"></button>
 
         <div class="dots-container">
-          <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
-            @click="goToImage(index)"></span>
+          <span
+            v-for="(image, index) in images"
+            :key="index"
+            class="dot"
+            :class="{ active: index === imageIndex }"
+            @click="goToImage(index)"
+          ></span>
           <button @click="togglePlayPause" class="play-pause-btn">
             {{ isPlaying ? "||" : "▶" }}
           </button>
@@ -143,7 +161,11 @@ onUnmounted(() => {
       </div>
       <div class="roomSearchForm-container">
         <div class="container p-0">
-          <RoomSearchForm class="m-auto" :accommodations="accommodations" @search="onSearchRooms" />
+          <RoomSearchForm
+            class="m-auto"
+            :accommodations="accommodations"
+            @search="onSearchRooms"
+          />
         </div>
       </div>
     </Header>
@@ -162,7 +184,6 @@ onUnmounted(() => {
 
 <style scoped>
 @media (min-width: 1400px) {
-
   .container-xxl,
   .container-xl,
   .container-lg,

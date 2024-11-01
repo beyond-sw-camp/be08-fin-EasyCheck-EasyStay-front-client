@@ -6,12 +6,7 @@
         <div class="card h-100">
           <div class="card-body d-flex">
             <div class="flex-shrink-0 me-3">
-              <img
-                src="/path/to/bedroom-icon.svg"
-                alt="침실/거실"
-                width="50"
-                height="50"
-              />
+              <img :src="LivingImg" alt="침실/거실" width="50" height="50" />
             </div>
             <div>
               <h5 class="card-title">침실/거실</h5>
@@ -24,12 +19,7 @@
         <div class="card h-100">
           <div class="card-body d-flex">
             <div class="flex-shrink-0 me-3">
-              <img
-                src="/path/to/bathroom-icon.svg"
-                alt="욕실"
-                width="50"
-                height="50"
-              />
+              <img :src="BathImg" alt="침실/거실" width="50" height="50" />
             </div>
             <div>
               <h5 class="card-title">욕실</h5>
@@ -46,12 +36,7 @@
         <div class="card h-100">
           <div class="card-body d-flex">
             <div class="flex-shrink-0 me-3">
-              <img
-                src="/path/to/dining-icon.svg"
-                alt="주방"
-                width="50"
-                height="50"
-              />
+              <img :src="KitchenImg" alt="주방" width="50" height="50" />
             </div>
             <div>
               <h5 class="card-title">주방</h5>
@@ -66,12 +51,7 @@
         <div class="card h-100">
           <div class="card-body d-flex">
             <div class="flex-shrink-0 me-3">
-              <img
-                src="/path/to/extras-icon.svg"
-                alt="추가 제공 물품"
-                width="50"
-                height="50"
-              />
+              <img :src="WiFiImg" alt="추가 제공 물품" width="50" height="50" />
             </div>
             <div>
               <h5 class="card-title">추가 제공 물품</h5>
@@ -87,6 +67,14 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import WineImg from "@/assets/img/additional-service/wine.png";
+import BathImg from "@/assets/img/additional-service/bath.png";
+import KitchenImg from "@/assets/img/additional-service/kitchen.png";
+import LivingImg from "@/assets/img/additional-service/living.png";
+import WiFiImg from "@/assets/img/additional-service/wifi.png";
+</script>
 
 <style lang="scss" scoped>
 .room-amenities {

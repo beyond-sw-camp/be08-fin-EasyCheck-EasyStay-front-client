@@ -1,84 +1,31 @@
 <template>
   <nav
-    class="navbar navbar-expand-lg navbar-dark py-2"
+    class="reservation-summary-navbar"
     :class="{ 'mobile-view': isMobileView }"
   >
     <div class="container-fluid">
-      <div
-        class="d-flex justify-content-between align-items-stretch w-100"
-        :class="{ 'flex-column': isMobileView }"
-      >
-        <div class="navbar-item" :class="{ card: !isMobileView }">
-          <div :class="{ 'card-body': !isMobileView }">
-            <small class="text-secondary" v-if="!isMobileView">지점</small>
-            <div class="d-flex align-items-center">
-              <span class="navbar-text me-2 text-light" v-if="isMobileView"
-                >지점</span
-              >
-              <h6 class="mb-0">{{ accommodationName }}</h6>
-              <i
-                class="bi bi-pencil-square text-secondary ms-2"
-                v-if="!isMobileView"
-              ></i>
-            </div>
-          </div>
-        </div>
-        <div class="navbar-item" :class="{ card: !isMobileView }">
-          <div :class="{ 'card-body': !isMobileView }">
-            <small class="text-secondary" v-if="!isMobileView">투숙 기간</small>
-            <div class="d-flex align-items-center">
-              <span class="navbar-text me-2 text-light" v-if="isMobileView"
-                >투숙 기간</span
-              >
-              <h6 class="mb-0">
-                {{ formattedCheckinDate }}
-                <span class="badge rounded-pill">{{ stayDuration }}박</span>
-                {{ formattedCheckoutDate }}
-              </h6>
-              <i
-                class="bi bi-pencil-square text-secondary ms-2"
-                v-if="!isMobileView"
-              ></i>
-            </div>
-          </div>
-        </div>
-        <div class="navbar-item" :class="{ card: !isMobileView }">
-          <div :class="{ 'card-body': !isMobileView }">
-            <small class="text-secondary" v-if="!isMobileView">객실 수</small>
-            <div class="d-flex align-items-center">
-              <span class="navbar-text me-2 text-light" v-if="isMobileView"
-                >객실 수</span
-              >
-              <h6 class="mb-0">{{ roomCount }}실</h6>
-              <i
-                class="bi bi-pencil-square text-secondary ms-2"
-                v-if="!isMobileView"
-              ></i>
-            </div>
-          </div>
-        </div>
-        <div class="navbar-item" :class="{ card: !isMobileView }">
-          <div :class="{ 'card-body': !isMobileView }">
-            <small class="text-secondary" v-if="!isMobileView"
-              >총 금액(VAT 포함)</small
-            >
-            <div class="d-flex align-items-center">
-              <span class="navbar-text me-2 text-light" v-if="isMobileView"
-                >총 금액(VAT 포함)</span
-              >
-              <h6 class="mb-0 text-danger">{{ totalPrice }} 원</h6>
-            </div>
-          </div>
-        </div>
+      <div class="summary-container" :class="{ 'flex-column': isMobileView }">
+        <summary-item
+          v-for="(item, index) in summaryItems"
+          :key="index"
+          :label="item.label"
+          :value="item.value"
+          :badge="item.badge"
+          :is-price="item.isPrice"
+          :is-mobile="isMobileView"
+          @edit="handleEdit(item.type)"
+        />
       </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useReservationStore } from "@/stores/reservationStore.js";
+
+import SummaryItem from "./SummaryItem.vue";
 
 const reservationStore = useReservationStore();
 
@@ -86,17 +33,65 @@ const {
   roomCount,
   totalPrice,
   stayDuration,
-  accommodationName,
   formattedCheckinDate,
   formattedCheckoutDate,
+  currentAccommodationName,
 } = storeToRefs(reservationStore);
 
+// 반응형 상태 관리
 const isMobileView = ref(window.innerWidth < 768);
+const MOBILE_BREAKPOINT = 768;
 
 const checkMobileView = () => {
-  isMobileView.value = window.innerWidth < 768;
+  isMobileView.value = window.innerWidth < MOBILE_BREAKPOINT;
 };
 
+// 요약 정보 항목들
+const summaryItems = computed(() => [
+  {
+    type: "accommodation",
+    label: "지점",
+    value: currentAccommodationName.value,
+    editable: true,
+  },
+  {
+    type: "stay-period",
+    label: "투숙 기간",
+    value: `${formattedCheckinDate.value} ~ ${formattedCheckoutDate.value}`,
+    badge: `${stayDuration.value}박`,
+    editable: true,
+  },
+  {
+    type: "room-count",
+    label: "객실 수",
+    value: `${roomCount.value}실`,
+    editable: true,
+  },
+  {
+    type: "total-price",
+    label: "총 금액(VAT 포함)",
+    value: totalPrice.value,
+    isPrice: true,
+    editable: false,
+  },
+]);
+
+// 수정 핸들러
+const handleEdit = (type) => {
+  switch (type) {
+    case "accommodation":
+      // 숙박시설 선택 모달/탭으로 이동
+      break;
+    case "stay-period":
+      // 달력 컴포넌트로 스크롤/포커스
+      break;
+    case "room-count":
+      // 객실 수 조절 컴포넌트로 스크롤/포커스
+      break;
+  }
+};
+
+// 라이프사이클 훅
 onMounted(() => {
   window.addEventListener("resize", checkMobileView);
 });
@@ -107,86 +102,27 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.navbar {
+.reservation-summary-navbar {
   padding: 0;
   background-color: #2b2b2b;
   width: 100%;
-  // position과 관련된 스타일 제거
-}
 
-.navbar-item {
-  flex: 1;
-  margin: 1rem;
-  &:last-child {
-    margin-right: 0;
-  }
-}
-
-.card {
-  background-color: #363636;
-  border: none;
-  border-radius: 0;
-  height: 100%;
-}
-
-.card-body {
-  padding: 0.5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-small {
-  font-size: 0.75rem;
-}
-
-h6 {
-  font-size: 0.9rem;
-  color: white;
-  margin-bottom: 0;
-}
-
-.badge {
-  background-color: #4a4a4a;
-  color: white;
-  font-weight: normal;
-  font-size: 0.75rem;
-  padding: 0.25em 0.5em;
-}
-
-.bi-pencil-square {
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.mobile-view {
-  .navbar-item {
+  .summary-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
     width: 100%;
-    margin-bottom: 0.5rem;
-    background-color: transparent;
+    padding: 0.5rem;
+
+    &.flex-column {
+      gap: 0.5rem;
+    }
   }
 
-  .navbar-text {
-    font-size: 0.75rem;
-  }
-
-  h6 {
-    font-size: 0.8rem;
-  }
-
-  .badge {
-    font-size: 0.7rem;
-  }
-}
-
-@media (max-width: 767px) {
-  .d-flex {
-    flex-direction: column;
-  }
-
-  .navbar-item {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+  &.mobile-view {
+    .summary-container {
+      padding: 1rem;
+    }
   }
 }
 </style>

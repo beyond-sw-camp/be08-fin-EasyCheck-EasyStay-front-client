@@ -1,6 +1,7 @@
 <template>
   <div class="reservation-form">
     <form @submit.prevent="handleSubmit">
+      <!-- 예약자 정보 섹션 -->
       <div class="form-section">
         <h3 class="form-title">예약자 정보 입력</h3>
         <p class="form-subtitle">* 표시된 항목은 필수 입력 사항입니다.</p>
@@ -8,41 +9,80 @@
         <div class="form-group">
           <label for="reservationName" class="form-label">예약자 이름 *</label>
           <div class="input-group">
-            <input :value="userInfo?.name" readonly type="text" id="reservationName" class="form-control"
-              placeholder="이름" />
+            <input
+              :value="userInfo?.name"
+              readonly
+              type="text"
+              id="reservationName"
+              class="form-control"
+              placeholder="이름"
+            />
           </div>
-
-          <small class="input-hint">온라인 비회원으로 예약 시 본인인증이 필요합니다.</small>
+          <small class="input-hint"
+            >온라인 비회원으로 예약 시 본인인증이 필요합니다.</small
+          >
         </div>
 
         <div class="form-group">
-          <label for="reservationPhone" class="form-label">예약자 휴대전화 번호 *</label>
-          <input readonly type="tel" :value="userInfo?.phone" id="reservationPhone" class="form-control"
-            placeholder="'-' 제외하고 숫자만 입력" />
+          <label for="reservationPhone" class="form-label"
+            >예약자 휴대전화 번호 *</label
+          >
+          <input
+            readonly
+            type="tel"
+            :value="userInfo?.phone"
+            id="reservationPhone"
+            class="form-control"
+            placeholder="'-' 제외하고 숫자만 입력"
+          />
         </div>
       </div>
 
+      <!-- 투숙자 정보 섹션 -->
       <div class="form-section">
         <h3 class="form-title">투숙자 정보 입력</h3>
         <div class="form-check">
-          <input type="checkbox" id="sameAsReservation" v-model="sameAsReservation" @change="copyReservationInfo"
-            class="form-check-input" />
-          <label for="sameAsReservation" class="form-check-label">예약자 정보와 동일</label>
+          <input
+            type="checkbox"
+            id="sameAsReservation"
+            v-model="sameAsReservation"
+            @change="handleSameAsReservation"
+            class="form-check-input"
+          />
+          <label for="sameAsReservation" class="form-check-label">
+            예약자 정보와 동일
+          </label>
         </div>
 
         <div class="form-group">
-          <label for="guestName" class="form-label">내표 투숙자 이름 *</label>
-          <input type="text" id="representativeName" v-model="form.representativeName" class="form-control"
-            :class="{ 'is-invalid': v$.form.representativeName.$error }" placeholder="이름" />
+          <label for="guestName" class="form-label">대표 투숙자 이름 *</label>
+          <input
+            type="text"
+            id="representativeName"
+            v-model="form.representativeName"
+            class="form-control"
+            :class="{ 'is-invalid': v$.form.representativeName.$error }"
+            placeholder="이름"
+            @blur="v$.form.representativeName.$touch"
+          />
           <div class="error-message" v-if="v$.form.representativeName.$error">
             {{ v$.form.representativeName.$errors[0].$message }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="guestPhone" class="form-label">내표 투숙자 휴대전화 번호 *</label>
-          <input type="tel" id="representativePhone" v-model="form.representativePhone" class="form-control"
-            :class="{ 'is-invalid': v$.form.representativePhone.$error }" placeholder="'-' 제외하고 숫자만 입력" />
+          <label for="guestPhone" class="form-label"
+            >대표 투숙자 휴대전화 번호 *</label
+          >
+          <input
+            type="tel"
+            id="representativePhone"
+            v-model="form.representativePhone"
+            class="form-control"
+            :class="{ 'is-invalid': v$.form.representativePhone.$error }"
+            placeholder="'-' 제외하고 숫자만 입력"
+            @blur="v$.form.representativePhone.$touch"
+          />
           <div class="error-message" v-if="v$.form.representativePhone.$error">
             {{ v$.form.representativePhone.$errors[0].$message }}
           </div>
@@ -51,40 +91,84 @@
         <div class="form-group">
           <label class="form-label">이메일 (선택)</label>
           <div class="email-group">
-            <input type="text" v-model="form.emailLocal" class="form-control" placeholder="이메일" />
+            <input
+              type="text"
+              v-model="form.emailLocal"
+              class="form-control"
+              placeholder="이메일"
+            />
             <span class="email-at">@</span>
-            <input type="text" v-model="form.emailDomain" class="form-control" placeholder="도메인" />
+            <input
+              type="text"
+              v-model="form.emailDomain"
+              class="form-control"
+              placeholder="도메인"
+            />
           </div>
-          <small class="input-hint">이메일 주소 입력 시 '예약확인정' 메일이 발송됩니다.</small>
+          <small class="input-hint"
+            >이메일 주소 입력 시 '예약확인' 메일이 발송됩니다.</small
+          >
         </div>
 
+        <!-- 투숙 인원 컨트롤 -->
         <div class="form-group">
           <label class="form-label">투숙 인원 *</label>
           <div class="guest-count-group">
             <div class="count-control">
-              <button type="button" @click="decreaseAdult">-</button>
-              <input type="text" v-model="adultCount" readonly />
-              <button type="button" @click="increaseAdult">+</button>
+              <button
+                type="button"
+                @click="handleGuestCount('adult', false)"
+                :disabled="adultCount <= 1"
+              >
+                -
+              </button>
+              <input type="text" :value="adultCount" readonly />
+              <button
+                type="button"
+                @click="handleGuestCount('adult', true)"
+                :disabled="isMaxGuests"
+              >
+                +
+              </button>
               <span>성인 {{ adultCount }}명</span>
             </div>
             <div class="count-control">
-              <button type="button" @click="decreaseChild">-</button>
-              <input type="text" v-model="childCount" readonly />
-              <button type="button" @click="increaseChild">+</button>
+              <button
+                type="button"
+                @click="handleGuestCount('child', false)"
+                :disabled="childCount <= 0"
+              >
+                -
+              </button>
+              <input type="text" :value="childCount" readonly />
+              <button
+                type="button"
+                @click="handleGuestCount('child', true)"
+                :disabled="isMaxGuests"
+              >
+                +
+              </button>
               <span>소인 {{ childCount }}명</span>
             </div>
           </div>
-          <small class="input-hint">객실 정원은 최대 {{ selectedRoom?.maxOccupancy }}인까지
-            가능합니다.</small>
+          <small class="input-hint"
+            >객실 정원은 최대 {{ selectedRoom?.maxOccupancy }}인까지
+            가능합니다.</small
+          >
           <small class="input-hint">객실 정원은 영유아 포함입니다.</small>
         </div>
       </div>
-      <!-- template 안의 결제 방법 부분을 다음과 같이 수정 -->
+
+      <!-- 결제 방법 섹션 -->
       <div class="form-section">
         <h3 class="form-title">결제 방법</h3>
         <div class="payment-methods">
-          <button type="button" class="payment-method-btn" :class="{ active: form.paymentMethod === 'card' }"
-            @click="selectPaymentMethod('card')">
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: form.paymentMethod === 'card' }"
+            @click="handlePaymentMethod('card')"
+          >
             <div class="payment-content">
               <span class="payment-icon">💳</span>
               <div class="payment-info">
@@ -96,8 +180,12 @@
             </div>
           </button>
 
-          <button type="button" class="payment-method-btn" :class="{ active: form.paymentMethod === 'vbank' }"
-            @click="selectPaymentMethod('vbank')">
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: form.paymentMethod === 'vbank' }"
+            @click="handlePaymentMethod('vbank')"
+          >
             <div class="payment-content">
               <span class="payment-icon">🏦</span>
               <div class="payment-info">
@@ -112,10 +200,13 @@
       </div>
     </form>
   </div>
+
   <slot />
+
+  <!-- 하단 버튼 -->
   <div class="action-buttons">
     <button class="cancel-btn" @click="handleCancel">취소</button>
-    <button class="reserve-btn" :disabled="!allAgreementsChecked" @click="handleSubmit">
+    <button class="reserve-btn" :disabled="!canSubmit" @click="handleSubmit">
       결제하기
     </button>
   </div>
@@ -130,10 +221,12 @@ import { userLoginStore } from "@/stores/loginStore";
 import { required, minLength, helpers } from "@vuelidate/validators";
 import { useReservationStore } from "@/stores/reservationStore";
 
+// Store & Router 초기화
 const router = useRouter();
 const userStore = userLoginStore();
 const reservationStore = useReservationStore();
 
+// Store refs
 const {
   selectedRoom,
   childCount,
@@ -143,14 +236,18 @@ const {
 } = storeToRefs(reservationStore);
 const { userInfo, email, domain } = storeToRefs(userStore);
 
+// Form state
 const form = ref({
   representativeName: "",
   representativePhone: "",
   emailLocal: "",
   emailDomain: "",
-  paymentMethod: "", // 추가
+  paymentMethod: "",
 });
 
+const sameAsReservation = ref(false);
+
+// Validation rules
 const rules = {
   form: {
     representativeName: {
@@ -173,79 +270,83 @@ const rules = {
   },
 };
 
-// 결제 방법 선택 함수 추가
-const selectPaymentMethod = (method) => {
-  form.value.paymentMethod = method;
-};
-
-// computed 속성 추가
-const selectedPaymentMethod = computed(() => form.value.paymentMethod);
-
 const v$ = useVuelidate(rules, { form });
 
-const sameAsReservation = ref(false);
+// Computed
+const isMaxGuests = computed(
+  () => totalGuests.value >= (selectedRoom.value?.maxOccupancy || 0)
+);
 
-const copyReservationInfo = () => {
+const canSubmit = computed(
+  () =>
+    allAgreementsChecked.value && !v$.value.$invalid && form.value.paymentMethod
+);
+
+// Methods
+const handleSameAsReservation = () => {
   if (sameAsReservation.value) {
-    form.value.representativeName = userInfo.value?.name;
-    form.value.representativePhone = userInfo.value?.phone;
-    form.value.emailLocal = email.value;
-    form.value.emailDomain = domain.value;
+    form.value = {
+      ...form.value,
+      representativeName: userInfo.value?.name || "",
+      representativePhone: userInfo.value?.phone || "",
+      emailLocal: email.value || "",
+      emailDomain: domain.value || "",
+    };
   } else {
-    form.value.representativePhone = "";
-    form.value.representativeName = "";
-    form.value.emailLocal = "";
-    form.value.emailDomain = "";
+    form.value = {
+      ...form.value,
+      representativeName: "",
+      representativePhone: "",
+      emailLocal: "",
+      emailDomain: "",
+    };
   }
 };
 
-const decreaseAdult = () => {
-  if (adultCount.value > 1) adultCount.value--;
+const handleGuestCount = (type, increment) => {
+  const count = type === "adult" ? "adultCount" : "childCount";
+  const minValue = type === "adult" ? 1 : 0;
+
+  if (increment && !isMaxGuests.value) {
+    reservationStore[count]++;
+  } else if (!increment && reservationStore[count] > minValue) {
+    reservationStore[count]--;
+  }
 };
 
-const increaseAdult = () => {
-  if (totalGuests.value < selectedRoom.value?.maxOccupancy) adultCount.value++;
+const handlePaymentMethod = (method) => {
+  form.value.paymentMethod = method;
 };
 
-const decreaseChild = () => {
-  if (childCount.value > 0) childCount.value--;
-};
-
-const increaseChild = () => {
-  if (totalGuests.value < selectedRoom.value?.maxOccupancy) childCount.value++;
-};
-
-const handleCancel = () => {
-  const isConfirmed = confirm(
+const handleCancel = async () => {
+  const isConfirmed = await confirm(
     "지금까지 입력한 내용이 모두 삭제됩니다. 메인페이지로 이동하시겠습니까?"
   );
 
   if (isConfirmed) {
-    // 예약 관련 상태 초기화
-    reservationStore.$reset(); // store의 상태를 초기값으로 리셋
-    // 메인 페이지로 이동
-    router.push("/"); // 메인 페이지 경로에 맞게 수정하세요
+    reservationStore.$reset();
+    router.push("/");
   }
 };
 
 const handleSubmit = async () => {
+  try {
+    const isFormValid = await v$.value.$validate();
+    if (!isFormValid) return;
 
-  const isFormValid = await v$.value.$validate();
-  if (!isFormValid) return;
+    await reservationStore.createReservation(form.value);
+    const isSuccess = await reservationStore.processPayment(
+      form.value.paymentMethod
+    );
 
-  const reservationForm = {
-    ...form.value,
-  };
-
-  await reservationStore.createReservation(reservationForm);
-  const isSuccess = await reservationStore.callImpRequestPay(
-    form.value.paymentMethod
-  );
-
-  if (isSuccess) {
-    router.replace({ name: "ReservationResult" });
-  } else {
-    router.replace("/");
+    if (isSuccess) {
+      router.replace({ name: "ReservationResult" });
+    } else {
+      router.replace("/");
+    }
+  } catch (error) {
+    console.error("결제 처리 중 오류 발생:", error);
+    // TODO: 에러 처리
   }
 };
 </script>
