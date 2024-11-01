@@ -357,7 +357,7 @@ export const useReservationStore = defineStore("reservationStore", {
         IMP.request_pay(paymentConfig, async (response) => {
           if (response.success) {
             try {
-              await this.handlePaymentSuccess(response);
+              await this.handlePaymentSuccess(response, paymentConfig);
               resolve(true);
             } catch (error) {
               reject(error);
@@ -370,11 +370,11 @@ export const useReservationStore = defineStore("reservationStore", {
       });
     },
 
-    async handlePaymentSuccess(response) {
+    async handlePaymentSuccess(response, paymentConfig) {
       const paymentData = {
         impUid: response.imp_uid,
         reservationId: this.reservationResult.id,
-        method: "CARD",
+        method: paymentConfig.pay_method,
         amount: this.totalPriceNumber,
         paymentDate: new Date().toISOString(),
         completionStatus: "COMPLETE",
