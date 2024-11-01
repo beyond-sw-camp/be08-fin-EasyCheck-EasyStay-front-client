@@ -3,17 +3,25 @@
     <div class="row">
       <div class="col">
         <div class="nav-wrapper position-relative w-lg-50 w-sm-75 end-0">
-          <ul class="nav nav-pills nav-fill" role="tablist" ref="navPillsRef">
+          <ul
+            class="nav nav-pills nav-fill"
+            role="tablist"
+            ref="navPillsRef"
+            :class="navClasses"
+          >
             <li
-              class="nav-item pe-3"
               v-for="(tab, index) in accommodationTabs"
-              :key="index"
+              :key="tab.accommodationId"
+              class="nav-item pe-3"
             >
               <a
                 class="nav-link mb-0 px-0"
-                :class="{ active: accommodationId === tab.accommodationId }"
-                :aria-selected="accommodationId === tab.accommodationId"
-                @click="onClickTab(index, tab.accommodationId, tab.name)"
+                :class="{
+                  active: currentAccommodationId === tab.accommodationId,
+                }"
+                :aria-selected="currentAccommodationId === tab.accommodationId"
+                role="tab"
+                @click="handleTabClick(index, tab)"
               >
                 {{ tab.name }}
               </a>
@@ -27,26 +35,35 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, onMounted, computed, watch } from "vue";
-
+import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
+// Store initialization
 const reservationStore = useReservationStore();
+const { accommodationTabs, currentAccommodationId } =
+  storeToRefs(reservationStore);
 
-const { accommodationTabs, accommodationId } = storeToRefs(reservationStore);
-
+// Template refs
 const navPillsRef = ref(null);
 
+// Styles
 const movingTabStyle = ref({
   transform: "translate3d(0px, 0px, 0px)",
   transition: ".5s ease",
   width: "0px",
 });
 
-const updateMovingTabPosition = () => {
-  if (!navPillsRef.value) return;
+// Computed
+const isFlexColumn = computed(() => window.innerWidth < 991);
 
-  const activeTab = navPillsRef.value.querySelector(".nav-link.active");
+const navClasses = computed(() => ({
+  "flex-column on-resize": isFlexColumn.value,
+  "flex-row": !isFlexColumn.value,
+}));
+
+// Methods
+const updateMovingTabPosition = () => {
+  const activeTab = navPillsRef.value?.querySelector(".nav-link.active");
   if (!activeTab) return;
 
   const tabWidth = activeTab.offsetWidth;
@@ -59,36 +76,30 @@ const updateMovingTabPosition = () => {
   };
 };
 
-const onClickTab = (index, accommodationId, accommodationName) => {
-  reservationStore.setAccommodationId(accommodationId);
-  reservationStore.setAccommodationName(accommodationName);
-  // 검색한 객실, 체크인, 체크아웃 날짜 초기화
-  reservationStore.resetRoomSelection();
-  reservationStore.resetReservationForm();
-  reservationStore.initCheckInCheckOut();
+const handleTabClick = (index, tab) => {
+  reservationStore.accommodation = {
+    id: tab.accommodationId,
+    name: tab.name,
+  };
+
+  // Reset related states
+  reservationStore.resetReservation();
+  reservationStore.initializeReservation();
 };
 
-watch(updateMovingTabPosition);
-
+// Lifecycle hooks and watchers
 onMounted(() => {
   updateMovingTabPosition();
   window.addEventListener("resize", updateMovingTabPosition);
 });
 
-const isFlexColumn = computed(() => {
-  return window.innerWidth < 991;
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateMovingTabPosition);
 });
 
-watch(isFlexColumn, (newValue) => {
-  if (newValue) {
-    navPillsRef.value?.classList.remove("flex-row");
-    navPillsRef.value?.classList.add("flex-column", "on-resize");
-  } else {
-    navPillsRef.value?.classList.remove("flex-column", "on-resize");
-    navPillsRef.value?.classList.add("flex-row");
-  }
-  updateMovingTabPosition();
-});
+watch(() => currentAccommodationId.value, updateMovingTabPosition);
+
+watch(isFlexColumn, updateMovingTabPosition);
 </script>
 
 <style scoped>

@@ -1,104 +1,87 @@
 <template>
-  <div class="easycheck-calendar">
+  <div class="reservation-calendar">
     <v-calendar
       borderless
       columns="2"
       :min-date="today"
-      :attributes="attrs"
-      @dayclick="clickDate"
+      :attributes="calendarAttributes"
+      @dayclick="handleDateSelection"
     />
   </div>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { ref, reactive, watch } from "vue";
+import { ref, computed } from "vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 
+// 상수
 const DATE_SELECTION_MODE = {
   START: "START",
   END: "END",
 };
 
+// 초기 설정
 const today = new Date(new Date().setHours(0, 0, 0, 0));
-const tomorrow = new Date().setDate(today.getDate() + 1);
-
 const selectMode = ref(DATE_SELECTION_MODE.START);
-const reservationStore = useReservationStore();
 
+// 스토어 설정
+const reservationStore = useReservationStore();
 const { checkIn, checkOut } = storeToRefs(reservationStore);
 
-// 초기값을 함수로 분리
-const getInitialAttrs = () => [
+// 캘린더 속성 계산
+const calendarAttributes = computed(() => [
   {
-    key: "today",
+    key: "selection",
     highlight: {
       start: { fillMode: "outline" },
       base: { fillMode: "light" },
       end: { fillMode: "outline" },
     },
     dates: {
-      start: checkIn,
-      end: checkOut,
+      start: checkIn.value,
+      end: checkOut.value,
     },
   },
-];
+]);
 
-const attrs = reactive(getInitialAttrs());
-
-// watch 수정
-// watch(
-//   () => reservationStore.accommodationId,
-//   () => {
-//     // reactive 배열의 내용을 업데이트
-//     attrs.length = 0; // 배열 비우기
-//     attrs.push(...getInitialAttrs()); // 새로운 초기값 추가
-
-//     // store의 날짜도 초기화
-//     reservationStore.setCheckinDate(today);
-//     reservationStore.setCheckoutDate(new Date(tomorrow));
-//   }
-// );
-
-const clickDate = (e) => {
-  const { date: selectedDate } = e;
-
+// 날짜 유효성 검사
+const isValidDateSelection = (selectedDate) => {
   if (selectedDate.getTime() < today.getTime()) {
     console.warn("과거 날짜는 선택할 수 없습니다.");
-    return;
+    return false;
   }
+  return true;
+};
 
-  const currentStartDate = attrs[0].dates.start;
+// 날짜 선택 처리
+const handleDateSelection = (e) => {
+  const { date: selectedDate } = e;
+
+  if (!isValidDateSelection(selectedDate)) return;
 
   if (selectMode.value === DATE_SELECTION_MODE.START) {
-    attrs[0].dates = {
-      start: selectedDate,
-      end: selectedDate,
-    };
-
+    // 시작 날짜 선택
     reservationStore.setCheckinDate(selectedDate);
     reservationStore.setCheckoutDate(selectedDate);
-  } else if (selectMode.value === DATE_SELECTION_MODE.END) {
+    reservationStore.setShowRoomSelectionGrid(false);
+    selectMode.value = DATE_SELECTION_MODE.END;
+  } else {
+    // 종료 날짜 선택
+    const currentStartDate = checkIn.value;
+
     if (selectedDate.getTime() < currentStartDate.getTime()) {
-      attrs[0].dates = {
-        start: selectedDate,
-        end: currentStartDate,
-      };
+      // 선택한 날짜가 시작일보다 이전인 경우
       reservationStore.setCheckinDate(selectedDate);
       reservationStore.setCheckoutDate(currentStartDate);
     } else {
-      attrs[0].dates = {
-        ...attrs[0].dates,
-        end: selectedDate,
-      };
+      // 선택한 날짜가 시작일보다 이후인 경우
       reservationStore.setCheckoutDate(selectedDate);
     }
-  }
 
-  selectMode.value =
-    selectMode.value === DATE_SELECTION_MODE.START
-      ? DATE_SELECTION_MODE.END
-      : DATE_SELECTION_MODE.START;
+    // 날짜 선택이 완료되면 객실 검색 실행
+    selectMode.value = DATE_SELECTION_MODE.START;
+  }
 };
 </script>
 
@@ -109,7 +92,7 @@ const clickDate = (e) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; // 스케일 변환 시 넘치는 부분 숨김
+  overflow: hidden;
 
   :deep(.vc-container) {
     width: 100%;
@@ -121,10 +104,21 @@ const clickDate = (e) => {
 
   :deep(.vc-day) {
     min-height: 24px;
+
+    &.is-today {
+      font-weight: bold;
+    }
+
+    &.is-disabled {
+      opacity: 0.4;
+    }
   }
 
   :deep(.vc-day-content) {
-    font-size: 1em; // 글자 크기 증가
+    font-size: 1em;
+    height: auto;
+    min-height: 32px;
+    padding: 4px;
   }
 }
 </style>

@@ -13,7 +13,7 @@
           <option
             v-for="accommodation in accommodations"
             :key="accommodation.id"
-            :value="{ id: accommodation.id, name: accommodation.name }"
+            :value="accommodation.id"
           >
             {{ accommodation.name }}
           </option>
@@ -102,12 +102,15 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, minValue, maxValue, helpers } from "@vuelidate/validators";
 
 const router = useRouter();
+
+// pinia 스토어
 const reservationStore = useReservationStore();
 const accommodationStore = useAccommodationStore();
 
 const { roomCount } = storeToRefs(reservationStore);
 const { accommodations } = storeToRefs(accommodationStore);
 
+// 달력 오늘, 내일로 초기화
 const today = new Date();
 const tomorrow = new Date(today);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -120,7 +123,6 @@ const formatDate = (date) => {
 };
 
 const accommodationId = ref();
-const accommodationName = ref("");
 const checkInDate = ref(formatDate(today));
 const checkOutDate = ref(formatDate(tomorrow));
 const resort = ref("");
@@ -178,25 +180,18 @@ const searchRooms = async () => {
     return;
   }
 
-  reservationStore.initReservationForm({
-    accommodationId: accommodationId.value,
-    accommodationName: accommodationName.value,
-    checkInDate: new Date(checkInDate.value),
-    checkOutDate: new Date(checkOutDate.value),
+  router.push({
+    name: "Reservation",
+    query: {
+      accommodationId: accommodationId.value,
+      checkInDate: checkInDate.value,
+      checkOutDate: checkOutDate.value,
+    },
   });
-
-  // router.push({
-  //   name: "Reservation",
-  // });
 };
 
 const onSelectAccommodation = (e) => {
-  console.log(e.target.value);
-  const selected = e.target.value;
-  console.log(JSON.parse(selected));
-
-  accommodationId.value = e.target.value.id;
-  accommodationName.value = e.target.value.name;
+  accommodationId.value = e.target.value;
 };
 </script>
 
