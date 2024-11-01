@@ -1,21 +1,20 @@
 <template>
   <section class="my-3 py-3">
-    <div class="d-flex justify-content-between align-items-center px-7 mb-5">
+    <div class="d-flex justify-content-between align-items-center px-5 mb-5">
       <h3 class="text-start text-black">시설 안내</h3>
       <MaterialButton
         class="large-button"
         color="danger"
         @click="handleUsageGuide"
+        >이용 안내</MaterialButton
       >
-        이용 안내
-      </MaterialButton>
     </div>
     <div class="container-fluid px-1">
       <Splide :options="splideOptions" class="custom-splide mb-lg-5">
         <SplideSlide
           v-for="attraction in attractions"
           :key="attraction.id"
-          class="slider-item d-flex justify-content-center px-3"
+          class="slider-item d-flex justify-content-center px-1"
         >
           <div class="card attraction-card" @click="openModal(attraction)">
             <div class="attraction-image-wrapper">
@@ -69,9 +68,6 @@ const router = useRouter();
 const selectedAttraction = ref(null);
 const showModal = ref(false);
 
-console.log("attractionInfo");
-console.log(props.currentThemePark);
-
 onMounted(() => {
   fetchAttractions();
 });
@@ -91,16 +87,6 @@ const fetchAttractions = () => {
 
 const attractions = computed(() => attractionStore.attractions);
 
-watch(
-  () => props.themeParkId,
-  async (newThemeParkId) => {
-    if (newThemeParkId) {
-      await fetchAttractions();
-    }
-  },
-  { immediate: true }
-);
-
 const openModal = (attraction) => {
   selectedAttraction.value = attraction;
   showModal.value = true;
@@ -118,20 +104,10 @@ const formattedIntroduction = (introduction) => {
 
 const handleUsageGuide = () => {
   if (props.currentThemePark && props.currentThemePark.guidePageName) {
-    console.log("Navigating to guide:", props.currentThemePark.guidePageName);
-    router
-      .push({
-        name: "UsageGuide",
-        params: { guidePageName: props.currentThemePark.guidePageName },
-      })
-      .then(() => {
-        console.log("Navigation successful!");
-      })
-      .catch((error) => {
-        console.error("Navigation error:", error);
-      });
-  } else {
-    console.error("guidePageName is not available for this theme park.");
+    router.push({
+      name: "UsageGuide",
+      params: { guidePageName: props.currentThemePark.guidePageName },
+    });
   }
 };
 
@@ -141,12 +117,15 @@ const splideOptions = {
   perMove: 1,
   pagination: true,
   arrows: true,
+  gap: "1rem",
   breakpoints: {
     1024: {
       perPage: 2,
+      gap: "0.5rem",
     },
     768: {
       perPage: 1,
+      gap: "0.25rem",
     },
   },
 };
@@ -155,23 +134,31 @@ const splideOptions = {
 <style scoped>
 .slider-item {
   padding: 0;
+  margin: 0 0.5rem;
 }
 
 .attraction-card {
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s;
   width: 100%;
-  max-width: 420px;
+  max-width: 500px;
   height: auto;
   margin-bottom: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .attraction-card:hover {
   transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .attraction-image-wrapper {
   position: relative;
+  width: 420px;
   height: 560px;
 }
 
@@ -186,24 +173,27 @@ const splideOptions = {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.4);
   color: #fff;
   padding: 1rem;
   box-sizing: border-box;
+  backdrop-filter: blur(2px);
 }
 
-.card-title {
-  color: #ffffff;
+.card-title,
+.card-text {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  color: #fff;
 }
 
 .splide__arrow {
   background-color: #007bff;
   color: #ffffff;
   border-radius: 50%;
-  padding: 0.75rem;
-  width: 60px;
-  height: 60px;
-  opacity: 0.9;
+  padding: 1rem;
+  width: 50px;
+  height: 50px;
+  opacity: 0.8;
   transition: background-color 0.3s, opacity 0.3s;
 }
 
@@ -213,7 +203,13 @@ const splideOptions = {
 }
 
 .splide__track {
-  margin-bottom: 3rem !important;
+  margin-bottom: 2rem !important;
+  overflow-x: hidden;
+}
+
+.slider-item {
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 .large-button {
@@ -221,5 +217,14 @@ const splideOptions = {
   padding: 0.75rem 1.5rem;
   min-width: 150px;
   min-height: 50px;
+  background-color: #ff4c4c;
+  border-radius: 8px;
+  color: white;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.large-button:hover {
+  background-color: #cc3a3a;
+  transform: scale(1.02);
 }
 </style>

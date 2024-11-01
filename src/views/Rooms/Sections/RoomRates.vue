@@ -3,22 +3,13 @@
     <h3 class="text-black mb-3">객실 요금</h3>
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="dropdown">
-        <button
-          class="btn btn-secondary rounded-0 dropdown-toggle"
-          type="button"
-          id="dropdownMenuButton"
-          @click="toggleDropdown"
-        >
+        <button class="btn btn-secondary rounded-0 dropdown-toggle" type="button" id="dropdownMenuButton"
+          @click="toggleDropdown">
           {{ selectedMonth }}
         </button>
         <ul class="dropdown-menu" :class="{ show: isDropdownOpen }">
-          <li
-            v-for="month in availableMonths"
-            :key="month"
-            class="dropdown-item"
-            href="#"
-            @click.prevent="selectMonth(month)"
-          >
+          <li v-for="month in availableMonths" :key="month" class="dropdown-item" href="#"
+            @click.prevent="selectMonth(month)">
             {{ month }}
           </li>
         </ul>
@@ -70,41 +61,38 @@
         <tbody>
           <tr v-for="(row, index) in feeData" :key="index">
             <td :rowspan="row.timeSlots.length">{{ row.season }}</td>
-            <template
-              v-for="(slot, slotIndex) in row.timeSlots"
-              :key="`${index}-${slotIndex}`"
-            >
-              <tr v-if="slotIndex !== 0">
-                <td>{{ slot.time }}</td>
-                <td>{{ slot.memberFee }}</td>
-                <td>{{ slot.nonMemberFee }}</td>
-              </tr>
-              <td v-else>{{ slot.time }}</td>
-              <td>{{ slot.memberFee }}</td>
-              <td>{{ slot.nonMemberFee }}</td>
-            </template>
+            <template v-for="(slot, slotIndex) in row.timeSlots" :key="`${index}-${slotIndex}`">
+          <tr v-if="slotIndex !== 0">
+            <td>{{ slot.time }}</td>
+            <td>{{ slot.memberFee }}</td>
+            <td>{{ slot.nonMemberFee }}</td>
           </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-3 small">
-      <ul>
-        <li>오후 3시 이후 퇴실 시에는 1박의 객실요금을 지불해야 합니다.</li>
-        <li>퇴실 연장은 객실상황에 따라 불가할 수 있습니다.</li>
-        <li>
-          퇴실 연장을 원하시는 고객님께서는 사전에 프런트로 문의해 주시기
-          바랍니다.
-        </li>
-      </ul>
-      <p><strong>요일기준</strong></p>
-      <ul>
-        <li>주중: 일 ~ 목</li>
-        <li>주말: 금, 토</li>
-        <li>연휴: 공휴일 당일 및 전일</li>
-        <li>성수기: 여름 및 겨울 성수기 기간 별도 안내</li>
-      </ul>
-    </div>
-  </section>
+          <td v-else>{{ slot.time }}</td>
+          <td>{{ slot.memberFee }}</td>
+          <td>{{ slot.nonMemberFee }}</td>
+</template>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-3 small">
+  <ul>
+    <li>오후 3시 이후 퇴실 시에는 1박의 객실요금을 지불해야 합니다.</li>
+    <li>퇴실 연장은 객실상황에 따라 불가할 수 있습니다.</li>
+    <li>
+      퇴실 연장을 원하시는 고객님께서는 사전에 프런트로 문의해 주시기
+      바랍니다.
+    </li>
+  </ul>
+  <p><strong>요일기준</strong></p>
+  <ul>
+    <li>주중: 일 ~ 목</li>
+    <li>주말: 금, 토</li>
+    <li>연휴: 공휴일 당일 및 전일</li>
+    <li>성수기: 여름 및 겨울 성수기 기간 별도 안내</li>
+  </ul>
+</div>
+</section>
 </template>
 
 <script setup>
@@ -202,6 +190,13 @@ const formatPrice = (price) => {
 
   .table th {
     background-color: #f8f9fa;
+    border: 1px solid #dee2e6 !important;
+    border-collapse: collapse;
+  }
+
+  .table td {
+    border: 1px solid #dee2e6 !important;
+    border-collapse: collapse;
   }
 
   .dropdown-toggle,
@@ -214,14 +209,18 @@ const formatPrice = (price) => {
 
   .dropdown-menu {
     display: none;
+
     &.show {
       display: block;
     }
   }
 }
+
 .late-checkout-fees {
   .table {
     font-size: 0.9rem;
+    border: 1px solid #dee2e6 !important;
+    border-collapse: collapse;
 
     @media (max-width: 768px) {
       font-size: 0.8rem;
@@ -231,6 +230,13 @@ const formatPrice = (price) => {
   .table th {
     background-color: #f8f9fa;
     vertical-align: middle;
+    border: 1px solid #dee2e6 !important;
+    border-collapse: collapse;
+  }
+
+  .table td {
+    border: 1px solid #dee2e6 !important;
+    border-collapse: collapse;
   }
 
   .text-brown {

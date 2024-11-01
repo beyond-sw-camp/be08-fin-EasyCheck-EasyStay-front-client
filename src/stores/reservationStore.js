@@ -102,7 +102,7 @@ export const useReservationStore = defineStore("reservationStore", {
           ? state.selectedRoom?.corpPrice
           : state.selectedRoom?.normalPrice;
 
-      const price = basePrice * state.roomCount || 0;
+      const price = basePrice * state.roomCount * state.stayDuration || 0;
 
       return new Intl.NumberFormat("ko-KR", {
         style: "currency",
@@ -117,7 +117,7 @@ export const useReservationStore = defineStore("reservationStore", {
           ? state.selectedRoom?.corpPrice
           : state.selectedRoom?.normalPrice;
 
-      return basePrice * state.roomCount || 0;
+      return basePrice * state.roomCount * state.stayDuration || 0;
     },
 
     // 기타 getter
@@ -422,6 +422,27 @@ export const useReservationStore = defineStore("reservationStore", {
       if (agreement1 !== null) this.agreementChecked1 = agreement1;
       if (agreement2 !== null) this.agreementChecked2 = agreement2;
       if (agreement3 !== null) this.agreementChecked3 = agreement3;
+    },
+
+    // 예약 취소
+    async cancelReservation(id) {
+      const reservationRoomUpdateRequest = {
+        reservationStatus: "CANCELED",
+      };
+
+      try {
+        await apiClient.put(
+          `/reservation-room/${id}`,
+          reservationRoomUpdateRequest
+        );
+        alert("예약이 취소되었습니다.");
+        await this.fetchReservationRoomLists();
+      } catch (error) {
+        console.error("예약 취소 실패:", error);
+        this.reservationError =
+          error.response?.data || "예약 취소 중 오류 발생";
+        alert(this.reservationError);
+      }
     },
   },
 });

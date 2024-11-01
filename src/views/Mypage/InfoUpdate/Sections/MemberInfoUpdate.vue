@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
-import apiClient from "@/api";
 import { mypageStore } from '@/stores/mypageStore';
 
 // Vue Material Kit 2 components

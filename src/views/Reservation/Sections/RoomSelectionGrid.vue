@@ -28,10 +28,21 @@
 
             <p class="card-text fw-bold small">{{ room.description }}</p>
             <p class="card-text fw-bold">
+              <<<<<<< HEAD
               <small class="text-muted">
                 기준 인원: {{ room.standardOccupancy }} / 최대 인원:
                 {{ room.maxOccupancy }}
               </small>
+              =======
+              <small class="text-muted"
+                >기준 인원:{{ room.standardOccupancy }} / 최대 인원:{{
+                  room.maxOccupancy
+                }}</small
+              >
+              >>>>>>> develop
+            </p>
+            <p class="card-text fw-bold small">
+              잔여 객실({{ room.remainingRoom }})
             </p>
             <p class="card-text">
               <small class="text-muted">1박 기준(VAT 포함)</small>

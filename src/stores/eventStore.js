@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api";
-import axios from "axios";
 
 export const useEventStore = defineStore("eventStore", {
   state: () => ({
@@ -84,7 +83,7 @@ export const useEventStore = defineStore("eventStore", {
 
       try {
         console.log("Fetching accommodations...");
-        const response = await axios.get("/api/v1/accommodations"); // 리조트 목록 API 호출
+        const response = await apiClient.get("/accommodations"); // 리조트 목록 API 호출
         console.log("사업장 정보 : ", response);
         this.accommodations = response.data; // API 응답 데이터를 accommodations에 저장
       } catch (err) {

@@ -30,6 +30,7 @@ import ThemeParkErrorPage from "@/views/ErrorPages/ThemeParkErrorPage.vue";
 import TicketOrderView from "@/views/TicketOrders/TicketOrderView.vue";
 import TicketSelectionView from "@/views/TicketOrders/TicketSelectionView.vue";
 import UsageGuideWrapper from "@/views/ThemeParks/UsageGuides/UsageGuideWrapper.vue";
+import TicketResultView from "@/views/TicketOrders/TicketResultView.vue";
 
 import AccommodationView from "@/views/Accommodations/AccommodationView.vue";
 
@@ -61,6 +62,7 @@ import PwAuthView from "@/views/Mypage/InfoUpdate/PwAuthView.vue";
 import InfoAuthView from "@/views/Mypage/InfoUpdate/InfoAuthView.vue";
 import RoomReservationList from "@/views/Mypage/RoomReservationList/RoomReservationList.vue";
 import ThemeparkReservationList from "@/views/Mypage/ThemeparkReservationList/ThemeparkReservationList.vue";
+import RoomReservationDetailView from "@/views/Mypage/RoomReservationList/RoomReservationDetailView.vue";
 
 import PaymentPage from "@/views/Payment/PaymentPage.vue";
 import NoticesListView from "@/views/Notices/NoticesListView.vue";
@@ -236,6 +238,11 @@ const router = createRouter({
           },
         },
       ],
+    },
+    {
+      path: "/ticket/result",
+      name: "TicketResult",
+      component: TicketResultView,
     },
     {
       path: "/themepark/error",
@@ -426,11 +433,16 @@ const router = createRouter({
       name: "TicketRefund",
       component: TicketRefund,
     },
+    {
+      path: "/users/roomReservationLists/details/:id",
+      name: "RoomReservationDetailView",
+      component: RoomReservationDetailView,
+    },
   ],
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.name === "TicketOrderView") {
+  if (to.name === "TicketOrderView" || to.name === "TicketSelectionView") {
     window.scrollTo(0, 0); // 해당 페이지로 이동할 때 스크롤을 맨 위로 이동
   }
   next();

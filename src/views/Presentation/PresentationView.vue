@@ -3,7 +3,6 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "@/api";
 import RoomSearchForm from "./Sections/SearchRoom/RoomSearchForm.vue";
-import RoomList from "./Sections/SearchRoom/RoomList.vue";
 
 import Header from "../../examples/Header.vue";
 import KakaoMap from "../../components/map/KakaoMap.vue";
@@ -26,11 +25,6 @@ const imageIndex = ref(0);
 let intervalId = null;
 
 const accommodations = ref([]);
-const availableRooms = ref([]);
-const selectedResort = ref(null);
-let checkInDate = null; // 체크인 날짜를 문자열로 저장
-let checkOutDate = null; // 체크아웃 날짜를 문자열로 저장
-let roomCount = null;
 const router = useRouter(); // useRouter 호출
 
 // 테스트용 추가 버튼 연결하고 주석 지우겠음
@@ -49,29 +43,6 @@ const fetchAccommodations = async () => {
   } catch (error) {
     console.error("리조트 목록을 가져오는 중 오류가 발생했습니다.", error);
   }
-};
-
-const onSearchRooms = async ({
-  resort,
-  checkInDate: inDate,
-  checkOutDate: outDate,
-  roomCount: count,
-  accommodationId,
-}) => {
-  selectedResort.value = resort; // 선택한 리조트 저장
-  checkInDate = inDate; // 체크인 날짜 저장
-  checkOutDate = outDate; // 체크아웃 날짜 저장
-  roomCount = count; // 객실 수 저장
-
-  router.push({
-    name: "Reservation",
-    query: {
-      checkInDate,
-      checkOutDate,
-      accommodationId,
-      roomCount,
-    },
-  });
 };
 
 onMounted(fetchAccommodations);
@@ -125,6 +96,19 @@ onUnmounted(() => {
     clearInterval(intervalId);
   }
 });
+
+// const onSearchRooms = (searchData) => {
+//   // Navigate to ReservationView with searchData as query parameters
+//   router.push({
+//     name: "ReservationView", // Make sure this matches your route name
+//     query: {
+//       resort: searchData.resort,
+//       checkInDate: searchData.checkInDate,
+//       checkOutDate: searchData.checkOutDate,
+//       roomCount: searchData.roomCount,
+//     },
+//   });
+// };
 </script>
 
 <template>
@@ -177,8 +161,11 @@ onUnmounted(() => {
       </div>
       <div class="roomSearchForm-container">
         <div class="container p-0">
-          <RoomSearchForm class="m-auto" :accommodations="accommodations" />
-          <RoomList :rooms="availableRooms" @select-room="onRoomSelected" />
+          <RoomSearchForm
+            class="m-auto"
+            :accommodations="accommodations"
+            @search="onSearchRooms"
+          />
         </div>
       </div>
     </Header>
