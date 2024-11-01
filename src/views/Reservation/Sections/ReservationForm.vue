@@ -229,12 +229,6 @@ const handleCancel = () => {
 };
 
 const handleSubmit = async () => {
-  // 로그인 상태 확인
-  if (!userStore.isLoggedIn) {
-    alert("로그인이 필요합니다.");
-    router.push({ name: "login" }); // 로그인 화면의 경로에 맞게 수정
-    return;
-  }
 
   const isFormValid = await v$.value.$validate();
   if (!isFormValid) return;
