@@ -46,12 +46,14 @@
 
 <script setup>
 import RoomTypeNavs from "@/views/Rooms/Sections/RoomTypeNavs.vue";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useReservationStore } from "@/stores/reservationStore.js";
 import { userLoginStore } from "@/stores/loginStore.js";
 
 const reservationStore = useReservationStore();
 
+const router = useRouter();
 const userStore = userLoginStore();
 
 const { availableRoomList: rooms, selectedRoom } =
@@ -71,6 +73,13 @@ const getRoomSelectionText = (room) =>
   isRoomSelected(room) ? "객실 선택됨" : "객실 선택";
 
 const toggleRoomSelection = async (room) => {
+  // 로그인 상태 확인
+  if (!userStore.isLoggedIn) {
+    alert("로그인이 필요합니다.");
+    router.push({ name: "login" }); // 로그인 화면의 경로에 맞게 수정
+    return;
+  }
+
   if (isRoomSelected(room)) {
     reservationStore.closeReservationForm();
     reservationStore.resetReservationRoom();
