@@ -153,7 +153,6 @@ const fetchReservationsWithDetails = async () => {
   }
 };
 
-
 // 예약 상세보기 선택
 const selectReservation = (reservation) => {
   const id = reservation.payment.id;
