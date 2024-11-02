@@ -18,6 +18,7 @@ export const userLoginStore = defineStore("userStore", {
     userData: {
       name: "",
       email: "",
+      phone: "",
     },
 
     // 로그인 상태 저장
@@ -288,6 +289,7 @@ export const userLoginStore = defineStore("userStore", {
           this.userData.id = response.data.id;
           this.userData.name = response.data.name;
           this.userData.email = response.data.email;
+          this.userData.phone = response.data.phone;
         }
       } catch (error) {
         console.error("사용자 정보 가져오기 실패:", error);

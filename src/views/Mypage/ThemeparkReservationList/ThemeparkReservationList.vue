@@ -32,10 +32,10 @@ const currentPage = ref(1);
 const itemsPerPage = 5;
 
 // 검색바 - 시설 조회
-// const fetchAccommodations = async () => {
-//   await mypage.fetchAccommodations();
-//   accommodations.value = mypage.accommodations;
-// };
+const fetchAccommodations = async () => {
+  await mypage.fetchAccommodations();
+  accommodations.value = mypage.accommodations;
+};
 
 // 검색바 - 지점 선택 변경 처리
 const updateBranch = () => {
@@ -110,7 +110,7 @@ const formatDate = (dateString) => {
 const paymentStatusMapping = {
   COMPLETED: "결제 완료",
   INCOMPLETE: "결제 미완료",
-  REFUND: "환불 완료",
+  REFUNDED: "환불 완료",
 };
 
 // 결제 방법 값 매핑
@@ -142,6 +142,7 @@ const fetchTicketOrdersWithDetails = async () => {
 
     reservations.value = userPayments.map(payment => ({
       orderId: payment.orderId || "정보 없음",
+
       accommodationName: payment.accommodationName || "정보 없음",
       themeParkName: payment.themeParkName || "정보 없음",
       ticketName: payment.ticketName || "정보 없음",
@@ -149,8 +150,8 @@ const fetchTicketOrdersWithDetails = async () => {
       quantity: payment.quantity || "정보 없음",
       validFromDate: formatDate(payment.validFromDate),
       validToDate: formatDate(payment.validToDate),
-      paymentDate: formatDate(payment.paymentDate),
       paymentMethod: paymentMethodMapping[payment.paymentMethod] || "정보 없음",
+      paymentDate: formatDate(payment.paymentDate),
       paymentStatus: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
     }));
 
@@ -190,7 +191,7 @@ onMounted(async () => {
   // 모든 예약을 초기화 (예약 정보를 가져온 후)
   filteredReservations.value = [...reservations.value];
 
-  // 현재 날짜 설정
+  // 검색바 현재 날짜 설정
   const today = new Date().toISOString().split('T')[0];
   checkInDate.value = today;
   checkOutDate.value = today;
