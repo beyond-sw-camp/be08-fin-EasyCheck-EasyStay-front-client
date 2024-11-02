@@ -1,34 +1,43 @@
 <template>
-  <div class="card py-4 px-6">
+  <div class="card py-3 px-5">
     <form class="row g-3 align-items-center" @submit.prevent="searchRooms">
-      <div class="col-md-4">
-        <label for="resortSelect" class="form-label">방문리조트 선택</label>
-        <select
-          v-model="resort"
-          id="resortSelect"
-          :class="['form-select', { 'is-invalid': v$.resort.$error }]"
-          @change="onSelectAccommodation"
-        >
-          <option value="" disabled>지점선택</option>
-          <option
-            v-for="accommodation in accommodations"
-            :key="accommodation.id"
-            :value="accommodation.id"
+      <div
+        class="col-md-2"
+        style="border-right: 2px solid lightgray; height: 90px"
+      >
+        <div class="custom-select-container">
+          <label for="resortSelect" class="form-label">방문리조트 선택</label>
+          <select
+            v-model="resort"
+            id="resortSelect"
+            :class="['form-select', { 'is-invalid': v$.resort.$error }]"
+            @change="onSelectAccommodation"
           >
-            {{ accommodation.name }}
-          </option>
-        </select>
+            <option value="" disabled>지점선택</option>
+            <option
+              v-for="accommodation in accommodations"
+              :key="accommodation.id"
+              :value="accommodation.id"
+            >
+              {{ accommodation.name }}
+            </option>
+          </select>
+        </div>
         <div class="invalid-feedback" v-if="v$.resort.$error">
           리조트를 선택해주세요.
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div
+        class="col-md-2 custom-date-container"
+        style="padding-left: 30px; height: 90px"
+      >
         <label for="checkIn" class="form-label">체크인</label>
         <input
           id="checkIn"
           type="date"
-          :class="['form-control', { 'is-invalid': v$.checkInDate.$error }]"
+          class="custom-date-input form-control"
+          :class="{ 'is-invalid': v$.checkInDate.$error }"
           v-model="checkInDate"
         />
         <div class="invalid-feedback" v-if="v$.checkInDate.$error">
@@ -36,12 +45,20 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div
+        class="col-md-2 custom-date-container"
+        style="
+          border-right: 2px solid lightgray;
+          padding-right: 30px;
+          height: 90px;
+        "
+      >
         <label for="checkOut" class="form-label">체크아웃</label>
         <input
           id="checkOut"
           type="date"
-          :class="['form-control', { 'is-invalid': v$.checkOutDate.$error }]"
+          class="custom-date-input form-control"
+          :class="{ 'is-invalid': v$.checkOutDate.$error }"
           v-model="checkOutDate"
         />
         <div class="invalid-feedback" v-if="v$.checkOutDate.$error">
@@ -49,7 +66,17 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div
+        class="col-md-2 custom-date-container"
+        style="
+          /* border-right: 1px solid lightgray; */
+          padding-right: 40px;
+          padding-left: 40px;
+          height: 90px;
+          justify-content: center;
+          align-items: center;
+        "
+      >
         <label for="roomCount" class="form-label">객실 수</label>
         <div class="room-count-wrapper d-flex">
           <button
@@ -85,7 +112,10 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div
+        class="col-md-4"
+        style="height: 90px; justify-content: center; align-items: center"
+      >
         <button type="submit" class="btn btn-black w-100">객실 검색</button>
       </div>
     </form>
@@ -199,6 +229,8 @@ const onSelectAccommodation = (e) => {
 .btn {
   border-radius: 0;
   /* border: 1px solid; */
+  margin-left: 50px;
+  margin-top: 30px;
   font-size: 14px;
   box-shadow: none;
 }
@@ -265,5 +297,92 @@ const onSelectAccommodation = (e) => {
 
 .room-count-wrapper.is-invalid {
   border-color: #dc3545;
+}
+
+.form-select {
+  appearance: none; /* 기본 선택 상자 스타일 제거 */
+  background-color: #fff; /* 배경색 */
+  border: 1px solid #444; /* 테두리 */
+  border-radius: 0.1rem; /* 둥근 모서리 */
+  padding: 0.5rem 1rem; /* 안쪽 여백 */
+  font-size: 1rem; /* 글자 크기 */
+  color: #333; /* 글자 색상 */
+  transition: border-color 0.3s ease; /* 테두리 색상 변화 애니메이션 */
+  width: 160px; /* 너비 100% */
+}
+
+.form-select:hover {
+  border-color: #007bff; /* 마우스 오버 시 테두리 색상 */
+}
+
+.form-select:focus {
+  outline: none; /* 포커스 아웃라인 제거 */
+  border-color: #007bff; /* 포커스 시 테두리 색상 */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* 포커스 시 그림자 효과 */
+}
+
+.form-select.is-invalid {
+  border-color: #dc3545; /* 에러 발생 시 테두리 색상 */
+}
+
+.form-select option {
+  padding: 0.5rem; /* 옵션 안쪽 여백 */
+}
+.custom-date-container {
+  width: 180px;
+}
+
+.custom-date-input {
+  font-size: 0.9rem;
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 0;
+  background-color: #f9f9f9;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  /* transition: border-color 0.3s ease, box-shadow 0.3s ease; */
+}
+
+.custom-date-input:focus {
+  border-color: #333;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+.custom-date-input.is-invalid {
+  border-color: #dc3545;
+}
+.divider {
+  width: 1000px;
+  height: 100%;
+  border-left: 1px solid #444; /* 선 색상을 지정 */
+  border-color: black;
+  opacity: 0.1; /* 선의 투명도를 조정 (선택사항) */
+}
+.room-count-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #444; /* 진한 테두리 색상 */
+  border-radius: 0; /* 둥글기 제거 */
+  overflow: hidden;
+}
+.room-count-input {
+  width: 60px;
+  border: none;
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+}
+.room-count-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+.room-count-wrapper:focus-within {
+  border-color: #333;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2); /* 포커스 시 진한 테두리 효과 */
+}
+.room-count-wrapper.is-invalid {
+  border-color: #dc3545; /* 유효성 검사 실패 시 테두리 색상 */
 }
 </style>
