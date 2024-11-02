@@ -106,15 +106,18 @@ const fetchReservationsWithDetails = async () => {
     await userStore.getUserData();
     const userId = userStore.userData.id;
 
+    console.log("사용자 ID:", userId);
+
     await paymentStore.fetchAllPayments();
     const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
 
-    console.log("결제 내역:", allPayments);
+    console.log("사용자의 결제 내역:", allPayments);
 
-    await reservationStore.fetchReservationRoomLists();
-    const allReservations = reservationStore.reservations;
+    await reservationStore.fetchAllReservationRoomLists();
+    console.log("모든 예약 내역:", reservationStore.reservations);
+    const allReservations = reservationStore.reservations.filter(reservation => reservation.userId === userId);
 
-    console.log("예약 내역: ", allReservations);
+    console.log("사용자의 예약 내역:", allReservations);
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -123,15 +126,16 @@ const fetchReservationsWithDetails = async () => {
       return localDate.toISOString().split('T')[0];
     };
 
+    // 모든 결제에 대해 해당 결제와 연결된 모든 예약을 찾기
+    reservations.value = allPayments.flatMap(payment => {
+      const matchingReservations = allReservations.filter(res => res.id === payment.reservationRoomId);
 
-    reservations.value = allPayments.map(payment => {
-      const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
-
-      return {
-        accommodationName: payment.accommodationName || "정보 없음",
-        checkinDate: formatDate(payment.checkinDate),
-        checkoutDate: formatDate(payment.checkoutDate),
-        typeName: reservation ? reservation.typeName : "정보 없음",
+      return matchingReservations.map(reservation => ({
+        reservationId: reservation.id,
+        accommodationName: reservation.accommodationName || "정보 없음",
+        checkinDate: formatDate(reservation.checkinDate),
+        checkoutDate: formatDate(reservation.checkoutDate),
+        typeName: reservation.typeName || "정보 없음",
         paymentDate: formatDate(payment.paymentDate),
         payment: {
           method: paymentMethodMapping[payment.method] || "정보 없음",
@@ -139,9 +143,8 @@ const fetchReservationsWithDetails = async () => {
           id: payment.id
         },
         totalPrice: payment.amount || "정보 없음",
-      };
+      }));
     });
-
     filteredReservations.value = [...reservations.value];
     console.log("최종 예약 정보:", reservations.value);
 
@@ -149,6 +152,7 @@ const fetchReservationsWithDetails = async () => {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
 };
+
 
 // 예약 상세보기 선택
 const selectReservation = (reservation) => {
@@ -251,10 +255,7 @@ onMounted(async () => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="paginatedReservations.length === 0">
-                  <td colspan="8" class="text-center">예약이 없습니다.</td>
-                </tr>
-                <tr v-for="reservation in paginatedReservations" :key="reservation.id"
+                <tr v-for="reservation in paginatedReservations" :key="reservation.reservationId"
                   @click="selectReservation(reservation)">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
                   <td>{{ reservation.checkinDate || '정보 없음' }}</td>
