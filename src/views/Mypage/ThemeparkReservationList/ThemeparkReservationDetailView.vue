@@ -1,8 +1,10 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { ref, onMounted } from "vue";
 import { userLoginStore } from '@/stores/loginStore';
 import { useTicketPaymentStore } from "@/stores/ticketpaymentStore";
+import { useRoute, useRouter } from "vue-router";
+import { refundPayment } from "@/components/Payment/TicketPayment.vue";
+
 import KakaoMap from "@/components/map/KakaoMap.vue";
 
 import Header from "@/examples/Header.vue";
@@ -16,11 +18,13 @@ onMounted(() => {
 
 const userStore = userLoginStore();
 const paymentStore = useTicketPaymentStore();
+const router = useRouter();
+const route = useRoute();
 
 // 상태 변수
 const reservations = ref([]);
 const filteredReservations = ref([]);
-const selectedReservation = ref(null);
+const orderParamId = route.params.id;
 
 const centerCoordinate = ref({
   lat: 37.4972146715141,
@@ -29,7 +33,7 @@ const centerCoordinate = ref({
 
 // 결제 상태 값 매핑
 const paymentStatusMapping = {
-  COMPLETE: "결제 완료",
+  COMPLETED: "결제 완료",
   INCOMPLETE: "결제 미완료",
   REFUND: "환불 완료",
 };
@@ -69,14 +73,20 @@ const fetchTicketOrdersWithDetails = async () => {
     await paymentStore.getAllTicketPayments();
     const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
 
+    console.log("payments: ", allPayments);
+
     reservations.value = allPayments.map(payment => {
       return {
-        // 예약 정보
+        paymentId: payment.id,
         orderId: payment.orderId,
+        impUid: payment.impUid,
+
+        // 예약 정보
         status: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
         reservationDate: formatDate(payment.paymentDate) || "정보 없음",
         accommodationName: payment.accommodationName || "정보 없음",
         themeparkName: payment.themeParkName,
+        ticketName: payment.ticketName || "정보 없음",
         validFromDate: formatDate(payment.validFromDate),
         validToDate: formatDate(payment.validToDate),
         quantity: payment.quantity,
@@ -101,24 +111,38 @@ const fetchTicketOrdersWithDetails = async () => {
   }
 };
 
-// 예약 취소
-const handleCancelReservation = async () => {
-  if (!selectedReservation.value) {
-    alert("취소할 예약이 없습니다.");
+// 환불
+const handleRefund = async () => {
+  const reservationsToRefund = reservations.value.filter(res => String(res.orderId) === String(orderParamId));
+  console.log("찾은 예약 정보:", reservationsToRefund);
+
+  const confirmation = confirm("정말 환불하시겠습니까?");
+
+  if (!confirmation) {
     return;
   }
 
-  const orderId = selectedReservation.value.orderId; // 선택된 예약의 orderId를 가져옵니다.
-
   try {
-    await paymentStore.cancelPayment(orderId); // API 호출
-    alert("예약이 취소되었습니다.");
-    await fetchTicketOrdersWithDetails(); // 예약 목록 다시 불러오기
+    if (reservationsToRefund.length === 0) {
+      alert("환불할 예약이 없습니다.");
+      return;
+    }
+
+    const paymentId = reservationsToRefund[0].paymentId;
+    const impUid = reservationsToRefund[0].impUid;
+
+    console.log(paymentId);
+    console.log(impUid);
+
+    // 환불 함수 호출
+    await refundPayment(paymentId, impUid);
+    router.push("/users/themeparkReservationLists");
+
   } catch (error) {
-    alert("예약 취소에 실패했습니다.");
+    console.error("환불 처리 중 오류 발생:", error);
+    alert("환불 처리 중 오류가 발생했습니다.");
   }
 };
-
 </script>
 
 <template>
@@ -155,6 +179,10 @@ const handleCancelReservation = async () => {
                 <tr>
                   <th scope="row">테마파크명</th>
                   <td>{{ reservations[0]?.themeparkName || '정보 없음' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">티켓명</th>
+                  <td>{{ reservations[0]?.ticketName || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">사용 시작 기간</th>
@@ -239,7 +267,7 @@ const handleCancelReservation = async () => {
 
         <!-- 예약 취소 버튼 -->
         <div class="cancel-button-container mb-5">
-          <button class="btn btn-danger" @click="handleCancelReservation">예약 취소</button>
+          <button class="btn btn-danger" @click="handleRefund">예약 취소</button>
         </div>
 
         <h4>오시는 길 안내</h4>
