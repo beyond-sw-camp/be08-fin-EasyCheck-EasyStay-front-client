@@ -450,5 +450,22 @@ export const useReservationStore = defineStore("reservationStore", {
         alert(this.reservationError);
       }
     },
+
+    async fetchAllReservationRoomLists() {
+      let allReservations = [];
+      let page = 0;
+      let size = 10;
+      let response;
+
+      do {
+        response = await apiClient.get(`/reservation-room`, {
+          params: { page, size },
+        });
+        allReservations = [...allReservations, ...response.data];
+        page++;
+      } while (response.data.length === size); // 더 이상 데이터가 없을 때까지 반복
+
+      this.reservations = allReservations;
+    },
   },
 });

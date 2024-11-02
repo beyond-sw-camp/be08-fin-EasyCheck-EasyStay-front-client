@@ -32,10 +32,10 @@ const currentPage = ref(1);
 const itemsPerPage = 5;
 
 // 검색바 - 시설 조회
-const fetchAccommodations = async () => {
-  await mypage.fetchAccommodations();
-  accommodations.value = mypage.accommodations;
-};
+// const fetchAccommodations = async () => {
+//   await mypage.fetchAccommodations();
+//   accommodations.value = mypage.accommodations;
+// };
 
 // 검색바 - 지점 선택 변경 처리
 const updateBranch = () => {

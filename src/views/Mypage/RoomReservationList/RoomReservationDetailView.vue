@@ -16,13 +16,14 @@ import setMaterialInput from "@/assets/js/material-input";
 
 onMounted(() => {
   setMaterialInput();
-  fetchReservationsWithDetails();
+  fetchReservationsWithDetails(orderId);
 });
 
 const userStore = userLoginStore();
 const paymentStore = usePaymentStore();
 const reservationStore = useReservationStore();
 const router = useRouter();
+
 // 상태 변수
 const reservations = ref([]);
 const filteredReservations = ref([]);
@@ -46,8 +47,11 @@ const paymentMethodMapping = {
 };
 
 
+const route = useRoute();
+const orderId = route.params.id;
+
 // 예약 내역 조회
-const fetchReservationsWithDetails = async () => {
+const fetchReservationsWithDetails = async (orderId) => {
   try {
     await userStore.getUserData();
     const userId = userStore.userData.id;
@@ -55,79 +59,92 @@ const fetchReservationsWithDetails = async () => {
     await paymentStore.fetchAllPayments();
     const allPayments = paymentStore.payments.filter(payment => payment.userId === userId);
 
-    await reservationStore.fetchReservationRoomLists();
+    await reservationStore.fetchAllReservationRoomLists();
     const allReservations = reservationStore.reservations;
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
+      // UTC에서 로컬 시간으로 변환
+      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return localDate.toISOString().split('T')[0];
     };
 
     reservations.value = allPayments.map(payment => {
-      const reservation = allReservations.find(res => res.id === payment.reservationRoomId);
+      console.log("payment.reservationRoomId: ", payment.reservationRoomId);
+      const reservation = allReservations.find(res => String(res.id) === String(payment.reservationRoomId));
+
+      console.log("reservation: ", reservation);
 
       return {
-        ...reservation,
-        reservationId: payment.reservationRoomId,
-        impUid: payment.impUid,
+        // 예약 정보
         completionStatus: paymentStatusMapping[payment.completionStatus] || "정보 없음",
         reservationDate: formatDate(payment.paymentDate),
         accommodationName: payment.accommodationName || "정보 없음",
-        typeName: reservation ? reservation.typeName : "정보 없음",
+        typeName: reservation ? reservation.typeName || "정보 없음" : "정보 없음",
+        roomName: reservation ? reservation.roomName || "정보 없음" : "정보 없음",
         checkinDate: formatDate(payment.checkinDate),
         checkoutDate: formatDate(payment.checkoutDate),
         roomCount: reservation ? reservation.totalRoomCount : 0,
         adult: reservation ? reservation.adultCount : 0,
         child: reservation ? reservation.childCount : 0,
-        paymentMethod: paymentStatusMapping[payment.completionStatus],
-        // 결제자 이름, 전화번호
+
+        // 결제 정보
+        paymentMethod: paymentMethodMapping[payment.method],
+        paymentStatus: paymentStatusMapping[payment.completionStatus],
+        totalPrice: payment.amount,
+
+        // 예약자 정보
         userName: reservation ? reservation.userName : "정보 없음",
         userPhone: reservation ? reservation.userPhone : "정보 없음",
-        // 투숙자 이름, 전화번호
+
+        // 투숙자 정보
         representativeName: reservation ? reservation.userName : "정보 없음",
-        representativePhone: reservation ? reservation.userPhone : "정보 없음"
+        representativePhone: reservation ? reservation.userPhone : "정보 없음",
+
+        paymentId: payment.id,
+        reservationId: payment.reservationRoomId,
+        impUid: payment.impUid,
       };
     });
 
+    // orderId에 해당하는 예약 정보 필터링
+    filteredReservations.value = reservations.value.filter(res => String(res.paymentId) === String(orderId));
 
-    filteredReservations.value = [...reservations.value];
     console.log("최종 예약 정보:", reservations.value);
+    console.log("필터링된 예약 정보:", filteredReservations.value);
 
   } catch (error) {
     console.error("예약 및 결제 정보를 가져오는 중 오류 발생:", error);
   }
 };
 
-const route = useRoute();
-const orderId = ref(route.params.id); // 예약 ID를 저장할 ref (이 값을 페이지에서 가져오세요)
-
+// 환불 처리 메서드
 const handleRefund = async () => {
-  if (reservations.value.length === 0) {
-    alert("예약 정보가 없습니다.");
+  console.log("주문 ID:", orderId);
+  console.log("최종 예약 정보:", reservations.value);
+
+  const reservationsToRefund = reservations.value.filter(res => String(res.paymentId) === String(orderId));
+
+  console.log("찾은 예약 정보:", reservationsToRefund);
+
+  if (reservationsToRefund.length === 0) {
+    alert("환불할 예약 정보가 없습니다.");
     return;
   }
 
-  // 현재 예약 정보를 가져오는 방식
-  const reservationId = reservations.value[0]?.reservationId; // 예시로 첫 번째 예약의 reservationId를 사용
-  const reservation = reservations.value.find(res => res.reservationId === reservationId); // reservationId로 예약 정보 찾기
-
-  if (!reservation || !reservation.impUid) {
-    alert("유효한 결제 정보를 찾을 수 없습니다.");
+  const userConfirmed = confirm("정말 환불하시겠습니까?");
+  if (!userConfirmed) {
     return;
-  }
-
-  const confirmRefund = confirm("정말 환불하시겠습니까?");
-  if (!confirmRefund) {
-    return; // 사용자가 취소를 선택하면 함수 종료
   }
 
   try {
-    await refundPayment(reservation.id, reservation.impUid); // reservationId와 impUid 사용
-    alert('정상적으로 환불되었습니다.');
-    await reservationStore.fetchReservationRoomLists(); // 예약 목록 새로 고침
-    router.push("/users/roomReservationLists");
+    for (const reservation of reservationsToRefund) {
+      await refundPayment(reservation.paymentId, reservation.impUid);
+    }
+    router.push('/users/roomReservationLists');
   } catch (error) {
     console.error("환불 처리 중 오류 발생:", error);
+    alert("환불 처리 중 오류가 발생했습니다.");
   }
 };
 
@@ -154,35 +171,38 @@ const handleRefund = async () => {
               <tbody>
                 <tr>
                   <th scope="row">예약 상태</th>
-                  <td>{{ reservations[0]?.completionStatus || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.completionStatus || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">예약 날짜</th>
-                  <td>{{ reservations[0]?.reservationDate || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.reservationDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">예약 지점</th>
-                  <td>{{ reservations[0]?.accommodationName || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.accommodationName || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">객실 이름</th>
-                  <td>{{ reservations[0]?.typeName || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.typeName || '정보 없음' }} {{ filteredReservations[0]?.roomName || '정보 없음'
+                    }}</td>
+
                 </tr>
                 <tr>
                   <th scope="row">체크인</th>
-                  <td>{{ reservations[0]?.checkinDate || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.checkinDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">체크아웃</th>
-                  <td>{{ reservations[0]?.checkoutDate || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.checkoutDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">객실 수</th>
-                  <td>{{ reservations[0]?.roomCount || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.roomCount || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">투숙 인원</th>
-                  <td>{{ reservations[0]?.adult || 0 }}명 (성인), {{ reservations[0]?.child || 0 }}명 (어린이)</td>
+                  <td>{{ filteredReservations[0]?.adult || 0 }}명 (성인), {{ filteredReservations[0]?.child || 0 }}명 (어린이)
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -194,19 +214,19 @@ const handleRefund = async () => {
               <tbody>
                 <tr>
                   <th scope="row">결제 방법</th>
-                  <td>{{ reservations[0]?.paymentMethod || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.paymentMethod || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">결제 날짜</th>
-                  <td>{{ reservations[0]?.reservationDate || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.reservationDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">결제 상태</th>
-                  <td>{{ reservations[0]?.completionStatus || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.paymentStatus || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">총 가격</th>
-                  <td>{{ reservations[0]?.totalPrice || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.totalPrice || '정보 없음' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -216,11 +236,11 @@ const handleRefund = async () => {
               <tbody>
                 <tr>
                   <th scope="row">이름</th>
-                  <td>{{ reservations[0]?.userName || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.userName || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">전화번호</th>
-                  <td>{{ reservations[0]?.userPhone || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.userPhone || '정보 없음' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -230,11 +250,11 @@ const handleRefund = async () => {
               <tbody>
                 <tr>
                   <th scope="row">이름</th>
-                  <td>{{ reservations[0]?.representativeName || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.representativeName || '정보 없음' }}</td>
                 </tr>
                 <tr>
                   <th scope="row">전화번호</th>
-                  <td>{{ reservations[0]?.representativePhone || '정보 없음' }}</td>
+                  <td>{{ filteredReservations[0]?.representativePhone || '정보 없음' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -266,8 +286,12 @@ const handleRefund = async () => {
 
           <!-- 예약 취소 버튼 -->
           <div class="cancel-button-container mb-5">
-            <button class="btn btn-danger" @click="handleRefund">환불하기</button>
+            <button class="btn btn-danger" @click="handleRefund"
+              :disabled="filteredReservations[0]?.paymentStatus === '환불 완료'">
+              {{ filteredReservations[0]?.paymentStatus === '환불 완료' ? '환불 완료' : '환불하기' }}
+            </button>
           </div>
+
 
 
           <h4>오시는 길 안내</h4>
