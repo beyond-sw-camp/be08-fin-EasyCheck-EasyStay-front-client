@@ -43,14 +43,6 @@ const goToMain = () => {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-80" loading="lazy">
       <span class="mask bg-white opacity-6"></span>

@@ -204,9 +204,9 @@ const requestVerification = async () => {
               </select>
 
               <MaterialInput @input="handleInputChange" class="input-group-outline mb-0 me-2" v-model="phoneMiddle"
-                type="text" style="width: 25%;" />
+                type="text" style="width: 25%;" maxlength="4" />
               <MaterialInput @input="handleInputChange" class="input-group-outline mb-0" v-model="phoneSuffix"
-                type="text" style="width: 25%; margin-right: 10px;" />
+                type="text" style="width: 25%; margin-right: 10px;" maxlength="4" />
 
               <!-- 인증 요청 버튼 -->
               <button class="btn btn-black custom-btn mt-3" @click="authenticatePhone">

@@ -180,9 +180,14 @@ onMounted(async () => {
   await fetchReservationsWithDetails();
 
   // 현재 날짜 설정
-  const today = new Date().toISOString().split('T')[0];
-  checkInDate.value = today;
-  checkOutDate.value = today;
+  const today = new Date();
+  checkInDate.value = today.toISOString().split('T')[0];
+
+  // 내일 날짜 계산
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  checkOutDate.value = tomorrow.toISOString().split('T')[0];
+
 });
 
 </script>
@@ -242,27 +247,31 @@ onMounted(async () => {
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
             <table class="table table-reservation">
               <thead>
-                <tr>
+                <tr class="text-black">
                   <th>지점</th>
-                  <th>체크인</th>
-                  <th>체크아웃</th>
                   <th>객실 이름</th>
-                  <th>결제 날짜</th>
+                  <th>예약 날짜</th>
                   <th>결제 방법</th>
                   <th>결제 상태</th>
-                  <th>총 가격</th>
+                  <th>결제 날짜</th>
+                  <th>가격(원)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="reservation in paginatedReservations" :key="reservation.reservationId"
-                  @click="selectReservation(reservation)">
+                  @click="selectReservation(reservation)" class="text-bold">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
-                  <td>{{ reservation.checkinDate || '정보 없음' }}</td>
-                  <td>{{ reservation.checkoutDate || '정보 없음' }}</td>
                   <td>{{ reservation.typeName || '정보 없음' }}</td>
-                  <td>{{ reservation.paymentDate || '정보 없음' }}</td>
+                  <td>{{ reservation.checkinDate || '정보 없음' }} ~ {{ reservation.checkoutDate || '정보 없음' }}</td>
                   <td>{{ reservation.payment?.method || '정보 없음' }}</td>
-                  <td>{{ reservation.payment?.completionStatus || '정보 없음' }}</td>
+                  <td v-bind:class="{
+                    'payment-complete': reservation.payment?.completionStatus === '결제 완료',
+                    'payment-incomplete': reservation.payment?.completionStatus === '결제 미완료',
+                    'payment-refund': reservation.payment?.completionStatus === '환불 완료'
+                  }">
+                    {{ reservation.payment?.completionStatus || '정보 없음' }}
+                  </td>
+                  <td>{{ reservation.paymentDate || '정보 없음' }}</td>
                   <td>{{ reservation.totalPrice !== undefined ? reservation.totalPrice : '정보 없음' }}</td>
                 </tr>
               </tbody>
@@ -305,5 +314,20 @@ onMounted(async () => {
 .table-reservation tbody tr:hover {
   background-color: #f5f5f5cc;
   /* 호버 시 배경 색상 변경 */
+}
+
+.payment-complete {
+  color: green;
+  font-weight: bold;
+}
+
+.payment-incomplete {
+  color: orange;
+  font-weight: bold;
+}
+
+.payment-refund {
+  color: red;
+  font-weight: bold;
 }
 </style>

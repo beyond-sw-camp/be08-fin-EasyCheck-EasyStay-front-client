@@ -90,7 +90,6 @@ const searchZipCode = () => {
 const emit = defineEmits(['update']);
 
 // 개인정보 수정 메서드
-// 개인정보 수정 메서드
 const updateUserData = async () => {
   try {
     // 전화번호 합치기

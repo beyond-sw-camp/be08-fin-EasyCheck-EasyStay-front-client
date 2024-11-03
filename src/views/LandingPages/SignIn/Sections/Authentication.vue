@@ -279,9 +279,9 @@ const closeModal = () => {
               </option>
             </select>
 
-            <MaterialInput class="input-group-outline mb-0 me-2" v-model="phoneMiddle" type="text"
+            <MaterialInput class="input-group-outline mb-0 me-2" v-model="phoneMiddle" type="text" maxlength="4"
               style="width: 25%;" />
-            <MaterialInput class="input-group-outline mb-0" v-model="phoneSuffix" type="text"
+            <MaterialInput class="input-group-outline mb-0" v-model="phoneSuffix" type="text" maxlength="4"
               style="width: 25%; margin-right: 10px;" />
 
             <!-- 인증 요청 버튼 -->
@@ -298,7 +298,7 @@ const closeModal = () => {
             <div class="d-flex align-items-center justify-content-start col-9">
               <MaterialInput class="input-group-outline mb-0" v-model="verificationCode" type="text"
                 placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
-              <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
+              <button id=" verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
             </div>
           </td>
         </tr>

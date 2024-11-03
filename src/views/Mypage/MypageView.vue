@@ -82,12 +82,12 @@ import easystayImage from '@/assets/img/easystay.png';
                   <div class="mt-2">테마파크 예약 내역</div>
                 </RouterLink>
               </div>
-              <div class="text-center mx-5">
+              <!-- <div class="text-center mx-5">
                 <RouterLink to="users/point">
                   <span class="material-icons" style="font-size: 70px;">loyalty</span>
                   <div class="mt-2">포인트</div>
                 </RouterLink>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>

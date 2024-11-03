@@ -191,10 +191,15 @@ onMounted(async () => {
   // 모든 예약을 초기화 (예약 정보를 가져온 후)
   filteredReservations.value = [...reservations.value];
 
-  // 검색바 현재 날짜 설정
-  const today = new Date().toISOString().split('T')[0];
-  checkInDate.value = today;
-  checkOutDate.value = today;
+  // 현재 날짜 설정
+  const today = new Date();
+  checkInDate.value = today.toISOString().split('T')[0];
+
+  // 내일 날짜 계산
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  checkOutDate.value = tomorrow.toISOString().split('T')[0];
+
 });
 
 </script>
@@ -230,7 +235,7 @@ onMounted(async () => {
                       </div>
 
                       <div class="d-flex align-items-center me-3">
-                        <label for="stayDuration" class="me-2 mb-0" style="white-space: nowrap;">투숙 기간</label>
+                        <label for="stayDuration" class="me-2 mb-0" style="white-space: nowrap;">사용 기간</label>
                         <MaterialInput type="date" v-model="checkInDate"
                           class="form-control me-2 input-group-outline" />
                         <span class="mx-2">~</span>
@@ -255,17 +260,16 @@ onMounted(async () => {
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
             <table class="table table-reservation">
               <thead>
-                <tr class="text-bold">
+                <tr class="text-black">
                   <th>지점</th>
                   <th>테마파크명</th>
                   <th>티켓명</th>
-                  <th>가격(원)</th>
                   <th>수량</th>
-                  <th>사용 시작 기간</th>
-                  <th>사용 종료 기간</th>
+                  <th>사용 날짜</th>
                   <th>결제 방법</th>
-                  <th>결제 날짜</th>
                   <th>결제 상태</th>
+                  <th>결제 날짜</th>
+                  <th>가격(원)</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,17 +277,21 @@ onMounted(async () => {
                   <td colspan="10" class="text-center">예약이 없습니다.</td>
                 </tr>
                 <tr v-else v-for="(reservation, index) in paginatedReservations" :key="index"
-                  @click="selectReservation(reservation)">
+                  @click="selectReservation(reservation)" class="text-bold">
                   <td>{{ reservation.accommodationName || '정보 없음' }}</td>
                   <td>{{ reservation.themeParkName || '정보 없음' }}</td>
                   <td>{{ reservation.ticketName || '정보 없음' }}</td>
-                  <td>{{ reservation.paymentAmount !== undefined ? reservation.paymentAmount : '정보 없음' }}</td>
                   <td>{{ reservation.quantity || '정보 없음' }}</td>
-                  <td>{{ reservation.validFromDate || '정보 없음' }}</td>
-                  <td>{{ reservation.validToDate || '정보 없음' }}</td>
+                  <td>{{ reservation.validFromDate || '정보 없음' }} ~ {{ reservation.validToDate || '정보 없음' }}</td>
                   <td>{{ reservation.paymentMethod || '정보 없음' }}</td>
+                  <td v-bind:class="{
+                    'payment-complete': reservation.paymentStatus === '결제 완료',
+                    'payment-incomplete': reservation.paymentStatus === '결제 미완료',
+                    'payment-refund': reservation.paymentStatus === '환불 완료'
+                  }">
+                    {{ reservation.paymentStatus || '정보 없음' }}</td>
                   <td>{{ reservation.paymentDate || '정보 없음' }}</td>
-                  <td>{{ reservation.paymentStatus || '정보 없음' }}</td>
+                  <td>{{ reservation.paymentAmount !== undefined ? reservation.paymentAmount : '정보 없음' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -339,5 +347,20 @@ onMounted(async () => {
 .table-reservation tbody tr:hover {
   background-color: #f5f5f5cc;
   /* 호버 시 배경 색상 변경 */
+}
+
+.payment-complete {
+  color: green;
+  font-weight: bold;
+}
+
+.payment-incomplete {
+  color: orange;
+  font-weight: bold;
+}
+
+.payment-refund {
+  color: red;
+  font-weight: bold;
 }
 </style>
