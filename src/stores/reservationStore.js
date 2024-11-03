@@ -165,6 +165,18 @@ export const useReservationStore = defineStore("reservationStore", {
       }
     },
 
+    decreaseRoomCount() {
+      if (this.roomCount > 1) {
+        this.roomCount -= 1;
+      }
+    },
+
+    increaseRoomCount() {
+      if (this.roomCount < 4) {
+        this.roomCount += 1;
+      }
+    },
+
     updateDateRange({ checkIn, checkOut }) {
       this.checkIn = checkIn;
       this.checkOut = checkOut;
@@ -357,7 +369,7 @@ export const useReservationStore = defineStore("reservationStore", {
         IMP.request_pay(paymentConfig, async (response) => {
           if (response.success) {
             try {
-              await this.handlePaymentSuccess(response, paymentConfig);
+              await this.handlePaymentSuccess(response);
               resolve(true);
             } catch (error) {
               reject(error);
@@ -370,11 +382,11 @@ export const useReservationStore = defineStore("reservationStore", {
       });
     },
 
-    async handlePaymentSuccess(response, paymentConfig) {
+    async handlePaymentSuccess(response) {
       const paymentData = {
         impUid: response.imp_uid,
         reservationId: this.reservationResult.id,
-        method: paymentConfig.pay_method,
+        method: "CARD",
         amount: this.totalPriceNumber,
         paymentDate: new Date().toISOString(),
         completionStatus: "COMPLETE",

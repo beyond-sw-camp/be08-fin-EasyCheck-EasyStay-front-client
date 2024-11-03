@@ -87,11 +87,11 @@
 </template>
 
 <script setup>
-import ThumnailImg1 from "@/assets/img/이벤트배너 1.png";
-import ThumnailImg2 from "@/assets/img/이벤트배너 2.png";
-import ThumnailImg3 from "@/assets/img/이벤트배너 3.png";
-import ThumnailImg4 from "@/assets/img/이벤트배너 4.png";
-import ThumnailImg5 from "@/assets/img/이벤트배너 5.png";
+import ThumnailImg1 from "@/assets/img/eventBanner 1.png";
+import ThumnailImg2 from "@/assets/img/eventBanner 2.png";
+import ThumnailImg3 from "@/assets/img/eventBanner 3.png";
+import ThumnailImg4 from "@/assets/img/eventBanner 4.png";
+import ThumnailImg5 from "@/assets/img/eventBanner 5.png";
 
 import Header from "@/examples/Header.vue";
 import { useRouter } from "vue-router";

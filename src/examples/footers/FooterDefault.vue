@@ -77,7 +77,10 @@ onMounted(async () => {
   // API로부터 불러온 accommodations를 Resort와 Hotel로 분류
   menus.value[0].items = accommodationStore.accommodations
     .filter((item) => item.accommodationType === "RESORT")
-    .map((resort) => ({ name: resort.name, href: `/accommodation/${resort.id}` }));
+    .map((resort) => ({
+      name: resort.name,
+      href: `/accommodation/${resort.id}`,
+    }));
 
   menus.value[1].items = accommodationStore.accommodations
     .filter((item) => item.accommodationType === "HOTEL")
@@ -121,7 +124,11 @@ onMounted(async () => {
         </div>
 
         <!-- 동적으로 생성된 메뉴 목록 -->
-        <div class="col-md-2 col-sm-6 col-6 mb-4" v-for="{ name, items } of menus" :key="name">
+        <div
+          class="col-md-2 col-sm-6 col-6 mb-4"
+          v-for="{ name, items } of menus"
+          :key="name"
+        >
           <h6 class="text-sm text-white">{{ name }}</h6>
           <ul class="flex-column ms-n3 nav">
             <li class="nav-item" v-for="item in items" :key="item.name">
