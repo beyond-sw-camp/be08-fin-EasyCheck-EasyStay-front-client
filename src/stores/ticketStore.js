@@ -45,12 +45,11 @@ export const useTicketStore = defineStore("ticketStore", {
       const groupedTickets = {};
 
       validTickets.forEach((ticket) => {
-        const typeKey = ticket.ticketName.replace(/ \(대인\)| \(소인\)/g, "");
+        const typeKey = ticket.ticketName.replace(/ 대인| 소인/g, "");
 
         if (!groupedTickets[typeKey]) {
           groupedTickets[typeKey] = {
             name: typeKey,
-            description: ticket.ticketName.split(" - ")[1] || "",
             adultTicket: null,
             childTicket: null,
             themeParkId: ticket.themeParkId,
