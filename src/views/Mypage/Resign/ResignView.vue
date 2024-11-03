@@ -27,6 +27,11 @@ const handleDeactivate = async () => {
     return;
   }
 
+  const confirmDeactivate = confirm("정말 탈퇴를 진행하시겠습니까?");
+  if (!confirmDeactivate) {
+    return;
+  }
+
   try {
     await mypage.deactivateUserAction();
     alert('회원 탈퇴가 완료되었습니다.');
@@ -35,6 +40,7 @@ const handleDeactivate = async () => {
     alert('탈퇴 중 오류가 발생했습니다: ' + error.message);
   }
 };
+
 
 </script>
 
