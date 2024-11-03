@@ -17,7 +17,11 @@
         </li>
       </ul>
       <h3>추가 정보</h3>
-      <p>{{ attraction.information }}</p>
+      <ul class="standard-use-list">
+        <li v-for="(item, index) in formattedInformation" :key="index">
+          {{ item }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -43,6 +47,16 @@ const formattedStandardUse = computed(() => {
     return [];
   }
   return props.attraction.standardUse
+    .split(";")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+});
+
+const formattedInformation = computed(() => {
+  if (!props.attraction.information) {
+    return [];
+  }
+  return props.attraction.information
     .split(";")
     .map((item) => item.trim())
     .filter((item) => item.length > 0);
