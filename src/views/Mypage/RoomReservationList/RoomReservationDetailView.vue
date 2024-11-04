@@ -167,41 +167,43 @@ const handleRefund = async () => {
         <div class="tables-container">
           <div class="reservation-table">
             <h4 class="text-left">예약 정보</h4>
-            <table class="table">
+            <table class="table" style="height: 520px;">
               <tbody>
                 <tr>
-                  <th scope="row">예약 상태</th>
-                  <td>{{ filteredReservations[0]?.completionStatus || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">예약 상태</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.completionStatus || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">예약 날짜</th>
-                  <td>{{ filteredReservations[0]?.reservationDate || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">예약 날짜</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.reservationDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">예약 지점</th>
-                  <td>{{ filteredReservations[0]?.accommodationName || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">예약 지점</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.accommodationName || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">객실 이름</th>
-                  <td>{{ filteredReservations[0]?.typeName || '정보 없음' }} {{ filteredReservations[0]?.roomName || '정보 없음'
-                    }}</td>
+                  <th scope="row" class="align-middle">객실 이름</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.typeName || '정보 없음' }} {{
+                    filteredReservations[0]?.roomName || '정보 없음'
+                  }}</td>
 
                 </tr>
                 <tr>
-                  <th scope="row">체크인</th>
-                  <td>{{ filteredReservations[0]?.checkinDate || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">체크인</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.checkinDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">체크아웃</th>
-                  <td>{{ filteredReservations[0]?.checkoutDate || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">체크아웃</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.checkoutDate || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">객실 수</th>
-                  <td>{{ filteredReservations[0]?.roomCount || '정보 없음' }}</td>
+                  <th scope="row" class="align-middle">객실 수</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.roomCount || '정보 없음' }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">투숙 인원</th>
-                  <td>{{ filteredReservations[0]?.adult || 0 }}명 (성인), {{ filteredReservations[0]?.child || 0 }}명 (어린이)
+                  <th scope="row" class="align-middle">투숙 인원</th>
+                  <td class="align-middle">{{ filteredReservations[0]?.adult || 0 }}명 (성인), {{
+                    filteredReservations[0]?.child || 0 }}명 (어린이)
                   </td>
                 </tr>
               </tbody>
