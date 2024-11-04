@@ -48,7 +48,7 @@ const paymentMethodMapping = {
 const formatDate = (dateString) => {
   if (!dateString) {
     console.error("유효하지 않은 날짜 값:", dateString);
-    return "정보 없음"; // 기본값 반환
+    return "정보 없음";
   }
 
   const date = new Date(dateString);
@@ -56,7 +56,7 @@ const formatDate = (dateString) => {
   // 날짜 유효성 검사
   if (isNaN(date.getTime())) {
     console.error("유효하지 않은 날짜 값:", dateString);
-    return "정보 없음"; // 기본값 반환
+    return "정보 없음";
   }
 
   return date.toISOString().split('T')[0];
@@ -262,7 +262,10 @@ const handleRefund = async () => {
 
         <!-- 예약 취소 버튼 -->
         <div class="cancel-button-container mb-5">
-          <button class="btn btn-danger" @click="handleRefund">예약 취소</button>
+          <button class="btn btn-danger" @click="handleRefund"
+            :disabled="filteredReservations[0]?.paymentStatus === '환불 완료'">
+            {{ filteredReservations[0]?.paymentStatus === '환불 완료' ? '환불 완료' : '환불하기' }}
+          </button>
         </div>
 
         <h4>오시는 길 안내</h4>

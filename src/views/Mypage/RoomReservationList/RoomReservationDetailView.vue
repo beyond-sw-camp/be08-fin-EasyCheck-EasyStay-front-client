@@ -294,8 +294,6 @@ const handleRefund = async () => {
             </button>
           </div>
 
-
-
           <h4>오시는 길 안내</h4>
           <div class="col-lg-10 col-md-8 col-12 mb-5" style="height: 500px; width: 100%;">
             <KakaoMap :lat="centerCoordinate.lat" :lng="centerCoordinate.lng" :draggable="true" />
