@@ -36,7 +36,7 @@ onMounted(() => {
       <div class="d-flex flex-column my-auto container custom-login-container position-relative">
         <div class="row">
           <div class="col-12">
-            <div class="bg-white shadow-succes py-3 mb-5 text-start">
+            <div class="bg-white shadow-succes py-3 mb-4 text-start">
               <h2 class="text-black mb-0">아이디 찾기</h2>
               <h5 class="text-black fw-normal mt-4">해당 이름으로 가입된 아이디입니다.</h5>
             </div>
@@ -62,7 +62,7 @@ onMounted(() => {
           </tbody>
         </table>
 
-        <hr class="my-2" style="border-top: 3px solid #000;" />
+        <hr class="my-1" style="border-top: 3px solid #000;" />
 
         <div class="text-center mt-5">
           <MaterialButton @click="goToMain" class="btn btn-light">홈으로</MaterialButton>
