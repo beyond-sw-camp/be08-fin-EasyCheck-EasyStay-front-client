@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { mypageStore } from "@/stores/mypageStore";
+import { userLoginStore } from "@/stores/loginStore";
 
 // example components
 import Header from "@/examples/Header.vue";
@@ -11,9 +12,13 @@ import setMaterialInput from "@/assets/js/material-input";
 const router = useRouter();
 const isAgreed = ref(false);
 const mypage = mypageStore();
+const loginStore = userLoginStore();
 
-onMounted(() => {
+onMounted(async () => {
   setMaterialInput();
+  await loginStore.getUserData(); // 사용자 정보를 로드
+  // 여기서 mypage.userData가 제대로 설정되었는지 확인
+  console.log("초기 사용자 데이터:", mypage.userData);
 });
 
 
@@ -32,14 +37,26 @@ const handleDeactivate = async () => {
     return;
   }
 
+  // 사용자 데이터 로드
+  await loginStore.getUserData(); // 사용자 정보를 업데이트
+  console.log("탈퇴 시 사용자 데이터:", mypage.userData); // 확인용 로그
+
+  // 사용자 정보가 설정되어 있는지 확인
+  if (!mypage.userData.id) {
+    alert("사용자 정보를 찾을 수 없습니다.");
+    return;
+  }
+
   try {
     await mypage.deactivateUserAction();
+    localStorage.removeItem('accessToken'); // 토큰 삭제
     alert('회원 탈퇴가 완료되었습니다.');
     router.push('/users/resignComplete');
   } catch (error) {
     alert('탈퇴 중 오류가 발생했습니다: ' + error.message);
   }
 };
+
 
 
 </script>
