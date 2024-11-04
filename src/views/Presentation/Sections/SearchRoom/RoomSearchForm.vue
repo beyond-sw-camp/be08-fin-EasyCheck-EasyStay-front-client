@@ -1,24 +1,13 @@
 <template>
-  <div class="card py-3 px-5">
+  <div class="card py-3 px-7">
     <form class="row g-3 align-items-center" @submit.prevent="searchRooms">
-      <div
-        class="col-md-2"
-        style="border-right: 2px solid lightgray; height: 90px"
-      >
+      <div class="col-md-2" style="border-right: 2px solid lightgray; height: 100px">
         <div class="custom-select-container">
           <label for="resortSelect" class="form-label">방문리조트 선택</label>
-          <select
-            v-model="resort"
-            id="resortSelect"
-            :class="['form-select', { 'is-invalid': v$.resort.$error }]"
-            @change="onSelectAccommodation"
-          >
+          <select v-model="resort" id="resortSelect" :class="['form-select', { 'is-invalid': v$.resort.$error }]"
+            @change="onSelectAccommodation">
             <option value="" disabled>지점선택</option>
-            <option
-              v-for="accommodation in accommodations"
-              :key="accommodation.id"
-              :value="accommodation.id"
-            >
+            <option v-for="accommodation in accommodations" :key="accommodation.id" :value="accommodation.id">
               {{ accommodation.name }}
             </option>
           </select>
@@ -28,82 +17,48 @@
         </div>
       </div>
 
-      <div
-        class="col-md-2 custom-date-container"
-        style="padding-left: 30px; height: 90px"
-      >
+      <div class="col-md-2 custom-date-container" style="padding-left: 30px; height: 100px">
         <label for="checkIn" class="form-label">체크인</label>
-        <input
-          id="checkIn"
-          type="date"
-          class="custom-date-input form-control"
-          :class="{ 'is-invalid': v$.checkInDate.$error }"
-          v-model="checkInDate"
-        />
+        <input id="checkIn" type="date" class="custom-date-input form-control"
+          :class="{ 'is-invalid': v$.checkInDate.$error }" v-model="checkInDate" />
         <div class="invalid-feedback" v-if="v$.checkInDate.$error">
           {{ v$.checkInDate.$errors[0].$message }}
         </div>
       </div>
 
-      <div
-        class="col-md-2 custom-date-container"
-        style="
+      <div class="col-md-2 custom-date-container" style="
           border-right: 2px solid lightgray;
           padding-right: 30px;
-          height: 90px;
-        "
-      >
+          height: 100px;
+        ">
         <label for="checkOut" class="form-label">체크아웃</label>
-        <input
-          id="checkOut"
-          type="date"
-          class="custom-date-input form-control"
-          :class="{ 'is-invalid': v$.checkOutDate.$error }"
-          v-model="checkOutDate"
-        />
+        <input id="checkOut" type="date" class="custom-date-input form-control"
+          :class="{ 'is-invalid': v$.checkOutDate.$error }" v-model="checkOutDate" />
         <div class="invalid-feedback" v-if="v$.checkOutDate.$error">
           {{ v$.checkOutDate.$errors[0].$message }}
         </div>
       </div>
 
-      <div
-        class="col-md-2 custom-date-container"
-        style="
+      <div class="col-md-2 custom-date-container" style="
           /* border-right: 1px solid lightgray; */
           padding-right: 40px;
           padding-left: 40px;
-          height: 90px;
+          height: 100px;
           justify-content: center;
           align-items: center;
-        "
-      >
+        ">
         <label for="roomCount" class="form-label">객실 수</label>
         <div class="room-count-wrapper d-flex">
-          <button
-            type="button"
-            class="room-count-btn"
-            @click="reservationStore.decreaseRoomCount"
-            :disabled="roomCount <= 1"
-          >
+          <button type="button" class="room-count-btn" @click="reservationStore.decreaseRoomCount"
+            :disabled="roomCount <= 1">
             -
           </button>
-          <input
-            min="1"
-            max="4"
-            type="number"
-            id="roomCount"
-            v-model="roomCount"
-            :class="[
-              'form-control room-count-input flex-grow-1',
-              { 'is-invalid': v$.roomCount.$error },
-            ]"
-          />
-          <button
-            type="button"
-            class="room-count-btn"
-            @click="reservationStore.increaseRoomCount"
-            :disabled="roomCount >= 4"
-          >
+          <input min="1" max="4" type="number" id="roomCount" v-model="roomCount" :class="[
+            'form-control room-count-input flex-grow-1',
+            { 'is-invalid': v$.roomCount.$error },
+          ]" />
+          <button type="button" class="room-count-btn" @click="reservationStore.increaseRoomCount"
+            :disabled="roomCount >= 4">
             +
           </button>
         </div>
@@ -112,10 +67,7 @@
         </div>
       </div>
 
-      <div
-        class="col-md-4"
-        style="height: 90px; justify-content: center; align-items: center"
-      >
+      <div class="col-md-4" style="height: 100px; justify-content: center; align-items: center">
         <button type="submit" class="btn btn-black w-100">객실 검색</button>
       </div>
     </form>
@@ -234,6 +186,7 @@ const onSelectAccommodation = (e) => {
   font-size: 14px;
   box-shadow: none;
 }
+
 .room-count-wrapper {
   display: flex;
   align-items: center;
@@ -246,7 +199,8 @@ const onSelectAccommodation = (e) => {
   width: 60px;
   border: none;
   text-align: center;
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
+  /* Firefox */
   margin: 0;
   padding: 0.375rem 0;
 }
@@ -300,34 +254,50 @@ const onSelectAccommodation = (e) => {
 }
 
 .form-select {
-  appearance: none; /* 기본 선택 상자 스타일 제거 */
-  background-color: #fff; /* 배경색 */
-  border: 1px solid #444; /* 테두리 */
-  border-radius: 0.1rem; /* 둥근 모서리 */
-  padding: 0.5rem 1rem; /* 안쪽 여백 */
-  font-size: 1rem; /* 글자 크기 */
-  color: #333; /* 글자 색상 */
-  transition: border-color 0.3s ease; /* 테두리 색상 변화 애니메이션 */
-  width: 160px; /* 너비 100% */
+  appearance: none;
+  /* 기본 선택 상자 스타일 제거 */
+  background-color: #fff;
+  /* 배경색 */
+  border: 1px solid #444;
+  /* 테두리 */
+  border-radius: 0.1rem;
+  /* 둥근 모서리 */
+  padding: 0.5rem 1rem;
+  /* 안쪽 여백 */
+  font-size: 1rem;
+  /* 글자 크기 */
+  color: #333;
+  /* 글자 색상 */
+  transition: border-color 0.3s ease;
+  /* 테두리 색상 변화 애니메이션 */
+  width: 160px;
+  /* 너비 100% */
 }
 
 .form-select:hover {
-  border-color: #007bff; /* 마우스 오버 시 테두리 색상 */
+  border-color: #007bff;
+  /* 마우스 오버 시 테두리 색상 */
 }
 
 .form-select:focus {
-  outline: none; /* 포커스 아웃라인 제거 */
-  border-color: #007bff; /* 포커스 시 테두리 색상 */
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* 포커스 시 그림자 효과 */
+  outline: none;
+  /* 포커스 아웃라인 제거 */
+  border-color: #007bff;
+  /* 포커스 시 테두리 색상 */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  /* 포커스 시 그림자 효과 */
 }
 
 .form-select.is-invalid {
-  border-color: #dc3545; /* 에러 발생 시 테두리 색상 */
+  border-color: #dc3545;
+  /* 에러 발생 시 테두리 색상 */
 }
 
 .form-select option {
-  padding: 0.5rem; /* 옵션 안쪽 여백 */
+  padding: 0.5rem;
+  /* 옵션 안쪽 여백 */
 }
+
 .custom-date-container {
   width: 180px;
 }
@@ -353,20 +323,27 @@ const onSelectAccommodation = (e) => {
 .custom-date-input.is-invalid {
   border-color: #dc3545;
 }
+
 .divider {
   width: 1000px;
   height: 100%;
-  border-left: 1px solid #444; /* 선 색상을 지정 */
+  border-left: 1px solid #444;
+  /* 선 색상을 지정 */
   border-color: black;
-  opacity: 0.1; /* 선의 투명도를 조정 (선택사항) */
+  opacity: 0.1;
+  /* 선의 투명도를 조정 (선택사항) */
 }
+
 .room-count-wrapper {
   display: flex;
   align-items: center;
-  border: 1px solid #444; /* 진한 테두리 색상 */
-  border-radius: 0; /* 둥글기 제거 */
+  border: 1px solid #444;
+  /* 진한 테두리 색상 */
+  border-radius: 0;
+  /* 둥글기 제거 */
   overflow: hidden;
 }
+
 .room-count-input {
   width: 60px;
   border: none;
@@ -375,14 +352,19 @@ const onSelectAccommodation = (e) => {
   color: #333;
   background-color: #f9f9f9;
 }
+
 .room-count-btn:hover:not(:disabled) {
   background-color: #e9ecef;
 }
+
 .room-count-wrapper:focus-within {
   border-color: #333;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2); /* 포커스 시 진한 테두리 효과 */
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  /* 포커스 시 진한 테두리 효과 */
 }
+
 .room-count-wrapper.is-invalid {
-  border-color: #dc3545; /* 유효성 검사 실패 시 테두리 색상 */
+  border-color: #dc3545;
+  /* 유효성 검사 실패 시 테두리 색상 */
 }
 </style>

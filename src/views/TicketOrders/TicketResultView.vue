@@ -62,9 +62,7 @@
 
           <div class="d-flex justify-content-between align-items-center mt-3">
             <span class="fw-bold">총 요금<br />(VAT 포함)</span>
-            <span class="text-danger fw-bold fs-4"
-              >{{ formattedTotalPrice }} 원</span
-            >
+            <span class="text-danger fw-bold fs-4">{{ formattedTotalPrice }} 원</span>
           </div>
         </div>
       </div>
