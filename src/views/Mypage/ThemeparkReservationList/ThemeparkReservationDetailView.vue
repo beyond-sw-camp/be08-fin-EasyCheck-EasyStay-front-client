@@ -35,7 +35,7 @@ const centerCoordinate = ref({
 const paymentStatusMapping = {
   COMPLETED: "결제 완료",
   INCOMPLETE: "결제 미완료",
-  REFUND: "환불 완료",
+  REFUNDED: "환불 완료",
 };
 
 // 결제 방법 값 매핑
@@ -48,7 +48,7 @@ const paymentMethodMapping = {
 const formatDate = (dateString) => {
   if (!dateString) {
     console.error("유효하지 않은 날짜 값:", dateString);
-    return "정보 없음"; // 기본값 반환
+    return "정보 없음";
   }
 
   const date = new Date(dateString);
@@ -56,7 +56,7 @@ const formatDate = (dateString) => {
   // 날짜 유효성 검사
   if (isNaN(date.getTime())) {
     console.error("유효하지 않은 날짜 값:", dateString);
-    return "정보 없음"; // 기본값 반환
+    return "정보 없음";
   }
 
   return date.toISOString().split('T')[0];
@@ -251,23 +251,21 @@ const handleRefund = async () => {
             <li>티켓 구매 후, 취소 및 환불 정책을 꼭 확인하시기 바랍니다.</li>
           </ul>
 
-          <h6>취소 규정</h6>
-          <ul>
-            <li>티켓 취소는 사용일 7일 전까지 가능합니다. 사용일 6일 전부터 취소 수수료가 부과됩니다.</li>
-            <li>티켓 변경은 사용일 6일 이내에는 불가능하며, 이에 따른 환불이나 변경은 고객센터로 문의해주시기 바랍니다.</li>
-            <li>예약하신 날짜에 방문하지 않거나 위의 지정 기간 이후에 취소한 경우, 환불이 불가능할 수 있습니다.</li>
-          </ul>
-
           <h6>입장 안내</h6>
           <ul>
-            <li>입장은 오전 9시부터 가능하며, 입장 시간이 지연될 경우 미리 연락해 주시기 바랍니다.</li>
+            <li>입장은 오전 9시부터 가능합니다.</li>
             <li>주말 및 공휴일에는 대기 시간이 발생할 수 있으니, 여유 있게 방문하시기 바랍니다.</li>
+            <li>입장권은 사전예약 없이 현장 매표소에도 구입하실 수 있습니다.</li>
+            <li>입장 후 1시간 이내 요청 시 환불 가능합니다.</li>
           </ul>
         </div>
 
         <!-- 예약 취소 버튼 -->
         <div class="cancel-button-container mb-5">
-          <button class="btn btn-danger" @click="handleRefund">예약 취소</button>
+          <button class="btn btn-danger" @click="handleRefund"
+            :disabled="filteredReservations[0]?.paymentStatus === '환불 완료'">
+            {{ filteredReservations[0]?.paymentStatus === '환불 완료' ? '환불 완료' : '환불하기' }}
+          </button>
         </div>
 
         <h4>오시는 길 안내</h4>

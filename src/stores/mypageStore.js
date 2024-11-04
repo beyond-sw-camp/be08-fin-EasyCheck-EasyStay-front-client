@@ -7,6 +7,7 @@ export const mypageStore = defineStore("mypageStore", {
     userData: {
       name: "",
       email: "",
+      id: "",
     },
 
     changePW: {
@@ -18,9 +19,16 @@ export const mypageStore = defineStore("mypageStore", {
     // 사업장 정보를 담을 배열
     accommodations: [],
     branchQuery: "", // 선택된 지점
+
+    isLoggedIn: false,
   }),
 
   actions: {
+    // 로그인 상태
+    async setLoginStatus(status) {
+      this.isLoggedIn = status;
+    },
+
     // 비밀번호 변경
     async changePassword(oldPassword, newPassword) {
       const loginStore = userLoginStore();
@@ -78,6 +86,7 @@ export const mypageStore = defineStore("mypageStore", {
       try {
         await apiClient.delete("/users");
         this.userData = {};
+        this.isLoggedIn = false; // 로그아웃 상태로 변경
       } catch (error) {
         console.error("탈퇴 실패:", error);
         throw error;

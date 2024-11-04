@@ -59,6 +59,10 @@ defineProps({
     type: String,
     default: "",
   },
+  maxlength: {  // maxlength 추가
+    type: Number,
+    default: null,
+  },
 });
 
 // emit()을 사용하기 위해 defineEmits() 추가
@@ -89,19 +93,9 @@ function getClasses(size, success, error) {
     <label v-if="label" :class="label.class">{{
       typeof label == "string" ? label : label.text
     }}</label>
-    <span v-if="icon" class="input-group-text"
-      ><i class="fas" :class="`fa-${icon}`" aria-hidden="true"></i
-    ></span>
-    <input
-      :id="id"
-      :type="type"
-      class="form-control"
-      :class="[getClasses(size, success, error), inputClass]"
-      :value="modelValue"
-      :placeholder="placeholder"
-      :required="isRequired"
-      :disabled="isDisabled"
-      @input="handleInput" 
-    />
+    <span v-if="icon" class="input-group-text"><i class="fas" :class="`fa-${icon}`" aria-hidden="true"></i></span>
+    <input :id="id" :type="type" class="form-control" :class="[getClasses(size, success, error), inputClass]"
+      :value="modelValue" :placeholder="placeholder" :required="isRequired" :disabled="isDisabled"
+      :maxlength="maxlength" @input="handleInput" />
   </div>
 </template>

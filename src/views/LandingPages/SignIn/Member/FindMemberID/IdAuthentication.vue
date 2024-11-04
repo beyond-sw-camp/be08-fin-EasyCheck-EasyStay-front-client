@@ -2,8 +2,9 @@
 import { onMounted, ref, computed } from "vue";
 import MaterialInput from "@/components/MaterialInput.vue";
 import { userLoginStore } from "@/stores/loginStore";
+import { useRouter } from "vue-router";
 
-import Modal from "./Modal.vue";
+import Modal from "../../Sections/Modal.vue";
 
 import setMaterialInput from "@/assets/js/material-input";
 
@@ -142,7 +143,8 @@ const carrierOptions = ref([
 
 // 인증번호 요청
 const loginStore = userLoginStore();
-const isVerificationRequested = ref(false); // 초기값을 false로 설정
+const isVerificationRequested = ref(false);
+const isPhoneVerified = ref(false);
 
 const authenticatePhone = async () => {
   if (!isAllChecked.value) {
@@ -162,6 +164,11 @@ const authenticatePhone = async () => {
   }
 };
 
+function onAuthenticationSuccess() {
+  loginStore.isAuthenticated = true; // 인증 성공 시 상태 변경
+  loginStore.isPhoneVerified = true;
+}
+
 // 인증 번호 확인
 const verificationCode = ref('');
 
@@ -177,15 +184,11 @@ const requestVerification = async () => {
 
     // 인증 성공 시 상태 변경
     onAuthenticationSuccess();
+
   } catch (error) {
     console.error('Error during verification:', error.message);
   }
 };
-
-function onAuthenticationSuccess() {
-  loginStore.isAuthenticated = true; // 인증 성공 시 상태 변경
-  alert("인증에 성공했습니다!");
-}
 
 // 자세히 보기 모달창 변수
 const isModalVisible = ref(false);
@@ -203,6 +206,40 @@ const showModal = (title, content) => {
 const closeModal = () => {
   isModalVisible.value = false;
 };
+
+const router = useRouter();
+const userName = ref('');
+const userPhone = ref('');
+
+function goToMain() {
+  router.push('/');
+}
+
+const foundEmails = ref([]); // 이메일 목록 배열
+
+const handleFindEmail = async () => {
+  console.log("인증 상태:", isPhoneVerified.value);
+  if (!loginStore.isPhoneVerified) {
+    alert("전화번호 인증이 필요합니다.");
+    return;
+  }
+
+  try {
+    const emails = await loginStore.findEmail(userName.value, userPhone.value);
+    if (emails && emails.length > 0) {
+      foundEmails.value = emails;
+      loginStore.setFoundEmails(emails);
+      router.push('/users/findId');
+    } else {
+      alert("이메일을 찾을 수 없습니다. 이름과 전화번호를 확인해주세요.");
+    }
+  } catch (error) {
+    console.error('Error finding email:', error.message);
+    alert("이메일 찾기 중 오류가 발생했습니다.");
+  }
+};
+
+
 
 </script>
 
@@ -253,8 +290,8 @@ const closeModal = () => {
         <td class="fw-bold fs-8">성함</td>
         <td>
           <div class="d-flex align-items-center col-9">
-            <MaterialInput v-model="loginStore.signUpformData.name" class="input-group-outline mb-0 custom-check-btn"
-              id="name" :label="{ text: '성함', class: 'form-label' }" type="text" />
+            <MaterialInput v-model="name" class="input-group-outline mb-0 custom-check-btn" id="name"
+              :label="{ text: '성함', class: 'form-label' }" type="text" />
           </div>
         </td>
       </tr>
@@ -264,7 +301,6 @@ const closeModal = () => {
         <td class="fw-bold fs-8">전화번호</td>
         <td>
           <div class="d-flex align-items-center col-9">
-            <!-- 통신사 -->
             <select id="carrier" class="form-select me-2" v-model="selectedCarrier" style="width: 20%;">
               <option value="" disabled selected>통신사 선택</option>
               <option v-for="carrier in carrierOptions" :key="carrier.value" :value="carrier.value">
@@ -272,7 +308,6 @@ const closeModal = () => {
               </option>
             </select>
 
-            <!-- 전화번호 -->
             <select id="phonePrefix" class="form-select me-2" v-model="selectedPhonePrefix" style="width: 15%;">
               <option v-for="input in phoneFields.inputs" :key="input.id" :value="input.text">
                 {{ input.text }}
@@ -284,7 +319,6 @@ const closeModal = () => {
             <MaterialInput class="input-group-outline mb-0" v-model="phoneSuffix" type="text" maxlength="4"
               style="width: 25%; margin-right: 10px;" />
 
-            <!-- 인증 요청 버튼 -->
             <button class="btn btn-black custom-btn mt-3" @click="authenticatePhone">
               인증 요청
             </button>
@@ -298,7 +332,8 @@ const closeModal = () => {
             <div class="d-flex align-items-center justify-content-start col-9">
               <MaterialInput class="input-group-outline mb-0" v-model="verificationCode" type="text"
                 placeholder="인증번호 입력" style="width: 25%; margin-right: 10px;" />
-              <button id=" verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification">인증</button>
+              <button id="verifyCode" class="btn btn-black custom-btn mt-3" @click="requestVerification"
+                maxlength="8">인증</button>
             </div>
           </td>
         </tr>
@@ -307,6 +342,17 @@ const closeModal = () => {
   </table>
 
   <hr style="border-top: 2px solid #ccc;" />
+
+  <!-- 버튼 -->
+  <div class="text-center mt-4 mb-5">
+    <MaterialButton @click="goToMain" class="btn btn-secondary">
+      취소
+    </MaterialButton>
+    <MaterialButton @click="handleFindEmail" class="btn btn-primary ms-2">
+      아이디 찾기
+    </MaterialButton>
+  </div>
+
   <Modal :isVisible="isModalVisible" :title="modalTitle" :content="modalContent" @close="closeModal" />
 </template>
 

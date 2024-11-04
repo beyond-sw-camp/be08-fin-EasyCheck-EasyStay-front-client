@@ -14,6 +14,7 @@ export const userLoginStore = defineStore("userStore", {
     roadAddress: "",
     jibunAddress: "",
     detailAddress: "",
+    foundEmails: [],
 
     userData: {
       name: "",
@@ -42,18 +43,16 @@ export const userLoginStore = defineStore("userStore", {
 
     // 인증 여부 저장 상태
     isAuthenticated: false,
+    isPhoneVerfied: false,
 
     // 마이페이지에서 유저 정보 가져오기
     userInfo: {},
   }),
 
   getters: {
+    // 약관 동의 필수 체크박스 체크 되었는지 확인
     isAllChecked(state) {
-      // 약관동의의 필수 체크박스가 체크되었는지 확인
-      return (
-        state.consentItems.every((item) => item.checked) &&
-        state.consentItems2.every((item) => item.checked)
-      );
+      return state.consentItems.every((item) => item.checked);
     },
     userRole: (state) =>
       state.userInfo?.role === "CORP_USER" ? "법인회원" : "일반회원",
@@ -92,7 +91,14 @@ export const userLoginStore = defineStore("userStore", {
           console.log("로그인 성공, 저장된 토큰:", response.data.accessToken);
 
           // 사용자 ID를 로그인 스토어에 저장
+          // 사용자 정보 설정
           this.userData.id = response.data.userId;
+          this.userData.name = response.data.name; // response 구조에 따라 수정 필요
+          this.userData.email = response.data.email; // response 구조에 따라 수정 필요
+
+          // 사용자 정보 로드
+          await this.getUserData(); // 사용자 정보 로드
+          mypageStoreInstance.userData = { ...this.userData };
 
           // 사용자 정보 가져오기
           if (localStorage.getItem("accessToken")) {
@@ -134,6 +140,10 @@ export const userLoginStore = defineStore("userStore", {
 
       // 약관이 모두 체크된 경우 인증 요청
       this.authenticatePhone();
+    },
+
+    setFoundEmails(emails) {
+      this.userData.foundEmails = emails; // 이메일 배열 저장
     },
 
     // 인증번호 요청
@@ -182,6 +192,7 @@ export const userLoginStore = defineStore("userStore", {
         if (response.status === 200) {
           alert("인증에 성공했습니다!");
           this.isAuthenticated = true;
+          this.isPhoneVerfied = true;
           console.log("인증 후 isAuthenticated:", this.isAuthenticated);
           return true;
         }
@@ -290,6 +301,7 @@ export const userLoginStore = defineStore("userStore", {
           this.userData.name = response.data.name;
           this.userData.email = response.data.email;
           this.userData.phone = response.data.phone;
+          this.isLoggedIn = true;
         }
       } catch (error) {
         console.error("사용자 정보 가져오기 실패:", error);
@@ -345,6 +357,25 @@ export const userLoginStore = defineStore("userStore", {
         throw new Error(
           error.response?.data?.message || "이메일 중복 확인 실패"
         );
+      }
+    },
+
+    // 아이디 찾기
+    async findEmail(name, phone) {
+      try {
+        const response = await apiClient.post("/find-email", {
+          name: name,
+          phone: phone,
+        });
+
+        if (response.data) {
+          // 이메일 찾기 성공 시
+          this.userData.email = response.data.email;
+          return response.data.email;
+        }
+      } catch (error) {
+        console.error("이메일 찾기 실패:", error);
+        alert("이메일 찾기 실패. 정보를 확인하세요.");
       }
     },
   },

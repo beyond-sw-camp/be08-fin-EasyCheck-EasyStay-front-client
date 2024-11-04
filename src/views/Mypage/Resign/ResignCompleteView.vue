@@ -2,16 +2,16 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { userLoginStore } from "@/stores/loginStore";
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
+const loginStore = userLoginStore();
 onMounted(() => {
   setMaterialInput();
+  loginStore.setLoginStatus(false);
 });
 
 const router = useRouter();
@@ -57,41 +57,5 @@ function goToMain() {
         </div>
       </div>
     </div>
-
-    <footer class="footer position-absolute bottom-2 py-2 w-100">
-      <div class="container">
-        <div class="row align-items-center justify-content-lg-between">
-          <div class="col-12 col-md-6 my-auto">
-            <div class="copyright text-center text-sm text-dark text-lg-start">
-              © {{ new Date().getFullYear() }}, made with
-              <i class="fa fa-heart" aria-hidden="true"></i> by
-              <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                class="font-weight-bold text-dark" target="_blank">EASY CHECK</a>
-              for a better web.
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server.git"
-                  class="nav-link text-dark" target="_blank">EASY CHECK</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client.git"
-                  class="nav-link text-dark" target="_blank">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin.git"
-                  class="nav-link text-dark" target="_blank">GitHub</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-dark"
-                  target="_blank">License</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
   </Header>
 </template>
