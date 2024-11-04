@@ -5,12 +5,13 @@ import { userLoginStore } from "@/stores/loginStore";
 import { useRouter } from "vue-router";
 
 import Modal from "../../Sections/Modal.vue";
-
 import setMaterialInput from "@/assets/js/material-input";
 
 onMounted(() => {
   setMaterialInput();
 });
+
+const router = useRouter();
 
 // 약관 자세히 보기 내용
 const consentItems = ref([
@@ -128,7 +129,6 @@ const phoneFields = ref({
     { id: 'phonePrefix2', text: '011' },
     { id: 'phonePrefix3', text: '02' },
     { id: 'phonePrefix4', text: '051' },
-    { id: 'phonePrefix11', text: '053' },
   ],
 });
 
@@ -165,7 +165,7 @@ const authenticatePhone = async () => {
 };
 
 function onAuthenticationSuccess() {
-  loginStore.isAuthenticated = true; // 인증 성공 시 상태 변경
+  loginStore.isAuthenticated = true;
   loginStore.isPhoneVerified = true;
 }
 
@@ -184,6 +184,7 @@ const requestVerification = async () => {
 
     // 인증 성공 시 상태 변경
     onAuthenticationSuccess();
+    isPhoneVerified.value = true;
 
   } catch (error) {
     console.error('Error during verification:', error.message);
@@ -207,39 +208,31 @@ const closeModal = () => {
   isModalVisible.value = false;
 };
 
-const router = useRouter();
-const userName = ref('');
-const userPhone = ref('');
 
 function goToMain() {
   router.push('/');
 }
 
-const foundEmails = ref([]); // 이메일 목록 배열
+const userName = ref('');
 
 const handleFindEmail = async () => {
-  console.log("인증 상태:", isPhoneVerified.value);
-  if (!loginStore.isPhoneVerified) {
-    alert("전화번호 인증이 필요합니다.");
-    return;
-  }
+  const phoneNumber = `${selectedPhonePrefix.value}${phoneMiddle.value}${phoneSuffix.value}`;
 
   try {
-    const emails = await loginStore.findEmail(userName.value, userPhone.value);
-    if (emails && emails.length > 0) {
-      foundEmails.value = emails;
-      loginStore.setFoundEmails(emails);
-      router.push('/users/findId');
+    const response = await loginStore.findEmail(userName.value, phoneNumber);
+    if (response) {
+      loginStore.userData.name = userName.value || '';
+      loginStore.userData.email = response.email || '';
+      loginStore.userData.phone = phoneNumber || '';
+      await router.push('/users/findId');
     } else {
-      alert("이메일을 찾을 수 없습니다. 이름과 전화번호를 확인해주세요.");
+      alert("이메일을 찾을 수 없습니다.");
     }
   } catch (error) {
     console.error('Error finding email:', error.message);
     alert("이메일 찾기 중 오류가 발생했습니다.");
   }
 };
-
-
 
 </script>
 
@@ -290,7 +283,7 @@ const handleFindEmail = async () => {
         <td class="fw-bold fs-8">성함</td>
         <td>
           <div class="d-flex align-items-center col-9">
-            <MaterialInput v-model="name" class="input-group-outline mb-0 custom-check-btn" id="name"
+            <MaterialInput v-model="userName" class="input-group-outline mb-0 custom-check-btn" id="name"
               :label="{ text: '성함', class: 'form-label' }" type="text" />
           </div>
         </td>
