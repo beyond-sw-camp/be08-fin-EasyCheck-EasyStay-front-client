@@ -1,25 +1,28 @@
 <!-- eslint-disable prettier/prettier -->
 <script setup>
-import { onMounted } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
+import { userLoginStore } from "@/stores/loginStore";
 
-// example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-
-//Vue Material Kit 2 components
-// import MaterialInput from "@/components/MaterialInput.vue";
-// import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
 onMounted(() => {
   setMaterialInput();
 });
 
+const loginStore = userLoginStore();
 const router = useRouter();
+const foundEmails = computed(() => {
+  return loginStore.userData.foundEmails.map(email => {
+    return {
+      name: email.name, // 이름이 함께 반환된다고 가정
+      email: email.email,
+      registeredDate: email.registeredDate // 가입일자도 함께 반환된다고 가정
+    };
+  });
+});
 
 function goToMain() {
   router.push('/');
@@ -53,12 +56,6 @@ function goToLogin() {
           </div>
         </div>
 
-        <div class="text-end">
-          <RouterLink to="/users/findPwAuthentication" class="text-decoration-none">
-            <p>비밀번호 찾기</p>
-          </RouterLink>
-        </div>
-
         <hr class="my-2" style="border-top: 3px solid #000;" />
 
         <table class="table">
@@ -70,10 +67,10 @@ function goToLogin() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>김나현</td>
-              <td>example@example.com</td>
-              <td>2024-10-18</td>
+            <tr v-for="(emailData, index) in foundEmails" :key="index">
+              <td>{{ emailData.name }}</td>
+              <td>{{ emailData.email }}</td>
+              <td>{{ emailData.registeredDate }}</td>
             </tr>
           </tbody>
         </table>
@@ -92,10 +89,9 @@ function goToLogin() {
 
       </div>
     </div>
-
   </Header>
-
 </template>
+
 
 <style>
 .table th {

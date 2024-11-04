@@ -1,33 +1,18 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import { userLoginStore } from "@/stores/loginStore";
 
-// example components
 import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
-import Authentication from "../../Sections/Authentication.vue";
+import IdAuthentication from "./IdAuthentication.vue";
 
 onMounted(() => {
   setMaterialInput();
 });
 
-const router = useRouter();
 const loginStore = userLoginStore();
-
-function goToMain() {
-  router.push('/');
-}
-
-function goToFindID() {
-  if (!loginStore.isAuthenticated) {
-    alert("인증이 완료되지 않았습니다.");
-    return;
-  }
-  router.push('/users/findId');
-}
+const selectedPhone = ref('');
 
 </script>
 
@@ -54,17 +39,7 @@ function goToFindID() {
           </div>
         </div>
 
-        <Authentication @authenticationSuccess="onAuthenticationSuccess" />
-
-        <!-- 버튼 -->
-        <div class="text-center mt-4 mb-5">
-          <MaterialButton @click="goToMain" class="btn btn-secondary">
-            취소
-          </MaterialButton>
-          <MaterialButton @click="goToFindID" class="btn btn-primary ms-2">
-            아이디 찾기
-          </MaterialButton>
-        </div>
+        <IdAuthentication :name="loginStore.signUpformData.name" :phone="selectedPhone" />
 
       </div>
     </div>
