@@ -3,7 +3,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
 import { userLoginStore } from "@/stores/loginStore.js";
-import LogoImg from "@/assets/img/logos/logo-ct-dark.png";
+import LogoImg from "@/assets/img/logos/logo.png";
 import { useAccommodationStore } from "@/stores";
 
 // props를 통해 네비게이션의 외형이나 메뉴 항목 등을 동적으로 설정할 수 있음.
@@ -114,62 +114,111 @@ watch(
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg top-0 py-3" :class="{
-    'z-index-3 w-100 position-absolute my-3': props.transparent,
-    'z-index-3 py-2 start-0 end-0 position-absolute': props.sticky,
-    'navbar-light bg-white py-3': !isScrolled && props.light,
-    'navbar-dark  z-index-3 py-3': props.dark || isScrolled || isMenuVisible, // 메뉴가 열렸을 때도 배경색 변경
-    'bg-transparent-black': isScrolled,
-  }">
+  <nav
+    class="navbar navbar-expand-lg top-0 py-3"
+    :class="{
+      'z-index-3 w-100 position-absolute my-3': props.transparent,
+      'z-index-3 py-2 start-0 end-0 position-absolute': props.sticky,
+      'navbar-light bg-white py-3': !isScrolled && props.light,
+      'navbar-dark  z-index-3 py-3': props.dark || isScrolled || isMenuVisible, // 메뉴가 열렸을 때도 배경색 변경
+      'bg-transparent-black': isScrolled,
+    }"
+  >
     <div class="container">
-      <RouterLink class="navbar-brand" :class="[
-        getTextColor(), // 수정된 부분
-        isScrolled
-          ? 'text-white font-weight-bolder ms-sm-3'
-          : 'text-dark font-weight-bolder ms-sm-3',
-      ]" :to="{ name: 'presentation' }" rel="tooltip" title="Designed and Coded by EasyCheck">
+      <RouterLink
+        class="navbar-brand"
+        :class="[
+          getTextColor(), // 수정된 부분
+          isScrolled
+            ? 'text-white font-weight-bolder ms-sm-3'
+            : 'text-dark font-weight-bolder ms-sm-3',
+        ]"
+        :to="{ name: 'presentation' }"
+        rel="tooltip"
+        title="Designed and Coded by EasyCheck"
+      >
         <img :src="LogoImg" alt="Logo" class="navbar-logo me-2" />
         EasyStay
       </RouterLink>
       <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
         <li class="nav-item mx-2">
-          <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block">
-            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
+          <button
+            @click="handleReservationClick"
+            class="reservation-btn btn btn-sm mb-0 ms-auto d-lg-none d-block"
+          >
+            <i class="material-icons opacity-6 me-2 text-md">calendar_today</i
+            >Reservation
           </button>
         </li>
       </ul>
-      <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
+      <div
+        class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0"
+        id="navigation"
+      >
         <ul class="navbar-nav navbar-nav-hover ms-auto align-items-center">
           <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
-            <RouterLink :to="{ name: 'Mypage' }" role="button"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
-              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">person</i>
+            <RouterLink
+              :to="{ name: 'Mypage' }"
+              role="button"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
+              :class="getTextColor()"
+            >
+              <i
+                class="material-icons opacity-6 me-2 text-md"
+                :class="getTextColor()"
+                >person</i
+              >
               MyPage
             </RouterLink>
           </li>
           <li v-else class="nav-item mx-2">
-            <RouterLink :to="{ name: 'login' }" role="button"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
-              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">login</i>
+            <RouterLink
+              :to="{ name: 'login' }"
+              role="button"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
+              :class="getTextColor()"
+            >
+              <i
+                class="material-icons opacity-6 me-2 text-md"
+                :class="getTextColor()"
+                >login</i
+              >
               Sign In / Sign Up
             </RouterLink>
           </li>
           <li v-if="useUserLoginStore.isLoggedIn" class="nav-item mx-2">
-            <RouterLink :to="{ name: 'logout' }" role="button" @click="useUserLoginStore.logout"
-              class="nav-link ps-2 d-flex cursor-pointer align-items-center" :class="getTextColor()">
-              <i class="material-icons opacity-6 me-2 text-md" :class="getTextColor()">logout</i>
+            <RouterLink
+              :to="{ name: 'logout' }"
+              role="button"
+              @click="useUserLoginStore.logout"
+              class="nav-link ps-2 d-flex cursor-pointer align-items-center"
+              :class="getTextColor()"
+            >
+              <i
+                class="material-icons opacity-6 me-2 text-md"
+                :class="getTextColor()"
+                >logout</i
+              >
               Sign Out
             </RouterLink>
           </li>
           <li class="nav-item mx-2">
-            <button @click="handleReservationClick" class="reservation-btn btn btn-sm mb-0 ms-auto">
-              <i class="material-icons opacity-6 me-2 text-md">calendar_today</i>Reservation
+            <button
+              @click="handleReservationClick"
+              class="reservation-btn btn btn-sm mb-0 ms-auto"
+            >
+              <i class="material-icons opacity-6 me-2 text-md">calendar_today</i
+              >Reservation
             </button>
           </li>
 
           <!-- 네비게이션 토글 버튼 -->
           <li class="nav-item mx-2">
-            <button class="navbar-toggler d-lg-block" type="button" @click="toggleMenu">
+            <button
+              class="navbar-toggler d-lg-block"
+              type="button"
+              @click="toggleMenu"
+            >
               <span class="navbar-toggler-icon mt-2">
                 <span class="navbar-toggler-bar bar1"></span>
                 <span class="navbar-toggler-bar bar2"></span>
