@@ -1,19 +1,18 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 import { mypageStore } from "@/stores/mypageStore";
 
-// example components
+import easystayImage from '@/assets/img/easystay.png';
+
 import Header from "@/examples/Header.vue";
 
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
+const router = useRouter();
 const userStore = userLoginStore();
 const error = ref(null);
-const router = useRouter();
 
 onMounted(async () => {
   setMaterialInput();
@@ -38,7 +37,6 @@ onMounted(async () => {
 });
 
 
-import easystayImage from '@/assets/img/easystay.png';
 </script>
 
 <template>
@@ -95,5 +93,3 @@ import easystayImage from '@/assets/img/easystay.png';
     </div>
   </Header>
 </template>
-
-<style scoped></style>

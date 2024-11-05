@@ -1,30 +1,81 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { mypageStore } from "@/stores/mypageStore";
+import { userLoginStore } from "@/stores/loginStore";
 
-// example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-
-//Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
-// import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
-
-onMounted(() => {
-  setMaterialInput();
-});
 
 const router = useRouter();
 const mypage = mypageStore();
+const loginStore = userLoginStore();
 
+// 유효성 검사 상태
+const isFormValid = ref(false);
+
+// 비밀번호 유효성 검사
+const passwordErrorMessage = ref("");
+const confirmPasswordErrorMessage = ref("");
+
+// 비밀번호 유효성 검사
+const validatePassword = () => {
+  const passwordValue = mypage.changePW.newPassword || "";
+  const confirmPasswordValue = mypage.changePW.confirmPassword || "";
+
+  const minLength = passwordValue.length >= 8;
+  const maxLength = passwordValue.length <= 16;
+  const hasUpperCase = /[A-Z]/.test(passwordValue);
+  const hasNumber = /\d/.test(passwordValue);
+
+  // 기본적으로 오류 메시지 초기화
+  passwordErrorMessage.value = "";
+  confirmPasswordErrorMessage.value = "";
+
+  // 비밀번호 길이 검사
+  if (!minLength || !maxLength) {
+    passwordErrorMessage.value = "비밀번호는 8자 이상, 16자 이하이어야 합니다.";
+  }
+
+  // 대문자 포함 검사
+  else if (!hasUpperCase) {
+    passwordErrorMessage.value = "비밀번호에는 대문자가 포함되어야 합니다.";
+  }
+
+  // 숫자 포함 검사
+  else if (!hasNumber) {
+    passwordErrorMessage.value = "비밀번호에는 숫자가 포함되어야 합니다.";
+  }
+
+  // 새 비밀번호와 새 비밀번호 확인 일치 여부 검사
+  else if (passwordValue !== confirmPasswordValue) {
+    confirmPasswordErrorMessage.value = "비밀번호가 일치하지 않습니다.";
+  }
+
+  // 유효성 검사를 통과했는지 여부
+  else {
+    isFormValid.value = true;  // 유효성 검사를 통과하면 버튼 활성화
+    return true;
+  }
+
+  isFormValid.value = false;  // 오류가 있으면 버튼 비활성화
+  return false;
+};
+
+// 비밀번호 입력 시 유효성 검사
+watch(() => mypage.changePW.newPassword, () => validatePassword());
+watch(() => mypage.changePW.confirmPassword, () => validatePassword());
+
+// 비밀번호 변경
 const changePassword = async () => {
   try {
+    const validationError = validatePassword();
+    if (!validationError) {
+      return; // 유효성 검사를 통과하지 않으면 아무 동작도 하지 않음
+    }
+
     const email = mypage.userData.email;
     const oldPassword = mypage.changePW.oldPassword;
     const newPassword = mypage.changePW.newPassword;
@@ -36,9 +87,14 @@ const changePassword = async () => {
     alert(error.message);
   }
 };
+
 const goToMain = () => {
   router.push('/');
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 
@@ -65,7 +121,7 @@ const goToMain = () => {
               <td class="text-center align-middle fw-bold fs-8 col-2">현재 비밀번호</td>
               <td class="align-middle ps-0">
                 <MaterialInput v-model="mypage.changePW.oldPassword" id="oldPassword"
-                  class="text-start input-group-outline mb-0 w-25" :label="{ text: '비밀번호', class: 'form-label' }"
+                  class="text-start input-group-outline mb-0 w-25" :label="{ text: '현재 비밀번호', class: 'form-label' }"
                   type="password" />
               </td>
             </tr>
@@ -73,8 +129,24 @@ const goToMain = () => {
               <td class="text-center align-middle fw-bold fs-8 pe-0 col-2">새 비밀번호</td>
               <td class="align-middle ps-0">
                 <MaterialInput v-model="mypage.changePW.newPassword" id="newPassword"
-                  class="text-start input-group-outline mb-0 w-25" :label="{ text: '비밀번호', class: 'form-label' }"
+                  class="text-start input-group-outline mb-0 w-25" :label="{ text: '새 비밀번호', class: 'form-label' }"
                   type="password" />
+                <!-- 오류 메시지를 왼쪽 정렬 -->
+                <span v-if="passwordErrorMessage" class="text-danger" style="display: block; text-align: left;">
+                  {{ passwordErrorMessage }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="text-center align-middle fw-bold fs-8 pe-0 col-2">새 비밀번호 확인</td>
+              <td class="align-middle ps-0">
+                <MaterialInput v-model="mypage.changePW.confirmPassword" id="confirmPassword"
+                  class="text-start input-group-outline mb-0 w-25" :label="{ text: '새 비밀번호 확인', class: 'form-label' }"
+                  type="password" />
+                <!-- 오류 메시지를 왼쪽 정렬 -->
+                <span v-if="confirmPasswordErrorMessage" class="text-danger" style="display: block; text-align: left;">
+                  {{ confirmPasswordErrorMessage }}
+                </span>
               </td>
             </tr>
           </tbody>
@@ -87,7 +159,7 @@ const goToMain = () => {
           <MaterialButton @click="goToMain" class="btn btn-light">
             취소
           </MaterialButton>
-          <MaterialButton @click="changePassword" class="btn btn-dark ms-2">
+          <MaterialButton @click="changePassword" class="btn btn-dark ms-2" :disabled="!isFormValid">
             설정완료
           </MaterialButton>
         </div>

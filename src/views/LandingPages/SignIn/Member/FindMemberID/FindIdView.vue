@@ -11,9 +11,6 @@ const loginStore = userLoginStore();
 const router = useRouter();
 
 const userData = computed(() => loginStore.userData);
-onMounted(() => {
-  console.log("userData: ", userData.value);
-});
 
 function goToMain() {
   router.push('/');
@@ -25,6 +22,7 @@ function goToLogin() {
 
 onMounted(() => {
   setMaterialInput();
+  console.log("userData: ", userData.value);
 });
 
 </script>
@@ -73,7 +71,7 @@ onMounted(() => {
   </Header>
 </template>
 
-<style>
+<style scoped>
 .table th {
   border-bottom: 2px solid #000;
   text-align: center;

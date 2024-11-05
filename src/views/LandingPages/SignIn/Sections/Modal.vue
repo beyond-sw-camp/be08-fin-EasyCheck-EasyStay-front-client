@@ -64,8 +64,6 @@ const emit = defineEmits(['close']);
 
 .confirm-button {
   margin-top: 20px;
-  /* 버튼과 내용 사이에 공간 추가 */
   align-self: flex-end;
-  /* 버튼을 오른쪽 정렬 */
 }
 </style>

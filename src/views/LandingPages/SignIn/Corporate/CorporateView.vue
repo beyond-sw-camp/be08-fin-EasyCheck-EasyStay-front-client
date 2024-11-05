@@ -1,6 +1,5 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { RouterLink, useRouter } from 'vue-router';
 import { userLoginStore } from "@/stores/loginStore";
 
@@ -39,14 +38,6 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header style="margin-top: 80px;">
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask bg-white opacity-6"></span>
@@ -81,7 +72,7 @@ const handleSubmit = async () => {
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-checkbox {
   transform: scale(0.8);
 }

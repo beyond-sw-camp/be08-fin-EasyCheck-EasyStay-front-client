@@ -1,17 +1,30 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
-
-import Modal
-  from "./Modal.vue";
-import MaterialInput from "@/components/MaterialInput.vue";
-import setMaterialInput from "@/assets/js/material-input";
 import { userLoginStore } from "@/stores/loginStore";
 
-onMounted(() => {
-  setMaterialInput();
-});
+import Modal from "./Modal.vue";
+import MaterialInput from "@/components/MaterialInput.vue";
+import setMaterialInput from "@/assets/js/material-input";
+
 
 const loginStore = userLoginStore();
+
+const isVerificationRequested = ref('false');
+const verificationCode = ref('');
+
+// 전화번호
+const selectedPhonePrefix = ref('010');
+const phoneMiddle = ref('');
+const phoneSuffix = ref('');
+
+// 이메일 옵션 선택 변수
+const selectedDomain = ref('');
+const isCustomDomain = ref(false);
+
+// 자세히 보기 모달창 변수
+const isModalVisible = ref(false);
+const modalTitle = ref('');
+const modalContent = ref('');
 
 // 약관 자세히 보기 내용
 const consentItems = ref([
@@ -97,12 +110,15 @@ const consentItems = ref([
 
 // 약관 모두 동의
 const toggleAll = () => {
-  const isCheckedValue = isAllChecked.value; // 전체 체크 상태
+  // 전체 체크 상태
+  const isCheckedValue = isAllChecked.value;
   consentItems.value.forEach(item => {
-    item.checked = isCheckedValue; // 모든 항목의 체크 상태를 설정
+    // 모든 항목의 체크 상태를 설정
+    item.checked = isCheckedValue;
   });
 };
 
+// 모든 항목이 체크되었는지 확인
 const isAllChecked = computed({
   get() {
     // 모든 항목이 체크되어 있으면 true
@@ -116,11 +132,7 @@ const isAllChecked = computed({
   }
 });
 
-// 전화번호
-const selectedPhonePrefix = ref('010');
-const phoneMiddle = ref('');
-const phoneSuffix = ref('');
-
+// 전화번호 옵션
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
@@ -130,7 +142,7 @@ const phoneFields = ref({
   ],
 });
 
-// 통신사
+// 통신사 옵션
 const carrierOptions = ref([
   { value: 'carrier1', text: 'SKT' },
   { value: 'carrier2', text: 'KT' },
@@ -141,8 +153,6 @@ const carrierOptions = ref([
 ]);
 
 // 인증번호 요청
-const isVerificationRequested = ref('false');
-
 const authenticatePhone = async () => {
   // 약관 동의 여부 체크
   if (!isAllChecked.value) {
@@ -157,20 +167,18 @@ const authenticatePhone = async () => {
 
   try {
     await loginStore.handlePhoneAuthentication();
-    alert("인증번호 요청이 성공적으로 전송되었습니다."); // 성공 메시지
+    alert("인증번호 요청이 성공적으로 전송되었습니다.");
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
-    alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
+    alert("인증번호 요청 중 오류가 발생했습니다.");
   }
 };
 
 // 인증 번호 확인
-const verificationCode = ref('');
-
 const requestVerification = async () => {
   const phoneNumber = `${selectedPhonePrefix.value}${phoneMiddle.value}${phoneSuffix.value}`;
   console.log('Phone Number: ', phoneNumber);
-  console.log('Entered verification code: ', loginStore.verificationCode); // 스토어의 값 사용
+  console.log('Entered verification code: ', loginStore.verificationCode);
 
   try {
     const message = await loginStore.verifyCode(phoneNumber, loginStore.verificationCode);
@@ -180,13 +188,10 @@ const requestVerification = async () => {
   }
 };
 
-
-const selectedDomain = ref('');
-const isCustomDomain = ref(false);
-
 const onDomainChange = () => {
   if (selectedDomain.value === 'etc') {
-    isCustomDomain.value = true; // "기타" 선택 시 입력 박스 활성화
+    // "기타" 선택 시 입력 박스 활성화
+    isCustomDomain.value = true;
   } else {
     isCustomDomain.value = false; // 다른 도메인 선택 시 드롭다운 유지
     loginStore.signUpformData.emailSuffix = selectedDomain.value; // 선택한 도메인 저장
@@ -217,11 +222,6 @@ const createEmail = () => {
   return `${emailPrefix}@${emailSuffix}`;
 };
 
-// 자세히 보기 모달창 변수
-const isModalVisible = ref(false);
-const modalTitle = ref('');
-const modalContent = ref('');
-
 // 모달창 열기
 const showModal = (title, content) => {
   modalTitle.value = title;
@@ -233,6 +233,10 @@ const showModal = (title, content) => {
 const closeModal = () => {
   isModalVisible.value = false;
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 
@@ -412,7 +416,6 @@ const closeModal = () => {
 .table td {
   vertical-align: middle;
   padding: 0.5rem 0.75rem;
-  /* 간격 조정 */
 }
 
 .text-left {

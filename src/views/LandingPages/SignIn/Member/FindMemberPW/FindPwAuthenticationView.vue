@@ -1,13 +1,7 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { userLoginStore } from "@/stores/loginStore";
 
-// example components
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 
 import PwAuthentication from "../../Sections/PwAuthentication.vue";
@@ -15,8 +9,6 @@ import PwAuthentication from "../../Sections/PwAuthentication.vue";
 onMounted(() => {
   setMaterialInput();
 });
-
-
 
 </script>
 

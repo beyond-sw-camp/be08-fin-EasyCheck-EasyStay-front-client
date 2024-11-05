@@ -3,14 +3,17 @@ import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 import { mypageStore } from '@/stores/mypageStore';
 
-// Vue Material Kit 2 components
-import MaterialInput from "@/components/MaterialInput.vue";
-
-// material-input
-import setMaterialInput from "@/assets/js/material-input";
-import MaterialButton from "@/components/MaterialButton.vue";
 import router from "@/router";
 
+import MaterialInput from "@/components/MaterialInput.vue";
+import setMaterialInput from "@/assets/js/material-input";
+import MaterialButton from "@/components/MaterialButton.vue";
+
+const mypage = mypageStore();
+const loginStore = userLoginStore();
+
+const error = ref(null);
+const success = ref(null);
 const userInfo = ref({
   email: '',
   password: '',
@@ -26,15 +29,13 @@ const userInfo = ref({
   detailAddress: ''
 });
 
-const loginStore = userLoginStore();
-const mypage = mypageStore();
-const error = ref(null);
-const success = ref(null);
+const selectedCarrier = ref('');
+const selectedPhonePrefix = ref('010');
 
 // 사용자 정보 불러오기
 const loadUserData = async () => {
   try {
-    await loginStore.getUserData(); // 로그인 스토어의 사용자 정보 가져오기
+    await loginStore.getUserData();
     userInfo.value = { ...loginStore.userData }; // 데이터를 복사
   } catch (error) {
     error.value = error.message;
@@ -42,12 +43,7 @@ const loadUserData = async () => {
   }
 };
 
-onMounted(async () => {
-  setMaterialInput();
-  await loadUserData();
-});
-
-// 전화번호
+// 전화번호 옵션
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
@@ -57,7 +53,7 @@ const phoneFields = ref({
   ],
 });
 
-// 통신사
+// 통신사 옵션
 const carrierOptions = ref([
   { value: 'carrier1', text: 'SKT' },
   { value: 'carrier2', text: 'KT' },
@@ -66,9 +62,6 @@ const carrierOptions = ref([
   { value: 'carrier5', text: 'KT알뜰폰' },
   { value: 'carrier6', text: 'LGU+알뜰폰' },
 ]);
-
-const selectedCarrier = ref('');
-const selectedPhonePrefix = ref('010');
 
 // 우편번호 검색 핸들러
 const postcode = ref('');
@@ -113,7 +106,6 @@ const updateUserData = async () => {
   }
 };
 
-
 const handleButtonClick = () => {
   updateUserData();
 };
@@ -121,6 +113,11 @@ const handleButtonClick = () => {
 function goToMain() {
   router.push('/');
 }
+
+onMounted(async () => {
+  setMaterialInput();
+  await loadUserData();
+});
 
 </script>
 

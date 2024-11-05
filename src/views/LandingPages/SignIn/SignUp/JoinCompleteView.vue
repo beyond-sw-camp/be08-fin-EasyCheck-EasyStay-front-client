@@ -1,14 +1,9 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 
 onMounted(() => {
   setMaterialInput();
@@ -27,14 +22,6 @@ function goToLogin() {
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy">
       <span class="mask opacity-6"></span>

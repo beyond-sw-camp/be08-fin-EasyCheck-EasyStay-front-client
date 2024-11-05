@@ -1,24 +1,12 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from 'vue-router';
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// Vue Material Kit 2 components
-import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
 import MemberInfoUpdate from "./Sections/MemberInfoUpdate.vue";
 
-onMounted(() => {
-  setMaterialInput();
-});
-
-// 라우터
 const router = useRouter();
 
 function handleUpdateComplete() {
@@ -31,6 +19,9 @@ const handleUpdate = () => {
   handleUpdateComplete();
 };
 
+onMounted(() => {
+  setMaterialInput();
+});
 </script>
 
 <template>
@@ -54,14 +45,8 @@ const handleUpdate = () => {
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-checkbox {
   transform: scale(0.8);
-}
-
-.footer {
-  position: relative;
-  /* footer 위치 조정 */
-  bottom: 0;
 }
 </style>

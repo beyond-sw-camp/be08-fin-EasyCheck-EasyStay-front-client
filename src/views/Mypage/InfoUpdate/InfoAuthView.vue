@@ -3,29 +3,16 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
-import apiClient from "@/api";
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// Vue Material Kit 2 components
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
 import Authentication from "@/views/LandingPages/SignIn/Sections/Authentication.vue";
 
-onMounted(() => {
-  setMaterialInput();
-});
-
+const router = useRouter();
 const loginStore = userLoginStore();
 
-// 라우터
-const router = useRouter();
-
-// 인증 완료 상태
 const isAuthenticated = ref(false);
 
 function goToMain() {
@@ -53,6 +40,10 @@ const handleNext = () => {
     alert("전화번호 인증을 완료해야 다음 단계로 진행할 수 있습니다.");
   }
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 

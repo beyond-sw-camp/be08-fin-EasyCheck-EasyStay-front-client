@@ -11,11 +11,6 @@ import Header from "@/examples/Header.vue";
 
 import setMaterialInput from "@/assets/js/material-input";
 
-onMounted(() => {
-  setMaterialInput();
-  fetchTicketOrdersWithDetails();
-});
-
 const userStore = userLoginStore();
 const paymentStore = useTicketPaymentStore();
 const router = useRouter();
@@ -143,6 +138,11 @@ const handleRefund = async () => {
     alert("환불 처리 중 오류가 발생했습니다.");
   }
 };
+
+onMounted(() => {
+  setMaterialInput();
+  fetchTicketOrdersWithDetails();
+});
 </script>
 
 <template>

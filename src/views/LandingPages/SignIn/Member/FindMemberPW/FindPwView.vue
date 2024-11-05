@@ -14,6 +14,7 @@ const loginStore = userLoginStore();
 const newPassword = ref(loginStore.pwData.newPassword);
 const confirmPassword = ref(loginStore.pwData.confirmPassword);
 
+// 비밀번호 변경
 const resetPassword = async () => {
   const { email, phone } = loginStore.pwData;
   console.log("Sending data:", { email, phone, newPassword: newPassword.value, confirmPassword: confirmPassword.value });
@@ -80,7 +81,6 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
-
 
         <hr class="my-2" style="border-top: 3px solid #000;" />
 

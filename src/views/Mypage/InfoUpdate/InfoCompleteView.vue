@@ -3,16 +3,8 @@
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
-
-onMounted(() => {
-  setMaterialInput();
-});
 
 const router = useRouter();
 
@@ -23,6 +15,10 @@ function goToMain() {
 function goToLogin() {
   router.push('/reservation');
 }
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 
