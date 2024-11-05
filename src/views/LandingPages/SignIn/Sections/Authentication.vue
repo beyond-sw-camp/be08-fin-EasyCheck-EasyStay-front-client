@@ -214,7 +214,7 @@ onMounted(() => {
     <h4 class="text-left">동의 항목 목록</h4>
     <p class="text-left">아래 항목에 대해 동의해 주시기 바랍니다.</p>
 
-    <table class="table text-left">
+    <table class="table text-center">
       <thead>
         <tr>
           <th scope="col" class="col-5">동의 항목</th>
