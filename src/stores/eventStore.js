@@ -121,7 +121,7 @@ export const useEventStore = defineStore("eventStore", {
         ? `?accommodationId=${accommodationId}`
         : "";
       try {
-        const response = await apiClient.get(`/events${queryParams}`);
+        const response = await apiClient.get(`/events`);
         this.events = response.data;
         console.log("호출 3", response.data);
       } catch (error) {

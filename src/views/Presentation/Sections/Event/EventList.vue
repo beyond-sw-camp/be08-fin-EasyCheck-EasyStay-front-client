@@ -101,12 +101,12 @@ onMounted(() => {
 
 <style scoped>
 .title-text {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
 }
 
 .description-text {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
 .pagination-arrow {
