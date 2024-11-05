@@ -39,13 +39,8 @@ const goToNextAccommodation = () => {
   currentIndex.value = (currentIndex.value + 1) % accommodations.value.length;
 };
 
-const fetchAccommodationById = async (id) => {
-  try {
-    await accommodationStore.fetchAccommodationById(id);
-    router.push({ name: "Accommodation", params: { id } });
-  } catch (error) {
-    console.error("Failed to fetch accommodation by ID:", error);
-  }
+const fetchAccommodationById = (id) => {
+  router.push({ name: "Accommodation", params: { accommodationId: id } });
 };
 
 onMounted(() => {
@@ -78,7 +73,7 @@ onMounted(() => {
               <div class="col-md-4 image-container" v-for="accommodation in paginatedAccommodations"
                 :key="accommodation.id">
                 <ExampleCard :image="accommodation.thumbnailUrls[0]" :title="accommodation.name"
-                  @click="fetchAccommodationById(accommodation.id)" />
+                  @click="accommodation.id && fetchAccommodationById(accommodation.id)" />
               </div>
             </div>
           </div>

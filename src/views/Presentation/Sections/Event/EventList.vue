@@ -39,13 +39,8 @@ const goToNextEvent = () => {
   currentIndex.value = (currentIndex.value + 1) % events.value.length;
 };
 
-const fetchEventById = async (id) => {
-  try {
-    await eventStore.fetchEventById(id);
-    router.push({ name: "Event", params: { id } });
-  } catch (error) {
-    console.error("Failed to fetch event by ID:", error);
-  }
+const fetchEventById = (id) => {
+  router.push({ name: "EventDetail", params: { id } });
 };
 
 onMounted(() => {
