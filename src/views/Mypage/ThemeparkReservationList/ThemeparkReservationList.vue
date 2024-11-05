@@ -264,7 +264,7 @@ onMounted(async () => {
           <div class=" col-12 mt-4">
             <h4 class="text-start ms-3">예약 내역</h4>
             <div style="border-top: 1px solid #000; width: 100%; margin: 10px auto;"></div>
-            <table class="table table-reservation">
+            <table class="table table-reservation text-center">
               <thead>
                 <tr class="text-black">
                   <th>지점</th>
