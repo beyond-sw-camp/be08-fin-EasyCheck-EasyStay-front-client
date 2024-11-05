@@ -130,8 +130,16 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <button class="btn-prev" @click="prevImage"></button>
-        <button class="btn-next" @click="nextImage"></button>
+        <button class="btn-prev" @click="prevImage">
+          <div class="icon-wrapper" data-v-3e37aaed>
+            <span class="carousel-control-prev-icon" aria-hidden="true" data-v-3e37aaed></span>
+          </div>
+        </button>
+        <button class="btn-next" @click="nextImage">
+          <div class="icon-wrapper" data-v-3e37aaed>
+            <span class="carousel-control-next-icon" aria-hidden="true" data-v-3e37aaed></span>
+          </div>
+        </button>
 
         <div class="dots-container">
           <span v-for="(image, index) in images" :key="index" class="dot" :class="{ active: index === imageIndex }"
@@ -143,7 +151,7 @@ onUnmounted(() => {
       </div>
       <div class="roomSearchForm-container">
         <div class="container p-0">
-          <RoomSearchForm class="m-auto" :accommodations="accommodations" @search="onSearchRooms" />
+          <RoomSearchForm class="roomSearch m-auto" :accommodations="accommodations" @search="onSearchRooms" />
         </div>
       </div>
     </Header>
@@ -161,6 +169,10 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.roomSearch {
+  width: 1280px;
+}
+
 @media (min-width: 1400px) {
 
   .container-xxl,
@@ -240,9 +252,7 @@ onUnmounted(() => {
 .btn-next {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  font-size: 3rem;
-  color: white;
+  transform: translateY(-80%);
   background: none;
   border: none;
   cursor: pointer;
@@ -251,31 +261,11 @@ onUnmounted(() => {
   transition: color 0.3s ease;
 }
 
-.btn-prev:hover,
-.btn-next:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .btn-prev {
   left: 20px;
 }
 
 .btn-next {
   right: 20px;
-}
-
-.btn-prev::before,
-.btn-next::before {
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  display: inline-block;
-}
-
-.btn-prev::before {
-  content: "\f104";
-}
-
-.btn-next::before {
-  content: "\f105";
 }
 </style>
