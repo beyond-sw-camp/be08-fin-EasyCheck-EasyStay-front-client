@@ -43,6 +43,10 @@ const fetchEventById = (id) => {
   router.push({ name: "EventDetail", params: { id } });
 };
 
+const goToEvent = (index) => {
+  currentIndex.value = index;
+};
+
 onMounted(() => {
   fetchEvents();
 });
@@ -79,7 +83,8 @@ onMounted(() => {
           <!-- 페이지 인디케이터 -->
           <div class="pagination-indicator mt-6 d-flex justify-content-center">
             <span v-for="(event, index) in events" :key="index"
-              :class="{ 'active-dot': index === currentIndex % events.length }" class="dot"></span>
+              :class="{ 'active-dot': index === currentIndex % events.length }" class="dot"
+              @click="goToEvent(index)"></span>
           </div>
         </div>
       </div>
@@ -139,6 +144,7 @@ onMounted(() => {
   background-color: #ccc;
   border-radius: 50%;
   display: inline-block;
+  cursor: pointer;
 }
 
 .pagination-indicator .active-dot {

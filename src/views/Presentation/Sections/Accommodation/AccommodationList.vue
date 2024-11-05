@@ -43,6 +43,10 @@ const fetchAccommodationById = (id) => {
   router.push({ name: "Accommodation", params: { accommodationId: id } });
 };
 
+const goToAccommodation = (index) => {
+  currentIndex.value = index;
+};
+
 onMounted(() => {
   fetchAccommodations();
 });
@@ -80,7 +84,8 @@ onMounted(() => {
           <!-- 페이지 인디케이터 -->
           <div class="pagination-indicator mt-6 d-flex justify-content-center">
             <span v-for="(accommodation, index) in accommodations" :key="index"
-              :class="{ 'active-dot': index === currentIndex % accommodations.length }" class="dot"></span>
+              :class="{ 'active-dot': index === currentIndex % accommodations.length }" class="dot"
+              @click="goToAccommodation(index)"></span>
           </div>
         </div>
       </div>
@@ -140,6 +145,7 @@ onMounted(() => {
   background-color: #ccc;
   border-radius: 50%;
   display: inline-block;
+  cursor: pointer;
 }
 
 .pagination-indicator .active-dot {
