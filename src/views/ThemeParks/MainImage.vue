@@ -1,29 +1,15 @@
 <template>
   <div v-if="themePark && themePark.imageUrls" class="carousel slide">
     <div class="carousel-inner">
-      <div
-        v-for="(url, index) in themePark.imageUrls"
-        :key="url"
-        class="carousel-item"
-        :class="{ active: index === activeIndex }"
-      >
-        <img
-          :src="url"
-          :alt="`Slide ${index + 1}`"
-          class="w-100 carousel-image"
-          @load="updateCaptionColor(index, url)"
-        />
+      <div v-for="(url, index) in themePark.imageUrls" :key="url" class="carousel-item"
+        :class="{ active: index === activeIndex }">
+        <img :src="url" :alt="`Slide ${index + 1}`" class="w-100 carousel-image"
+          @load="updateCaptionColor(index, url)" />
         <div class="carousel-caption">
-          <h2
-            :class="{ 'dark-text': isDarkText, 'light-text': !isDarkText }"
-            class="carousel-title"
-          >
+          <h2 :class="{ 'dark-text': isDarkText, 'light-text': !isDarkText }" class="carousel-title">
             {{ themePark.name }}
           </h2>
-          <p
-            :class="{ 'dark-text': isDarkText, 'light-text': !isDarkText }"
-            class="carousel-description"
-          >
+          <p :class="{ 'dark-text': isDarkText, 'light-text': !isDarkText }" class="carousel-description">
             {{ themePark.description }}
           </p>
         </div>
@@ -186,14 +172,14 @@ watch(
 .carousel-control-next {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-55%);
 }
 
 .carousel-control-prev {
-  left: 10px;
+  left: -55px;
 }
 
 .carousel-control-next {
-  right: 10px;
+  right: -55px;
 }
 </style>
