@@ -206,7 +206,6 @@ onMounted(async () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   checkOutDate.value = tomorrow.toISOString().split('T')[0];
-
 });
 
 </script>

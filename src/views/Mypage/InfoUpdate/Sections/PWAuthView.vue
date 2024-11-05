@@ -2,19 +2,12 @@
 import { onMounted, ref, computed } from "vue";
 import { userLoginStore } from '@/stores/loginStore';
 
-// Vue Material Kit 2 components
 import MaterialInput from "@/components/MaterialInput.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
-// Initialize MaterialInput on mount
-onMounted(() => {
-  setMaterialInput();
-});
+const isChecked = ref(false);
 
 // 약관 동의
-const isChecked = ref(false);
 
 const consentItems = ref([
   { label: '개인정보 이용 동의 (필수)', checked: false },
@@ -114,6 +107,10 @@ const requestVerification = async () => {
     console.error('Error during verification:', error.message);
   }
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 

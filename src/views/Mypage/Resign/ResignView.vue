@@ -14,18 +14,11 @@ const isAgreed = ref(false);
 const mypage = mypageStore();
 const loginStore = userLoginStore();
 
-onMounted(async () => {
-  setMaterialInput();
-  await loginStore.getUserData(); // 사용자 정보를 로드
-  // 여기서 mypage.userData가 제대로 설정되었는지 확인
-  console.log("초기 사용자 데이터:", mypage.userData);
-});
-
-
 function goToMain() {
   router.push('/');
 }
 
+// 회원 탈퇴
 const handleDeactivate = async () => {
   if (!isAgreed.value) {
     alert("회원 탈퇴에 동의하셔야 합니다.");
@@ -39,7 +32,7 @@ const handleDeactivate = async () => {
 
   // 사용자 데이터 로드
   await loginStore.getUserData(); // 사용자 정보를 업데이트
-  console.log("탈퇴 시 사용자 데이터:", mypage.userData); // 확인용 로그
+  console.log("탈퇴 시 사용자 데이터:", mypage.userData);
 
   // 사용자 정보가 설정되어 있는지 확인
   if (!mypage.userData.id) {
@@ -57,8 +50,11 @@ const handleDeactivate = async () => {
   }
 };
 
-
-
+onMounted(async () => {
+  setMaterialInput();
+  await loginStore.getUserData(); // 사용자 정보를 로드
+  console.log("초기 사용자 데이터:", mypage.userData);
+});
 </script>
 
 <template>

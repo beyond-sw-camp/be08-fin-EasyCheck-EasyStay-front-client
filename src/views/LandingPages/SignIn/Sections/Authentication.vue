@@ -7,9 +7,20 @@ import Modal from "./Modal.vue";
 
 import setMaterialInput from "@/assets/js/material-input";
 
-onMounted(() => {
-  setMaterialInput();
-});
+const loginStore = userLoginStore();
+const isVerificationRequested = ref(false);
+const verificationCode = ref('');
+
+// 전화번호
+const selectedCarrier = ref('');
+const selectedPhonePrefix = ref('010');
+const phoneMiddle = ref('');
+const phoneSuffix = ref('');
+
+// 자세히 보기 모달창 변수
+const isModalVisible = ref(false);
+const modalTitle = ref('');
+const modalContent = ref('');
 
 // 약관 자세히 보기 내용
 const consentItems = ref([
@@ -95,12 +106,15 @@ const consentItems = ref([
 
 // 약관 모두 동의
 const toggleAll = () => {
-  const isCheckedValue = isAllChecked.value; // 전체 체크 상태
+  // 전체 체크 상태
+  const isCheckedValue = isAllChecked.value;
   consentItems.value.forEach(item => {
-    item.checked = isCheckedValue; // 모든 항목의 체크 상태를 설정
+    // 모든 항목의 체크 상태를 설정
+    item.checked = isCheckedValue;
   });
 };
 
+// 모든 항목이 체크되어 있는지 확인
 const isAllChecked = computed({
   get() {
     // 모든 항목이 체크되어 있으면 true
@@ -114,12 +128,7 @@ const isAllChecked = computed({
   }
 });
 
-// 전화번호
-const selectedCarrier = ref('');
-const selectedPhonePrefix = ref('010');
-const phoneMiddle = ref('');
-const phoneSuffix = ref('');
-
+// 전화번호 옵션
 const phoneFields = ref({
   label: '전화번호',
   inputs: [
@@ -131,6 +140,7 @@ const phoneFields = ref({
   ],
 });
 
+// 통신사 옵션
 const carrierOptions = ref([
   { value: 'carrier1', text: 'SKT' },
   { value: 'carrier2', text: 'KT' },
@@ -141,9 +151,6 @@ const carrierOptions = ref([
 ]);
 
 // 인증번호 요청
-const loginStore = userLoginStore();
-const isVerificationRequested = ref(false); // 초기값을 false로 설정
-
 const authenticatePhone = async () => {
   if (!isAllChecked.value) {
     alert("모든 약관에 동의해야 인증번호를 요청할 수 있습니다.");
@@ -163,8 +170,6 @@ const authenticatePhone = async () => {
 };
 
 // 인증 번호 확인
-const verificationCode = ref('');
-
 const requestVerification = async () => {
   const phoneNumber = `${selectedPhonePrefix.value}${phoneMiddle.value}${phoneSuffix.value}`;
   console.log('Phone Number: ', phoneNumber);
@@ -183,14 +188,8 @@ const requestVerification = async () => {
 };
 
 function onAuthenticationSuccess() {
-  loginStore.isAuthenticated = true; // 인증 성공 시 상태 변경
-  alert("인증에 성공했습니다!");
+  loginStore.isAuthenticated = true;
 }
-
-// 자세히 보기 모달창 변수
-const isModalVisible = ref(false);
-const modalTitle = ref('');
-const modalContent = ref('');
 
 // 모달창 열기
 const showModal = (title, content) => {
@@ -203,6 +202,10 @@ const showModal = (title, content) => {
 const closeModal = () => {
   isModalVisible.value = false;
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 
@@ -315,7 +318,6 @@ const closeModal = () => {
 .table td {
   vertical-align: middle;
   padding: 0.5rem 0.75rem;
-  /* 간격 조정 */
 }
 
 .text-left {
@@ -328,10 +330,7 @@ const closeModal = () => {
 
 .custom-check-btn {
   padding: -10px -24px;
-  /* 상하 패딩과 좌우 패딩을 줄입니다. */
   font-size: 0.875rem;
-  /* 폰트 크기를 줄입니다. */
   line-height: 1;
-  /* 줄 높이를 조정하여 버튼의 높이를 줄입니다. */
 }
 </style>

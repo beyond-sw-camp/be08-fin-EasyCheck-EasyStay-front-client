@@ -9,21 +9,18 @@ import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 
-onMounted(() => {
-  setMaterialInput();
-});
-
 const router = useRouter();
 const mypage = mypageStore();
 const loginStore = userLoginStore();
 
-// 상태 변수 추가
-const isFormValid = ref(false); // 유효성 검사 상태 (폼이 유효한지 여부)
+// 유효성 검사 상태
+const isFormValid = ref(false);
 
 // 비밀번호 유효성 검사
 const passwordErrorMessage = ref("");
 const confirmPasswordErrorMessage = ref("");
 
+// 비밀번호 유효성 검사
 const validatePassword = () => {
   const passwordValue = mypage.changePW.newPassword || "";
   const confirmPasswordValue = mypage.changePW.confirmPassword || "";
@@ -71,6 +68,7 @@ const validatePassword = () => {
 watch(() => mypage.changePW.newPassword, () => validatePassword());
 watch(() => mypage.changePW.confirmPassword, () => validatePassword());
 
+// 비밀번호 변경
 const changePassword = async () => {
   try {
     const validationError = validatePassword();
@@ -84,7 +82,7 @@ const changePassword = async () => {
 
     await mypage.changePassword(oldPassword, newPassword);
     alert("비밀번호 변경이 완료되었습니다.");
-    router.push('/users/pwComplete');  // 비밀번호 변경 후 페이지 이동
+    router.push('/users/pwComplete');
   } catch (error) {
     alert(error.message);
   }
@@ -93,6 +91,11 @@ const changePassword = async () => {
 const goToMain = () => {
   router.push('/');
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
+
 </script>
 
 <template>

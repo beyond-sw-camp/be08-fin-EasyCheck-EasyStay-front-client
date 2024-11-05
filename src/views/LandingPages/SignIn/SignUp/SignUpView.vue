@@ -4,6 +4,7 @@ import { onMounted } from "vue";
 
 import Header from "@/examples/Header.vue";
 import setMaterialInput from "@/assets/js/material-input";
+
 onMounted(() => {
   setMaterialInput();
 });
@@ -51,7 +52,7 @@ onMounted(() => {
   </Header>
 </template>
 
-<style>
+<style scoped>
 .custom-router-link {
   color: inherit;
 }

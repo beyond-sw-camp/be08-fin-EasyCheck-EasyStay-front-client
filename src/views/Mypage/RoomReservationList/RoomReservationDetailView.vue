@@ -1,4 +1,3 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
@@ -13,11 +12,6 @@ import KakaoMap from "@/components/map/KakaoMap.vue";
 import Header from "@/examples/Header.vue";
 
 import setMaterialInput from "@/assets/js/material-input";
-
-onMounted(() => {
-  setMaterialInput();
-  fetchReservationsWithDetails(orderId);
-});
 
 const userStore = userLoginStore();
 const paymentStore = usePaymentStore();
@@ -147,6 +141,11 @@ const handleRefund = async () => {
     alert("환불 처리 중 오류가 발생했습니다.");
   }
 };
+
+onMounted(() => {
+  setMaterialInput();
+  fetchReservationsWithDetails(orderId);
+});
 
 </script>
 
@@ -308,14 +307,12 @@ const handleRefund = async () => {
 .tables-container {
   display: flex;
   gap: 20px;
-  /* 테이블 간의 간격 */
   align-items: stretch;
 }
 
 .reservation-table,
 .payment-table {
   flex: 1;
-  /* 각 테이블이 남은 공간을 균등하게 차지하도록 설정 */
 }
 
 .table {
@@ -329,17 +326,12 @@ const handleRefund = async () => {
 .table th,
 .table td {
   padding: 8px;
-  /* 셀 패딩 추가 */
   text-align: left;
-  /* 텍스트 왼쪽 정렬 */
   border-bottom: 1px solid #ddd;
-  /* 기본적으로 연한 가로선 추가 */
 }
 
-/* 헤더 스타일 */
 .table th {
   background-color: #f2f2f2;
-  /* 헤더 배경 색상 설정 */
 }
 
 /* 모든 열의 첫 번째 셀에 대한 상단 경계 추가 */

@@ -1,31 +1,17 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { userLoginStore } from '@/stores/loginStore';
-import apiClient from "@/api";
 
-// example components
 import Header from "@/examples/Header.vue";
-
-// Vue Material Kit 2 components
 import MaterialButton from "@/components/MaterialButton.vue";
-
-// material-input
 import setMaterialInput from "@/assets/js/material-input";
 
 import Authentication from "@/views/LandingPages/SignIn/Sections/Authentication.vue";
 
-onMounted(() => {
-  setMaterialInput();
-});
-
+const router = useRouter();
 const loginStore = userLoginStore();
 
-// 라우터
-const router = useRouter();
-
-// 인증 완료 상태
 const isAuthenticated = ref(false);
 
 function goToMain() {
@@ -37,7 +23,6 @@ const authenticatePhone = async () => {
   try {
     await loginStore.handlePhoneAuthentication(); // 전화번호 인증 요청
     loginStore.isAuthenticated = true; // 인증 성공 시 상태 업데이트
-    alert("인증이 완료되었습니다."); // 성공 메시지
   } catch (error) {
     console.error('Error during phone authentication:', error.message);
     alert("인증번호 요청 중 오류가 발생했습니다."); // 오류 메시지
@@ -53,6 +38,10 @@ const handleNext = () => {
     alert("전화번호 인증을 완료해야 다음 단계로 진행할 수 있습니다.");
   }
 };
+
+onMounted(() => {
+  setMaterialInput();
+});
 
 </script>
 

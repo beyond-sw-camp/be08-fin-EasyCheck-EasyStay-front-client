@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import { userLoginStore } from "@/stores/loginStore";
 
-import NavbarDefault from "@/examples/navbars/NavbarDefault.vue";
 import Header from "@/examples/Header.vue";
 import setMaterialInput from "@/assets/js/material-input";
 import IdAuthentication from "./IdAuthentication.vue";
@@ -17,14 +16,6 @@ const selectedPhone = ref('');
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy" style="margin-top: 70px;">
       <span class="mask bg-white opacity-6"></span>
