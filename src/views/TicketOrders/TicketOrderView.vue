@@ -44,7 +44,6 @@
       <button class="btn btn-primary mx-2" @click="handleSubmit">
         구매하기
       </button>
-      <button @click="goToTicketRefund">결제 내역 조회하기</button>
     </div>
   </div>
 </template>
