@@ -145,7 +145,13 @@ const fetchReservationsWithDetails = async () => {
         totalPrice: payment.amount || "정보 없음",
       }));
     });
-    filteredReservations.value = [...reservations.value];
+
+    // 예약 정보를 결제 날짜 기준으로 최신순으로 정렬
+    filteredReservations.value = [...reservations.value].sort((a, b) => {
+      const dateA = new Date(a.paymentDate);
+      const dateB = new Date(b.paymentDate);
+      return dateB - dateA; // 내림차순 정렬
+    });
     console.log("최종 예약 정보:", reservations.value);
 
   } catch (error) {

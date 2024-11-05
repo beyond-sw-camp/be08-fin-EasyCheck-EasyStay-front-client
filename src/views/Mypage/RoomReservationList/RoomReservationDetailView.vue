@@ -186,7 +186,6 @@ const handleRefund = async () => {
                   <td class="align-middle">{{ filteredReservations[0]?.typeName || '정보 없음' }} {{
                     filteredReservations[0]?.roomName || '정보 없음'
                   }}</td>
-
                 </tr>
                 <tr>
                   <th scope="row" class="align-middle">체크인</th>

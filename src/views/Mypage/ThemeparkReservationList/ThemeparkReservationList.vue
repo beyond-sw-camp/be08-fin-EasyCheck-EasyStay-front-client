@@ -155,6 +155,13 @@ const fetchTicketOrdersWithDetails = async () => {
       paymentStatus: paymentStatusMapping[payment.paymentStatus] || "정보 없음",
     }));
 
+    // 결제 날짜를 기준으로 내림차순 정렬 (최신순)
+    filteredReservations.value = reservations.value.sort((a, b) => {
+      const dateA = new Date(a.paymentDate);
+      const dateB = new Date(b.paymentDate);
+
+      return dateB - dateA; // 내림차순 정렬
+    });
     console.log("최종 예약 정보:", reservations.value);
 
   } catch (error) {
