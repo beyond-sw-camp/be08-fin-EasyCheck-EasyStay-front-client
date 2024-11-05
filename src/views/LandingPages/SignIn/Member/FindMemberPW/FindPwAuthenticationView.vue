@@ -10,38 +10,17 @@ import Header from "@/examples/Header.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
 import setMaterialInput from "@/assets/js/material-input";
 
-import Authentication from "../../Sections/Authentication.vue";
+import PwAuthentication from "../../Sections/PwAuthentication.vue";
 
 onMounted(() => {
   setMaterialInput();
 });
 
-const router = useRouter();
-const loginStore = userLoginStore();
 
-function goToMain() {
-  router.push('/');
-}
-
-function goToFindPW() {
-  if (!loginStore.isAuthenticated) {
-    alert("인증이 완료되지 않았습니다.");
-    return;
-  }
-  router.push('/users/findPw');
-}
 
 </script>
 
 <template>
-  <div class="position-sticky z-index-sticky top-0">
-    <div class="row">
-      <div class="col-12">
-        <NavbarDefault :sticky="true" />
-      </div>
-    </div>
-  </div>
-
   <Header>
     <div class="page-header align-items-start min-vh-100" loading="lazy" style="margin-top: 70px;">
       <span class="mask bg-white opacity-6"></span>
@@ -56,17 +35,7 @@ function goToFindPW() {
           </div>
         </div>
 
-        <Authentication @authenticationSuccess="onAuthenticationSuccess" />
-
-        <!-- 버튼 -->
-        <div class="text-center mt-4 mb-5">
-          <MaterialButton @click="goToMain" class="btn btn-secondary">
-            취소
-          </MaterialButton>
-          <MaterialButton @click="goToFindPW" class="btn btn-primary ms-2">
-            인증 요청
-          </MaterialButton>
-        </div>
+        <PwAuthentication @authenticationSuccess="onAuthenticationSuccess" />
 
       </div>
     </div>

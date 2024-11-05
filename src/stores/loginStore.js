@@ -47,6 +47,13 @@ export const userLoginStore = defineStore("userStore", {
 
     // 마이페이지에서 유저 정보 가져오기
     userInfo: {},
+
+    pwData: {
+      email: "",
+      phone: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
   }),
 
   getters: {
@@ -79,6 +86,23 @@ export const userLoginStore = defineStore("userStore", {
       this.selectedPhonePrefix = prefix;
       this.phoneMiddle = middle;
       this.phoneSuffix = suffix;
+    },
+    setUserName(name) {
+      this.userData.name = name;
+    },
+    setEmail(email) {
+      this.pwData.email = email;
+    },
+    setNewPassword(password) {
+      this.pwData.newPassword = password;
+    },
+    setConfirmPassword(password) {
+      this.pwData.confirmPassword = password;
+    },
+    setPhone(prefix, middle, suffix) {
+      const phoneNumber = `${prefix}${middle}${suffix}`;
+      this.userData.phone = phoneNumber;
+      this.pwData.phone = phoneNumber;
     },
     // 인증번호 생성
     generateVerificationCode() {
@@ -378,6 +402,24 @@ export const userLoginStore = defineStore("userStore", {
       } catch (error) {
         console.error("이메일 찾기 실패:", error);
         alert("이메일 찾기 실패. 정보를 확인하세요.");
+      }
+    },
+
+    async resetPassword(email, phone, newPassword, confirmPassword) {
+      try {
+        const payload = { email, phone, newPassword, confirmPassword };
+        console.log("Request payload:", payload); // 요청 본문 로그
+
+        const response = await apiClient.post("/users/find-password", payload);
+
+        console.log("Response from server:", response.data);
+        return response;
+      } catch (error) {
+        console.error("Error resetting password:", error.message);
+        if (error.response) {
+          console.error("Error details:", error.response.data);
+        }
+        throw error;
       }
     },
   },
