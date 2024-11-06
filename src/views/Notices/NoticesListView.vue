@@ -1,6 +1,6 @@
 <template>
   <Header />
-  <section class="py-6">
+  <section class="py-8">
     <div class="container">
       <h3>Easy News</h3>
 
@@ -13,11 +13,7 @@
       <div class="mb-4">
         <label for="resort-select" class="form-label">지점 선택</label>
         <select id="resort-select" v-model="query.branch" class="form-select">
-          <option
-            v-for="branch in accommodations"
-            :key="branch.id"
-            :value="branch.name"
-          >
+          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
             {{ branch.name }}
           </option>
         </select>
@@ -25,12 +21,7 @@
 
       <!-- 검색 영역 -->
       <div class="mb-4 input-group">
-        <input
-          type="text"
-          v-model="query.content"
-          placeholder="검색어 입력..."
-          class="form-control search-input"
-        />
+        <input type="text" v-model="query.content" placeholder="검색어 입력..." class="form-control search-input" />
         <button class="btn btn-warning search-btn" @click="filterNotices">
           검색
         </button>
@@ -42,13 +33,8 @@
       </div>
       <!-- 공지사항 리스트 -->
       <div v-if="filteredNotices.length > 0" class="notice-list">
-        <div
-          v-for="notice in filteredNotices"
-          :key="notice.id"
-          class="notice-item border p-3 mb-3"
-          @click="goToNoticeDetail(notice.id)"
-          style="cursor: pointer"
-        >
+        <div v-for="notice in filteredNotices" :key="notice.id" class="notice-item border p-3 mb-3"
+          @click="goToNoticeDetail(notice.id)" style="cursor: pointer">
           <h5>{{ notice.title }}</h5>
           <p>{{ notice.content }}</p>
           <p>{{ notice.accommodationName }}</p>

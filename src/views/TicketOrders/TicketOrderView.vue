@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-5 my-5 mt-8">
+  <div class="container mt-8">
     <h2 class="text-left mb-4">입장권 구매</h2>
     <p class="text-left text-muted pb-4">
       입장권 구매 후 이용하실 수 있습니다.
@@ -10,41 +10,49 @@
     <buyer-info class="mb-4" v-model:buyerName="buyerName" v-model:buyerPhone="buyerPhone"
       v-model:buyerEmail="buyerEmail" v-model:buyerEmailDomain="buyerEmailDomain" />
 
-    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
-      @openModal="handleOpenModal" />
+    <div class="card p-4 mb-5">
+      <!-- 결제 방법 선택 영역 추가 -->
+      <div class="payment-methods">
+        <h4 class="mb-3">결제 방법</h4>
+        <div class=" d-flex gap-3">
+          <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'card' }"
+            @click="selectPaymentMethod('card')">
+            <div class="payment-content">
+              <span class="payment-icon">💳</span>
+              <span class="payment-text">카드 결제</span>
+            </div>
+            <div v-if="paymentMethod === 'card'" class="selected-mark">✓</div>
+          </button>
 
-    <!-- 결제 방법 선택 영역 추가 -->
-    <div class="payment-methods mt-4">
-      <h4 class="form-title">결제 방법</h4>
-      <div class="d-flex gap-3">
-        <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'card' }"
-          @click="selectPaymentMethod('card')">
-          <div class="payment-content">
-            <span class="payment-icon">💳</span>
-            <span class="payment-text">카드 결제</span>
-          </div>
-          <div v-if="paymentMethod === 'card'" class="selected-mark">✓</div>
-        </button>
-
-        <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'vbank' }"
-          @click="selectPaymentMethod('vbank')">
-          <div class="payment-content">
-            <span class="payment-icon">🏦</span>
-            <span class="payment-text">무통장 입금</span>
-          </div>
-          <div v-if="paymentMethod === 'vbank'" class="selected-mark">✓</div>
-        </button>
+          <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'vbank' }"
+            @click="selectPaymentMethod('vbank')">
+            <div class="payment-content">
+              <span class="payment-icon">🏦</span>
+              <span class="payment-text">무통장 입금</span>
+            </div>
+            <div v-if="paymentMethod === 'vbank'" class="selected-mark">✓</div>
+          </button>
+        </div>
       </div>
     </div>
 
+    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
+      @openModal="handleOpenModal" />
+
     <privacy-agreement-modal v-if="isModalOpen" :type="modalType" @close="closeModal" @agree="handleAgree" />
 
-    <div class="d-flex justify-content-center mt-5">
+    <div class="action-buttons">
+      <button class="cancel-btn" @click="handleCancel">취소</button>
+      <button class="reserve-btn" @click="handleSubmit">
+        결제하기
+      </button>
+    </div>
+    <!-- <div class="d-flex justify-content-center mt-5">
       <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>
       <button class="btn btn-primary mx-2" @click="handleSubmit">
         구매하기
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -107,11 +115,6 @@ const handleBeforeUnload = (e) => {
     "페이지를 벗어나면 입력하신 정보가 모두 사라집니다. 계속하시겠습니까?";
   e.returnValue = message;
   return message;
-};
-
-// 결제 내역 조회 페이지로 이동
-const goToTicketRefund = () => {
-  router.push({ name: "TicketRefund" });
 };
 
 onMounted(() => {
@@ -265,10 +268,9 @@ const handleAgree = () => {
 </script>
 
 <style scoped>
-.container {
-  background-color: #f9f9f9;
-  padding: 2rem;
-  border-radius: 10px;
+.card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
 .payment-methods {
@@ -326,5 +328,36 @@ const handleAgree = () => {
   color: #007bff;
   font-size: 1.5rem;
   margin-right: 0.5rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 4rem 0;
+
+  button {
+    flex: 1;
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &.cancel-btn {
+      background-color: #f8f8f8;
+      color: #333;
+      margin-right: 10px;
+    }
+
+    &.reserve-btn {
+      background-color: #e74c3c;
+      color: #fff;
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 </style>

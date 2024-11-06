@@ -35,27 +35,17 @@
           <tr>
             <td class="label-cell">구매 수량</td>
             <td class="content-cell">
+
               <div class="quantity-row">
                 <div class="quantity-group">
                   <label class="quantity-label">대인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementAdult"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementAdult">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="adultCount"
-                      class="form-control quantity-input"
-                      v-model="adultTicketAmount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementAdult"
-                    >
+                    <input type="number" id="adultCount" class="form-control quantity-input" v-model="adultTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementAdult">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -67,23 +57,12 @@
                 <div class="quantity-group">
                   <label class="quantity-label">소인</label>
                   <div class="input-group">
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="decrementChild"
-                    >
+                    <button class="btn btn-primary quantity-btn mb-0" @click="decrementChild">
                       <i class="ni ni-fat-delete"></i>
                     </button>
-                    <input
-                      type="number"
-                      id="childCount"
-                      class="form-control quantity-input"
-                      v-model="childTicketAmount"
-                      min="0"
-                    />
-                    <button
-                      class="btn btn-primary quantity-btn mb-0"
-                      @click="incrementChild"
-                    >
+                    <input type="number" id="childCount" class="form-control quantity-input" v-model="childTicketAmount"
+                      min="0" />
+                    <button class="btn btn-primary quantity-btn mb-0" @click="incrementChild">
                       <i class="ni ni-fat-add"></i>
                     </button>
                   </div>
@@ -150,12 +129,16 @@ const formattedTotalPrice = computed(() =>
 
 <style scoped>
 .card {
-  background-color: #ffffff;
+  background-color: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-bordered tr {
+  border: 1px solid #dee2e6;
 }
 
 .table-bordered td {
+  border: 1px solid #dee2e6 !important;
   vertical-align: middle;
   padding: 15px;
 }
@@ -230,5 +213,9 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.form-control {
+  border: 1px solid #dee2e6;
 }
 </style>

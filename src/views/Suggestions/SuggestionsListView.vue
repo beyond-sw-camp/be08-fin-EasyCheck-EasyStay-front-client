@@ -1,22 +1,14 @@
 <template>
   <Header />
-  <section class="py-6 luxurious-section">
+  <section class="py-8 luxurious-section">
     <div class="container">
       <h2 class="text-gold">Easy한 소리</h2>
       <!-- 유형 선택 -->
       <div class="mb-4">
         <label for="type-select" class="form-label">지점 선택</label>
-        <select
-          id="type-select"
-          v-model="selectedaccommodationId"
-          class="form-select"
-        >
+        <select id="type-select" v-model="selectedaccommodationId" class="form-select">
           <option disabled value="">지점을 선택하세요</option>
-          <option
-            v-for="accommodation in accommodations"
-            :key="accommodation.id"
-            :value="accommodation.id"
-          >
+          <option v-for="accommodation in accommodations" :key="accommodation.id" :value="accommodation.id">
             {{ accommodation.name }}
           </option>
         </select>
@@ -25,18 +17,9 @@
       <!-- 주제 선택 -->
       <div class="mb-4">
         <label for="topic-select" class="form-label">주제 선택</label>
-        <select
-          id="topic-select"
-          v-model="selectedTopic"
-          class="form-select"
-          @change="updateTypes"
-        >
+        <select id="topic-select" v-model="selectedTopic" class="form-select" @change="updateTypes">
           <option disabled value="">주제를 선택하세요</option>
-          <option
-            v-for="topic in topics"
-            :key="topic.value"
-            :value="topic.value"
-          >
+          <option v-for="topic in topics" :key="topic.value" :value="topic.value">
             {{ topic.label }}
           </option>
         </select>
@@ -47,11 +30,7 @@
         <label for="type-select" class="form-label">유형 선택</label>
         <select id="type-select" v-model="selectedType" class="form-select">
           <option disabled value="">유형을 선택하세요</option>
-          <option
-            v-for="type in filteredTypes"
-            :key="type.value"
-            :value="type.value"
-          >
+          <option v-for="type in filteredTypes" :key="type.value" :value="type.value">
             {{ type.label }}
           </option>
         </select>
@@ -61,16 +40,8 @@
       <div class="mb-4">
         <label class="form-label">이메일</label>
         <div class="input-group">
-          <input
-            v-model="emailPrefix"
-            type="text"
-            class="form-control bordered email-input"
-            placeholder="이메일"
-          />
-          <select
-            v-model="emailDomain"
-            class="form-select bordered domain-select"
-          >
+          <input v-model="emailPrefix" type="text" class="form-control bordered email-input" placeholder="이메일" />
+          <select v-model="emailDomain" class="form-select bordered domain-select">
             <option value="">도메인 선택</option>
             <option value="gmail.com">gmail.com</option>
             <option value="naver.com">naver.com</option>
@@ -78,48 +49,24 @@
             <option value="yahoo.com">yahoo.com</option>
             <option value="기타">기타</option>
           </select>
-          <input
-            v-if="emailDomain === '기타'"
-            v-model="customDomain"
-            type="text"
-            class="form-control bordered custom-domain-input"
-            placeholder="기타 도메인 입력"
-          />
+          <input v-if="emailDomain === '기타'" v-model="customDomain" type="text"
+            class="form-control bordered custom-domain-input" placeholder="기타 도메인 입력" />
         </div>
       </div>
       <div class="mb-4">
-        <input
-          v-model="title"
-          type="text"
-          class="form-control bordered"
-          placeholder="제목"
-        />
+        <input v-model="title" type="text" class="form-control bordered" placeholder="제목" />
       </div>
       <div class="mb-4">
-        <textarea
-          v-model="content"
-          class="form-control bordered"
-          rows="8"
-          placeholder="내용 입력"
-        ></textarea>
+        <textarea v-model="content" class="form-control bordered" rows="8" placeholder="내용 입력"></textarea>
       </div>
       <div class="mb-4">
-        <input
-          type="file"
-          @change="handleFileUpload"
-          class="form-control-file"
-        />
+        <input type="file" @change="handleFileUpload" class="form-control-file" />
       </div>
 
       <!-- 약관 동의 (커스텀 체크박스) 및 자세히보기 -->
       <div class="mb-4 custom-checkbox-container">
-        <input
-          type="checkbox"
-          v-model="termsAccepted"
-          id="terms-checkbox"
-          class="custom-checkbox"
-          @change="updateAgreeType"
-        />
+        <input type="checkbox" v-model="termsAccepted" id="terms-checkbox" class="custom-checkbox"
+          @change="updateAgreeType" />
         <label for="terms-checkbox" class="custom-checkbox-label">
           개인정보 수집 동의 및 이용문의
           <span class="details-link" @click="openModal">자세히보기</span>
@@ -279,8 +226,10 @@ const handleFileUpload = (event) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* 다른 요소들 위에 표시되도록 높은 z-index 값 */
+  z-index: 9999;
+  /* 다른 요소들 위에 표시되도록 높은 z-index 값 */
 }
+
 .modal-content {
   background: white;
   padding: 2rem;
@@ -299,6 +248,7 @@ const handleFileUpload = (event) => {
 .details-link:hover {
   text-decoration: underline;
 }
+
 .custom-checkbox-container {
   display: flex;
   align-items: center;
@@ -306,22 +256,33 @@ const handleFileUpload = (event) => {
   /* 회색 테두리 */
   background-color: #efefef;
 }
+
 .custom-checkbox-container,
 .custom-checkbox {
   padding: 8px;
-  border-radius: 0; /* 직각 테두리 */
+  border-radius: 0;
+  /* 직각 테두리 */
 }
+
 .custom-checkbox {
-  width: 12px; /* 체크박스의 너비 */
-  height: 12px; /* 체크박스의 높이 */
+  width: 12px;
+  /* 체크박스의 너비 */
+  height: 12px;
+  /* 체크박스의 높이 */
   margin-top: 10px;
   margin-left: 10px;
-  transform: scale(1.5); /* 체크박스 크기를 1.5배로 확대 */
-  -webkit-transform: scale(1.5); /* 웹킷 브라우저용 */
-  -moz-transform: scale(1.5); /* 파이어폭스용 */
-  -ms-transform: scale(1.5); /* 구형 IE용 */
-  -o-transform: scale(1.5); /* 구형 오페라용 */
+  transform: scale(1.5);
+  /* 체크박스 크기를 1.5배로 확대 */
+  -webkit-transform: scale(1.5);
+  /* 웹킷 브라우저용 */
+  -moz-transform: scale(1.5);
+  /* 파이어폭스용 */
+  -ms-transform: scale(1.5);
+  /* 구형 IE용 */
+  -o-transform: scale(1.5);
+  /* 구형 오페라용 */
 }
+
 /* 스타일 정의 */
 .container {
   max-width: 700px;
@@ -336,7 +297,8 @@ const handleFileUpload = (event) => {
   padding: 8px 12px;
   margin-bottom: 20px;
   color: #333;
-  border-radius: 0; /* 직각 테두리 */
+  border-radius: 0;
+  /* 직각 테두리 */
 }
 
 textarea {
@@ -345,13 +307,16 @@ textarea {
 }
 
 .luxurious-section {
-  background-color: #f9f9f9; /* 배경을 밝은 색으로 */
+  background-color: #f9f9f9;
+  /* 배경을 밝은 색으로 */
   padding: 2rem;
-  box-shadow: none; /* 그림자 제거 */
+  box-shadow: none;
+  /* 그림자 제거 */
 }
 
 .text-dark {
-  color: #333; /* 어두운 색 텍스트 */
+  color: #333;
+  /* 어두운 색 텍스트 */
 }
 
 .bordered {
@@ -381,6 +346,7 @@ textarea {
 .custom-checkbox-label {
   margin-left: 0.5rem;
 }
+
 .btn {
   background-color: rgb(0, 0, 0);
   color: #f9f9f9;

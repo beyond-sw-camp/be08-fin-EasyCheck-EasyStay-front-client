@@ -27,10 +27,8 @@
           <!-- 휴대전화 번호 -->
           <div class="form-group">
             <label for="buyerPhone">휴대전화 번호</label>
-            <div class="input-group input-lg">
-              <MaterialInput class="input-group-outline" placeholder="휴대전화 번호" size="lg" v-model="buyerPhone"
-                :readonly="isLoggedIn" />
-            </div>
+            <MaterialInput class="input-group-outline" placeholder="휴대전화 번호" size="lg" v-model="buyerPhone"
+              :readonly="isLoggedIn" />
             <span v-if="!isBuyerPhoneValid" class="error-message">
               올바른 휴대전화 번호를 입력해 주세요.
             </span>
@@ -124,9 +122,8 @@ const copyReservationInfo = () => {
 
 <style scoped>
 .card {
-  background-color: #ffffff;
+  background-color: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .grid-area-2x2 {
@@ -141,21 +138,10 @@ const copyReservationInfo = () => {
 }
 
 .input-group-outline {
-  border: 2px solid #ced4da;
   border-radius: 4px;
-  padding: 10px 12px;
+  padding: 10px 0 12px 0;
   font-size: 1rem;
   transition: border-color 0.3s;
-}
-
-.input-group-outline:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.input-group-add {
-  font-size: 1rem;
-  align-self: center;
 }
 
 .error-message {

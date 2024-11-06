@@ -1,6 +1,6 @@
 <template>
   <Header />
-  <section class="py-10">
+  <section class="py-9">
     <div class="container">
       <h2>Events</h2>
       <div class="banner-slider">
@@ -21,11 +21,7 @@
       <!-- Rest of your template remains the same -->
       <div class="branch-selection">
         <select id="resort-select" v-model="query.branch">
-          <option
-            v-for="branch in accommodations"
-            :key="branch.id"
-            :value="branch.name"
-          >
+          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
             {{ branch.name }}
           </option>
         </select>
@@ -36,18 +32,9 @@
       </div>
 
       <div class="event-list">
-        <div
-          v-for="(event, index) in paginatedEvents"
-          :key="index"
-          class="event-card"
-          @click="goToEventDetail(event.id)"
-          style="cursor: pointer"
-        >
-          <img
-            :src="event.images"
-            :alt="`Event ${index + 1} Image`"
-            class="event-image"
-          />
+        <div v-for="(event, index) in paginatedEvents" :key="index" class="event-card"
+          @click="goToEventDetail(event.id)" style="cursor: pointer">
+          <img :src="event.images" :alt="`Event ${index + 1} Image`" class="event-image" />
           <div class="event-info">
             <h3>{{ event.eventName }}</h3>
             <p>{{ event.startDate }} - {{ event.endDate }}</p>
@@ -56,21 +43,11 @@
       </div>
 
       <div class="pagination">
-        <button
-          id="prevPage"
-          class="page-btn"
-          @click="prevPage"
-          :disabled="currentPage === 1"
-        >
+        <button id="prevPage" class="page-btn" @click="prevPage" :disabled="currentPage === 1">
           이전
         </button>
         <span id="pageNumbers">{{ currentPage }} / {{ totalPages }}</span>
-        <button
-          id="nextPage"
-          class="page-btn"
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-        >
+        <button id="nextPage" class="page-btn" @click="nextPage" :disabled="currentPage === totalPages">
           다음
         </button>
       </div>
@@ -197,14 +174,18 @@ const goToEventDetail = (id) => {
 
 .event-list {
   display: flex;
-  flex-wrap: wrap; /* 한 줄에 다 들어가지 않을 때 자동으로 다음 줄로 넘어가게 함 */
-  justify-content: space-between; /* 카드 간격 조절 */
-  gap: 20px; /* 카드 사이에 간격 추가 */
+  flex-wrap: wrap;
+  /* 한 줄에 다 들어가지 않을 때 자동으로 다음 줄로 넘어가게 함 */
+  justify-content: space-between;
+  /* 카드 간격 조절 */
+  gap: 20px;
+  /* 카드 사이에 간격 추가 */
 }
 
 .event-list::after {
   content: "";
-  flex: auto; /* 빈 공간을 채워줌으로써 마지막 줄의 카드를 가운데로 정렬 */
+  flex: auto;
+  /* 빈 공간을 채워줌으로써 마지막 줄의 카드를 가운데로 정렬 */
 }
 
 .event-card {
@@ -213,11 +194,15 @@ const goToEventDetail = (id) => {
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
-  width: calc(33.333% - 20px); /* 3개의 카드가 한 줄에 들어가도록 설정 */
-  max-width: 400px; /* 최대 너비를 제한해서 크기를 조절 */
-  height: 450px; /* 카드의 고정된 높이 */
+  width: calc(33.333% - 20px);
+  /* 3개의 카드가 한 줄에 들어가도록 설정 */
+  max-width: 400px;
+  /* 최대 너비를 제한해서 크기를 조절 */
+  height: 450px;
+  /* 카드의 고정된 높이 */
   display: flex;
-  flex-direction: column; /* 내용을 세로로 정렬 */
+  flex-direction: column;
+  /* 내용을 세로로 정렬 */
   justify-content: space-between;
 }
 
@@ -234,10 +219,12 @@ const goToEventDetail = (id) => {
 
 .event-info {
   padding: 20px;
-  flex-grow: 1; /* 카드의 나머지 공간을 채움 */
+  flex-grow: 1;
+  /* 카드의 나머지 공간을 채움 */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* 제목과 내용이 카드 상단에서 바로 이어지도록 */
+  justify-content: flex-start;
+  /* 제목과 내용이 카드 상단에서 바로 이어지도록 */
 }
 
 .event-info h3 {
@@ -251,6 +238,7 @@ const goToEventDetail = (id) => {
   color: #666;
   margin-top: 5px;
 }
+
 .banner-slider {
   position: relative;
   max-width: 100%;
@@ -275,6 +263,7 @@ const goToEventDetail = (id) => {
   display: block;
   opacity: 1;
 }
+
 .prev,
 .next {
   position: absolute;
@@ -299,6 +288,7 @@ const goToEventDetail = (id) => {
 .next:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 .pagination {
   display: flex;
   justify-content: center;
