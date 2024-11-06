@@ -1,6 +1,6 @@
 <template>
   <div class="card p-4 mb-5 w-max">
-    <h4 class="note-title">유의사항</h4>
+    <h4 class="mb-3">유의사항</h4>
     <h4 class="desc-title">이용 안내</h4>
     <ul class="text-list">
       <li>본 테마파크 이용권은 이용 지점에 한합니다.</li>
@@ -19,34 +19,19 @@
     </ul>
     <div class="form-check-group">
       <div class="form-check">
-        <input
-          type="checkbox"
-          id="terms1"
-          :checked="termsChecked1"
-          @change="$emit('update:termsChecked1', $event.target.checked)"
-          class="form-check-input"
-          required
-        />
+        <input type="checkbox" id="terms1" :checked="termsChecked1"
+          @change="$emit('update:termsChecked1', $event.target.checked)" class="form-check-input" required />
         <label for="terms1" class="form-check-label">
           (필수) 개인정보 수집 및 이용동의
-          <a class="text-line" @click.prevent="$emit('openModal', '필수')"
-            >전문보기</a
-          >
+          <a class="text-line" @click.prevent="$emit('openModal', '필수')">전문보기</a>
         </label>
       </div>
       <div class="form-check">
-        <input
-          type="checkbox"
-          id="terms2"
-          :checked="termsChecked2"
-          @change="$emit('update:termsChecked2', $event.target.checked)"
-          class="form-check-input"
-        />
+        <input type="checkbox" id="terms2" :checked="termsChecked2"
+          @change="$emit('update:termsChecked2', $event.target.checked)" class="form-check-input" />
         <label for="terms2" class="form-check-label">
           (선택) 개인정보 수집 및 이용동의
-          <a class="text-line" @click.prevent="$emit('openModal', '선택')"
-            >전문보기</a
-          >
+          <a class="text-line" @click.prevent="$emit('openModal', '선택')">전문보기</a>
         </label>
       </div>
     </div>
@@ -64,9 +49,8 @@ const props = defineProps({
 
 <style scoped>
 .card {
-  background-color: #ffffff;
+  background-color: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .note-title {
@@ -105,6 +89,7 @@ const props = defineProps({
   margin-right: 0.5rem;
   transform: translateY(1px);
 }
+
 .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
   margin-top: 0;
 }
@@ -114,6 +99,7 @@ const props = defineProps({
   line-height: 1.5;
   margin-bottom: 0;
 }
+
 .text-line {
   text-decoration: underline;
 }
