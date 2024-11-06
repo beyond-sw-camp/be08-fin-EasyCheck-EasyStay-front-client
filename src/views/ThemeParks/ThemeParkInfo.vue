@@ -1,94 +1,61 @@
 <template>
   <div v-if="loading" class="spinner">로딩 중...</div>
 
-  <MainImage v-if="themePark && !loading" :themePark="themePark" />
+  <MainImage class="min-vh-100" v-if="themePark && !loading" :themePark="themePark" />
 
-  <section
-    class="accommodation-tabs px-6 pt-4"
-    v-if="accommodations.length && !loading"
-  >
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <div class="nav-wrapper position-relative end-0">
-            <ul
-              class="nav nav-tabs p-1 justify-content-center accommodation-nav-tabs"
-              role="tablist"
-            >
-              <li
-                class="nav-item"
-                v-for="accommodation in accommodations"
-                :key="accommodation.id"
-              >
-                <transition name="fade">
-                  <button
-                    class="nav-link px-4 py-2"
-                    :class="{
+  <div class="container">
+    <section class="accommodation-tabs px-6 pt-6" v-if="accommodations.length && !loading">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="nav-wrapper position-relative end-0">
+              <ul class="nav nav-tabs p-1 justify-content-center accommodation-nav-tabs" role="tablist">
+                <li class="nav-item" v-for="accommodation in accommodations" :key="accommodation.id">
+                  <transition name="fade">
+                    <button class="nav-link px-4 py-2" :class="{
                       active: currentAccommodationId === accommodation.id,
-                    }"
-                    @click="changeAccommodation(accommodation.id)"
-                    role="tab"
-                  >
-                    {{ accommodation.name }}
-                  </button>
-                </transition>
-              </li>
-            </ul>
+                    }" @click="changeAccommodation(accommodation.id)" role="tab">
+                      {{ accommodation.name }}
+                    </button>
+                  </transition>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="themepark-tabs px-6" v-if="themeParks.length && !loading">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <div class="nav-wrapper position-relative end-0">
-            <ul
-              class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs"
-              role="tablist"
-            >
-              <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
-                <transition name="fade">
-                  <button
-                    class="nav-link px-4 py-2"
-                    :class="{ active: tab.id === currentThemeParkId }"
-                    @click="changeThemePark(tab.id)"
-                    role="tab"
-                  >
-                    {{ tab.name }}
-                  </button>
-                </transition>
-              </li>
-            </ul>
+    <section class="themepark-tabs px-6" v-if="themeParks.length && !loading">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="nav-wrapper position-relative end-0">
+              <ul class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs" role="tablist">
+                <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
+                  <transition name="fade">
+                    <button class="nav-link px-4 py-2" :class="{ active: tab.id === currentThemeParkId }"
+                      @click="changeThemePark(tab.id)" role="tab">
+                      {{ tab.name }}
+                    </button>
+                  </transition>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <div class="container-fluid px-6" v-if="themePark && !loading">
-    <div class="section-divider"></div>
-    <AttractionInfo
-      :themeParkId="Number(themePark.id)"
-      :currentThemePark="themePark"
-    />
+    </section>
   </div>
 
-  <div
-    class="container-fluid d-flex justify-content-center my-5"
-    v-if="themePark?.ticketAvailable === 'Y' && !loading"
-  >
-    <MaterialButton
-      color="danger"
-      size="lg"
-      variant="gradient"
-      @click="goToTicketSelectionView"
-      class="material-button mx-3"
-    >
+  <div class="container-fluid px-6" v-if="themePark && !loading">
+    <AttractionInfo :themeParkId="Number(themePark.id)" :currentThemePark="themePark" />
+  </div>
+
+  <div class="container-fluid d-flex justify-content-center my-5" v-if="themePark?.ticketAvailable === 'Y' && !loading">
+    <button @click="goToTicketSelectionView" class="reserve-btn">
       {{ themePark.name }} 이용권 구매하기
-    </MaterialButton>
+    </button>
   </div>
 </template>
 
@@ -100,7 +67,6 @@ import { useThemeParkStore } from "@/stores/themeparkStore";
 import { useAccommodationStore } from "@/stores/accommodationStore";
 import MainImage from "@/views/ThemeParks/MainImage.vue";
 import AttractionInfo from "@/views/ThemeParks/AttractionInfo.vue";
-import MaterialButton from "@/components/MaterialButton.vue";
 
 const loading = ref(true);
 
@@ -160,6 +126,13 @@ const goToTicketSelectionView = () => {
 </script>
 
 <style scoped>
+@media (min-width: 1400px) {
+
+  .container {
+    max-width: 1320px;
+  }
+}
+
 /* 로딩 스피너 */
 .spinner {
   display: flex;
@@ -173,29 +146,43 @@ const goToTicketSelectionView = () => {
 
 .accommodation-nav-tabs,
 .themepark-nav-tabs {
-  background-color: #f2f4f7;
-  border-radius: 10px;
+  border-bottom: none;
   margin-bottom: 1.5rem;
-  padding: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
+  padding: 0;
   overflow-x: hidden;
 }
 
+.nav-item {
+  margin: 0;
+}
+
 .nav-link {
-  color: #495057;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding: 12px 20px;
-  border-radius: 20px;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6c757d;
+  /* 기본 탭 텍스트 색상 */
+  border: none;
+  background-color: transparent;
+  position: relative;
+  border-radius: 0 !important;
 }
 
 .nav-link.active {
-  background-color: #007bff;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-  transform: scale(1.05);
+  color: #e74c3c;
+  /* 활성화된 탭 텍스트 색상 */
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #ff4500;
+  /* 활성화된 탭 밑줄 색상 */
 }
 
 .nav-link:hover {
@@ -210,19 +197,16 @@ const goToTicketSelectionView = () => {
   overflow-x: hidden;
 }
 
-.material-button {
-  background-color: #007bff;
-  font-size: 1.2rem;
-  padding: 0.8rem 2rem;
-  border-radius: 10px;
-  transition: background-color 0.3s ease, transform 0.3s;
-  color: white;
-  max-width: 100%;
-}
-
-.material-button:hover {
-  transform: scale(1.05);
-  background-color: #0056b3;
+.reserve-btn {
+  text-align: center;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 4rem 0;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
 }
 
 @media (max-width: 768px) {
@@ -231,7 +215,7 @@ const goToTicketSelectionView = () => {
     font-size: 1rem;
   }
 
-  .material-button {
+  .reserve-btn {
     padding: 0.6rem 1.5rem;
     font-size: 1rem;
   }
