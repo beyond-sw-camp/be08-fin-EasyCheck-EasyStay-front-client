@@ -4,28 +4,21 @@
     <div class="container">
       <h2>Events</h2>
       <div class="banner-slider">
-        <div class="slide">
-          <img :src="ThumnailImg1" alt="Banner 1" />
+        <div
+          v-for="(image, index) in bannerImages"
+          :key="index"
+          class="slide"
+          :class="{ active: currentSlide === index }"
+          :style="{ display: currentSlide === index ? 'block' : 'none' }"
+        >
+          <img :src="image" :alt="`Banner ${index + 1}`" />
         </div>
-        <div class="slide">
-          <img :src="ThumnailImg2" alt="Banner 2" />
-        </div>
-        <div class="slide">
-          <img :src="ThumnailImg3" alt="Banner 3" />
-        </div>
-        <div class="slide">
-          <img :src="ThumnailImg4" alt="Banner 3" />
-        </div>
-        <div class="slide">
-          <img :src="ThumnailImg5" alt="Banner 3" />
-        </div>
-        <!-- 추가적인 배너 이미지를 여기다 넣을 수 있습니다 -->
 
-        <!-- 좌우 화살표 -->
-        <button class="prev">&#10094;</button>
-        <button class="next">&#10095;</button>
+        <button class="prev" @click="prevSlide">&#10094;</button>
+        <button class="next" @click="nextSlide">&#10095;</button>
       </div>
-      <!-- 지점 선택 -->
+
+      <!-- Rest of your template remains the same -->
       <div class="branch-selection">
         <select id="resort-select" v-model="query.branch">
           <option
@@ -38,11 +31,10 @@
         </select>
       </div>
 
-      <!-- 공지사항 총 개수 -->
       <div class="mb-3">
         <p>총 {{ events.length }}건</p>
       </div>
-      <!-- 이벤트 사진과 내용 -->
+
       <div class="event-list">
         <div
           v-for="(event, index) in paginatedEvents"
@@ -62,7 +54,7 @@
           </div>
         </div>
       </div>
-      <!-- 페이지네이션 버튼 -->
+
       <div class="pagination">
         <button
           id="prevPage"
@@ -87,120 +79,98 @@
 </template>
 
 <script setup>
-import ThumnailImg1 from "@/assets/img/eventBanner 1.png";
-import ThumnailImg2 from "@/assets/img/eventBanner 2.png";
-import ThumnailImg3 from "@/assets/img/eventBanner 3.png";
-import ThumnailImg4 from "@/assets/img/eventBanner 4.png";
-import ThumnailImg5 from "@/assets/img/eventBanner 5.png";
-
+import ThumnailImg1 from "@/assets/img/eventBanner-1.png";
+import ThumnailImg2 from "@/assets/img/eventBanner-2.png";
+import ThumnailImg3 from "@/assets/img/eventBanner-3.png";
+import ThumnailImg4 from "@/assets/img/eventBanner-4.png";
+import ThumnailImg5 from "@/assets/img/eventBanner-5.png";
 import Header from "@/examples/Header.vue";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
-
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import { useEventStore } from "@/stores/eventStore";
 
 const eventStore = useEventStore();
-
 const router = useRouter();
 
-// 여기서 state 꺼내올 수 있음
-// getters도 filteredNotices 이런식으로 받아올 수 있음
 const { accommodations, query, filteredEvents } = storeToRefs(eventStore);
-const { allEvents } = storeToRefs(eventStore); // allEvents를 가져옴
+const { allEvents } = storeToRefs(eventStore);
 
-// setup에서 events 데이터를 사용
 const events = ref([]);
-
-// 현재 페이지와 페이지당 이벤트 개수
 const currentPage = ref(1);
-const eventsPerPage = 3; // 페이지당 6개의 이벤트
+const eventsPerPage = 3;
+
+// 슬라이더 관련 상태 관리
+const currentSlide = ref(0);
+const bannerImages = [
+  ThumnailImg1,
+  ThumnailImg2,
+  ThumnailImg3,
+  ThumnailImg4,
+  ThumnailImg5,
+];
+let slideInterval;
+
+// 슬라이더 컨트롤 함수
+const nextSlide = () => {
+  currentSlide.value = (currentSlide.value + 1) % bannerImages.length;
+};
+
+const prevSlide = () => {
+  currentSlide.value =
+    (currentSlide.value - 1 + bannerImages.length) % bannerImages.length;
+};
+
+// 자동 슬라이드 시작
+const startSlideShow = () => {
+  slideInterval = setInterval(nextSlide, 5000);
+};
+
+// 자동 슬라이드 정지
+const stopSlideShow = () => {
+  if (slideInterval) {
+    clearInterval(slideInterval);
+  }
+};
 
 onMounted(async () => {
-  console.log("호출");
-  window.scrollTo(0, 0); // 페이지 로드 시 맨 위로 스크롤
-  // 지점 목록 조회하는 함수 호출 actions에서
+  window.scrollTo(0, 0);
   await eventStore.fetchEvents();
-  events.value = allEvents.value; // allEvents를 events에 할당
-  console.log("이벤트 목록:", eventStore.allEvents);
-
-  // 공지사항 조회하는 함수 호출 actions에서
+  events.value = allEvents.value;
   await eventStore.fetchAccommodations();
+  startSlideShow();
 });
 
-// 선택한 지점에 맞는 이벤트 필터링
-// const filteredEvents = computed(() => {
-//   const events = allEvents.value.filter((event) => {
-//     console.log(`Filtering: ${event.branchName} === ${query.branch}`);
-//     return event.branchName === query.branch;
-//   });
-//   console.log("Filtered Events:", events);
-//   return events;
-// });
+onUnmounted(() => {
+  stopSlideShow();
+});
 
-// 페이지에 맞는 이벤트 계산
 const paginatedEvents = computed(() => {
   const start = (currentPage.value - 1) * eventsPerPage;
   const end = start + eventsPerPage;
   return filteredEvents.value.slice(start, end);
 });
 
-// 총 페이지 수 계산
 const totalPages = computed(() => {
   return Math.ceil(allEvents.value.length / eventsPerPage);
 });
 
-// 이전 페이지로 이동
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
   }
 };
 
-// 다음 페이지로 이동
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  let currentSlide = 0;
-  const slides = document.querySelectorAll(".slide");
-  const prevButton = document.querySelector(".prev");
-  const nextButton = document.querySelector(".next");
-
-  function showSlide(index) {
-    slides.forEach((slide, i) => {
-      slide.style.display = i === index ? "block" : "none";
-    });
-  }
-
-  function nextSlide() {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
-  }
-
-  function prevSlide() {
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-    showSlide(currentSlide);
-  }
-
-  // 버튼 클릭 이벤트 추가
-  nextButton.addEventListener("click", nextSlide);
-  prevButton.addEventListener("click", prevSlide);
-
-  // 자동으로 5초마다 슬라이드 넘기기
-  setInterval(nextSlide, 5000);
-
-  // 초기 슬라이드 보여주기
-  showSlide(currentSlide);
-});
-
 const goToEventDetail = (id) => {
-  console.log("전달된 공지사항 ID: ", id); // 전달된 ID를 확인
+  console.log("전달된 공지사항 ID: ", id);
   router.push({ name: "EventDetail", params: { id } });
-  console.log("라우팅 완료"); // 라우팅 시도 후 로그
+  console.log("라우팅 완료");
 };
 </script>
 
