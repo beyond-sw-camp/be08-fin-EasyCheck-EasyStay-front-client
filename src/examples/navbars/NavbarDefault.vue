@@ -138,7 +138,7 @@ watch(
         title="Designed and Coded by EasyCheck"
       >
         <img :src="LogoImg" alt="Logo" class="navbar-logo me-2" />
-        EasyStay
+        EasyCheck
       </RouterLink>
       <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
         <li class="nav-item mx-2">
