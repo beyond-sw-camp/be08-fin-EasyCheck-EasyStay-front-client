@@ -130,12 +130,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.ticket-selection {
-  /* background-color: #f9f9f9; */
-  padding: 2rem;
-  /* border-radius: 10px; */
-}
-
 .ticket-card {
   border: 1px solid rgb(231, 231, 231);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
