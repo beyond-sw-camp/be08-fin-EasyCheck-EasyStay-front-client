@@ -117,7 +117,7 @@ onMounted(() => {
   cursor: pointer;
   color: #000;
   position: absolute;
-  top: 50%;
+  top: 45%;
   z-index: 10;
 }
 

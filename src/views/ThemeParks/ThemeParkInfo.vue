@@ -4,7 +4,7 @@
   <MainImage class="min-vh-100" v-if="themePark && !loading" :themePark="themePark" />
 
   <div class="container">
-    <section class="accommodation-tabs px-6 pt-4" v-if="accommodations.length && !loading">
+    <section class="accommodation-tabs px-6 pt-6" v-if="accommodations.length && !loading">
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
@@ -146,43 +146,43 @@ const goToTicketSelectionView = () => {
 
 .accommodation-nav-tabs,
 .themepark-nav-tabs {
-  background-color: transparent;
-  border-bottom: 1px solid #ddd;
+  border-bottom: none;
   margin-bottom: 1.5rem;
   padding: 0;
-  max-width: 100%;
   overflow-x: hidden;
 }
 
 .nav-item {
-  margin: 0 1rem;
+  margin: 0;
 }
 
 .nav-link {
-  color: #6c757d;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
-  padding: 0.5rem 0;
+  color: #6c757d;
+  /* 기본 탭 텍스트 색상 */
   border: none;
+  background-color: transparent;
   position: relative;
-  background: transparent;
-  border-radius: none !important;
+  border-radius: 0 !important;
 }
 
 .nav-link.active {
-  color: #000;
+  color: #e74c3c;
+  /* 활성화된 탭 텍스트 색상 */
   font-weight: 600;
 }
 
 .nav-link.active::after {
   content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: -2px;
   left: 0;
   right: 0;
   height: 2px;
   background-color: #ff4500;
-  /* 빨간색 밑줄 */
+  /* 활성화된 탭 밑줄 색상 */
 }
 
 .nav-link:hover {
