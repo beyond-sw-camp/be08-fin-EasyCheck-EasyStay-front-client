@@ -1,12 +1,11 @@
 <template>
   <reservation-result class="pt-8" />
   <caution class="mt-4" />
-  <location-guide class="mt-4" />
+  <!-- <location-guide class="mt-4" /> -->
 </template>
 
 <script setup>
 import { onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
 import ReservationResult from "./Sections/ReservationResult.vue";
 import Caution from "./Sections/Caution.vue";
 import LocationGuide from "./Sections/LocationGuide.vue";
