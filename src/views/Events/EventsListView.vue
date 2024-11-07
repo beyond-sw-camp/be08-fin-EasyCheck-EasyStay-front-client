@@ -21,7 +21,12 @@
       <!-- Rest of your template remains the same -->
       <div class="branch-selection">
         <select id="resort-select" v-model="query.branch">
-          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
+          <option value="">전체 리조트</option>
+          <option
+            v-for="branch in accommodations"
+            :key="branch.id"
+            :value="branch.name"
+          >
             {{ branch.name }}
           </option>
         </select>
@@ -32,9 +37,18 @@
       </div>
 
       <div class="event-list">
-        <div v-for="(event, index) in paginatedEvents" :key="index" class="event-card"
-          @click="goToEventDetail(event.id)" style="cursor: pointer">
-          <img :src="event.images" :alt="`Event ${index + 1} Image`" class="event-image" />
+        <div
+          v-for="(event, index) in paginatedEvents"
+          :key="index"
+          class="event-card"
+          @click="goToEventDetail(event.id)"
+          style="cursor: pointer"
+        >
+          <img
+            :src="event.images"
+            :alt="`Event ${index + 1} Image`"
+            class="event-image"
+          />
           <div class="event-info">
             <h3>{{ event.eventName }}</h3>
             <p>{{ event.startDate }} - {{ event.endDate }}</p>
@@ -43,11 +57,21 @@
       </div>
 
       <div class="pagination">
-        <button id="prevPage" class="page-btn" @click="prevPage" :disabled="currentPage === 1">
+        <button
+          id="prevPage"
+          class="page-btn"
+          @click="prevPage"
+          :disabled="currentPage === 1"
+        >
           이전
         </button>
         <span id="pageNumbers">{{ currentPage }} / {{ totalPages }}</span>
-        <button id="nextPage" class="page-btn" @click="nextPage" :disabled="currentPage === totalPages">
+        <button
+          id="nextPage"
+          class="page-btn"
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+        >
           다음
         </button>
       </div>

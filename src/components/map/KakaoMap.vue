@@ -209,7 +209,7 @@ const moveToLocation = (location) => {
 }
 
 .list-group-item.active:hover {
-  background-color: #0b5ed7;
+  background-color: black;
 }
 
 @media (max-width: 768px) {
