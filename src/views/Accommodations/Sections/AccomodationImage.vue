@@ -1,5 +1,5 @@
 <template>
-  <div class="carousel slide p-2">
+  <div class="carousel slide">
     <div class="carousel-inner">
       <div
         v-for="(url, index) in thumbnailUrls"
