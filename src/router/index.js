@@ -75,6 +75,10 @@ import TicketRefund from "@/views/TicketOrders/TicketRefund.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior() {
+    // 항상 페이지 맨 위로 스크롤
+    return { top: 0 };
+  },
   routes: [
     {
       path: "/",
