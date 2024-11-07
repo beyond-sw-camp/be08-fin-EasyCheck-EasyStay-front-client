@@ -10,11 +10,11 @@ import AccommodationList from "./Sections/Accommodation/AccommodationList.vue";
 import EventList from "./Sections/Event/EventList.vue";
 
 import image1 from "@/assets/img/main_images/Belvedere.jpg";
-import image2 from "@/assets/img/main_images/Sorano.jpg";
-import image3 from "@/assets/img/main_images/SanjungLake.jpeg";
-import image4 from "@/assets/img/main_images/Signiel.jpeg";
+import image2 from "@/assets/img/main_images/resort1.jpg";
+import image3 from "@/assets/img/main_images/resort2.jpg";
+import image4 from "@/assets/img/main_images/resort3.jpg";
 import image5 from "@/assets/img/main_images/ThePlaza.jpeg";
-import image6 from "@/assets/img/main_images/ParadiseCity.jpeg";
+import image6 from "@/assets/img/main_images/resort4.jpg";
 import { userLoginStore } from "@/stores/loginStore";
 
 const images = [image1, image2, image3, image4, image5, image6];
