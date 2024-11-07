@@ -40,23 +40,22 @@ onMounted(() => {
 
 // 일반회원 로그인
 async function login() {
-  // 폼 유효성 검사 실행
-  const isFormCorrect = await v$.value.$validate();
+  try {
+    // 폼 유효성 검사
+    const isFormCorrect = await v$.value.$validate();
+    if (!isFormCorrect) return;
 
-  // 유효성 검사 실패시 함수 종료
-  if (!isFormCorrect) return;
+    // 로그인 시도
+    await loginStore.login(formData.value);
 
-  loginStore
-    .login(formData.value)
-    .then((response) => {
-      console.log("응답 데이터:", response);
-      loginStore.setLoginStatus(true);
-      router.go(-1);
-      console.log("Success Login");
-    })
-    .catch((error) => {
-      console.log("Login Fail: ", error);
-    });
+    // 로그인 성공 처리
+    router.go(-1);
+    console.log("로그인 성공");
+  } catch (error) {
+    // 에러 처리
+    console.error("로그인 실패:", error);
+    alert("로그인에 실패했습니다.");
+  }
 }
 </script>
 
