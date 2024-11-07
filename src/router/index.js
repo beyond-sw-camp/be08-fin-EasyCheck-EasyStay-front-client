@@ -330,6 +330,7 @@ const router = createRouter({
         return next();
       },
     },
+    // 마이페이지 라우팅
     {
       path: "/users/mypage",
       name: "Mypage",
