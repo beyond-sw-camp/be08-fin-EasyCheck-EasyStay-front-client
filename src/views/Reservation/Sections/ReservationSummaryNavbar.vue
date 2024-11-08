@@ -2,6 +2,7 @@
   <nav
     class="reservation-summary-navbar"
     :class="{ 'mobile-view': isMobileView }"
+    :style="{ marginTop: navbarMargin }"
   >
     <div class="container-fluid">
       <div class="summary-container" :class="{ 'flex-column': isMobileView }">
@@ -24,10 +25,11 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useReservationStore } from "@/stores/reservationStore.js";
-
+import { useHeaderStore } from "@/stores/headerStore"; // headerStore import
 import SummaryItem from "./SummaryItem.vue";
 
 const reservationStore = useReservationStore();
+const headerStore = useHeaderStore(); // headerStore 초기화
 
 const {
   roomCount,
@@ -42,10 +44,12 @@ const {
 const isMobileView = ref(window.innerWidth < 768);
 const MOBILE_BREAKPOINT = 768;
 
+// 헤더 메뉴 상태에 따른 여백 계산을 위한 computed
+const navbarMargin = computed(() => headerStore.getContentPadding);
+
 const checkMobileView = () => {
   isMobileView.value = window.innerWidth < MOBILE_BREAKPOINT;
 };
-
 // 요약 정보 항목들
 const summaryItems = computed(() => [
   {
@@ -106,6 +110,7 @@ onUnmounted(() => {
   padding: 0;
   background-color: #2b2b2b;
   width: 100%;
+  transition: margin-top 0.3s ease; // 여백 변화에 애니메이션 추가
 
   .summary-container {
     display: flex;

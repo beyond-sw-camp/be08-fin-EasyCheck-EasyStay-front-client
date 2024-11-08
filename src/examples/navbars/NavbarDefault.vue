@@ -1,10 +1,11 @@
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
-import { ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, watch, onMounted, onBeforeUnmount, computed } from "vue";
 import { useWindowsWidth } from "../../assets/js/useWindowsWidth";
 import { userLoginStore } from "@/stores/loginStore.js";
 import LogoImg from "@/assets/img/logos/logo.png";
 import { useAccommodationStore } from "@/stores";
+import { useHeaderStore } from "@/stores/headerStore"; // headerStore import
 
 // props를 통해 네비게이션의 외형이나 메뉴 항목 등을 동적으로 설정할 수 있음.
 const props = defineProps({
@@ -30,8 +31,17 @@ const props = defineProps({
   },
 });
 
-// accommodationStore 사용 및 메뉴 기본 값 설정
+// pinia 스토어
+const headerStore = useHeaderStore();
+const useUserLoginStore = userLoginStore();
 const accommodationStore = useAccommodationStore();
+
+const router = useRouter();
+let isScrolled = ref(false);
+
+// isMenuVisible을 store에서 가져오도록 변경
+const isMenuVisible = computed(() => headerStore.getMenuState);
+
 const menus = ref([
   { name: "리조트 안내", items: [] },
   { name: "호텔 안내", items: [] },
@@ -45,6 +55,9 @@ const menus = ref([
     ],
   },
 ]);
+
+const textDark = ref(props.darkText);
+const { type } = useWindowsWidth();
 
 // API 호출 및 메뉴 항목 설정
 onMounted(async () => {
@@ -66,13 +79,8 @@ onMounted(async () => {
     }));
 });
 
-const router = useRouter();
-const useUserLoginStore = userLoginStore();
-let isScrolled = ref(false);
-let isMenuVisible = ref(false); // 메뉴의 보임 상태 관리
-
 const toggleMenu = () => {
-  isMenuVisible.value = !isMenuVisible.value; // 메뉴 상태 토글
+  headerStore.toggleMenu(); // headerStore의 toggleMenu action 사용
 };
 
 const handleScroll = () => {
@@ -85,13 +93,12 @@ const handleReservationClick = () => {
 };
 
 onMounted(() => {
-  // loadScrollState();
   window.addEventListener("scroll", handleScroll);
 
   // 페이지 전환 시 메뉴를 닫는 로직
   router.beforeEach((to, from, next) => {
-    isMenuVisible.value = false; // 메뉴를 닫기
-    next(); // 라우팅 진행
+    headerStore.closeMenu(); // headerStore의 closeMenu action 사용
+    next();
   });
 });
 
@@ -100,10 +107,10 @@ onBeforeUnmount(() => {
 });
 
 const getTextColor = () => {
-  return isScrolled.value || isMenuVisible.value ? "text-white" : "text-dark"; // 메뉴가 열렸을 때도 텍스트 색 변경
+  return isScrolled.value || headerStore.getMenuState
+    ? "text-white"
+    : "text-dark";
 };
-let textDark = ref(props.darkText);
-const { type } = useWindowsWidth();
 
 watch(
   () => type.value,
@@ -138,7 +145,7 @@ watch(
         title="Designed and Coded by EasyCheck"
       >
         <img :src="LogoImg" alt="Logo" class="navbar-logo me-2" />
-        EasyCheck
+        EasyStay
       </RouterLink>
       <ul class="navbar-nav navbar-nav-hover align-items-center d-lg-none">
         <li class="nav-item mx-2">
@@ -229,8 +236,8 @@ watch(
             <div
               id="nav-menu"
               class="nav-menu"
-              :class="{ active: isMenuVisible }"
-              v-show="isMenuVisible"
+              :class="{ active: headerStore.getMenuState }"
+              v-show="headerStore.getMenuState"
             >
               <div class="menu-grid">
                 <div class="grid-header">

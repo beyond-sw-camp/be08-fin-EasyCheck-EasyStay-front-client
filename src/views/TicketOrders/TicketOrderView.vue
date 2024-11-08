@@ -5,18 +5,31 @@
       입장권 구매 후 이용하실 수 있습니다.
     </p>
 
-    <product-info class="mb-4" v-model:adultCount="adultCount" v-model:childCount="childCount" />
+    <product-info
+      class="mb-4"
+      v-model:adultCount="adultCount"
+      v-model:childCount="childCount"
+    />
 
-    <buyer-info class="mb-4" v-model:buyerName="buyerName" v-model:buyerPhone="buyerPhone"
-      v-model:buyerEmail="buyerEmail" v-model:buyerEmailDomain="buyerEmailDomain" />
+    <buyer-info
+      class="mb-4"
+      v-model:buyerName="buyerName"
+      v-model:buyerPhone="buyerPhone"
+      v-model:buyerEmail="buyerEmail"
+      v-model:buyerEmailDomain="buyerEmailDomain"
+    />
 
     <div class="card p-4 mb-5">
       <!-- 결제 방법 선택 영역 추가 -->
       <div class="payment-methods">
         <h4 class="mb-3">결제 방법</h4>
-        <div class=" d-flex gap-3">
-          <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'card' }"
-            @click="selectPaymentMethod('card')">
+        <div class="d-flex gap-3">
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: paymentMethod === 'card' }"
+            @click="selectPaymentMethod('card')"
+          >
             <div class="payment-content">
               <span class="payment-icon">💳</span>
               <span class="payment-text">카드 결제</span>
@@ -24,8 +37,12 @@
             <div v-if="paymentMethod === 'card'" class="selected-mark">✓</div>
           </button>
 
-          <button type="button" class="payment-method-btn" :class="{ active: paymentMethod === 'vbank' }"
-            @click="selectPaymentMethod('vbank')">
+          <button
+            type="button"
+            class="payment-method-btn"
+            :class="{ active: paymentMethod === 'vbank' }"
+            @click="selectPaymentMethod('vbank')"
+          >
             <div class="payment-content">
               <span class="payment-icon">🏦</span>
               <span class="payment-text">무통장 입금</span>
@@ -36,16 +53,23 @@
       </div>
     </div>
 
-    <usage-info class="mb-4" v-model:termsChecked1="termsChecked1" v-model:termsChecked2="termsChecked2"
-      @openModal="handleOpenModal" />
+    <usage-info
+      class="mb-4"
+      v-model:termsChecked1="termsChecked1"
+      v-model:termsChecked2="termsChecked2"
+      @openModal="handleOpenModal"
+    />
 
-    <privacy-agreement-modal v-if="isModalOpen" :type="modalType" @close="closeModal" @agree="handleAgree" />
+    <privacy-agreement-modal
+      v-if="isModalOpen"
+      :type="modalType"
+      @close="closeModal"
+      @agree="handleAgree"
+    />
 
     <div class="action-buttons">
       <button class="cancel-btn" @click="handleCancel">취소</button>
-      <button class="reserve-btn" @click="handleSubmit">
-        결제하기
-      </button>
+      <button class="reserve-btn" @click="handleSubmit">결제하기</button>
     </div>
     <!-- <div class="d-flex justify-content-center mt-5">
       <button class="btn btn-danger mx-2" @click="handleCancel">취소</button>
@@ -91,7 +115,7 @@ const { accommodationId } = storeToRefs(accommodationStore);
 
 onMounted(async () => {
   await userStore.fetchUserInfo();
-})
+});
 
 const buyerName = ref("");
 const buyerPhone = ref("");
@@ -181,15 +205,24 @@ const handleSubmit = async () => {
         buyer_tel: buyerPhone.value || "",
         buyer_email: `${buyerEmail.value}@${buyerEmailDomain.value}` || "",
         // 가상계좌 선택 시 추가 정보
-        vbank_due: paymentMethod.value === "vbank" ? getVbankDueDate() : undefined,
+        vbank_due:
+          paymentMethod.value === "vbank" ? getVbankDueDate() : undefined,
         bank: paymentMethod.value === "vbank" ? "우리은행" : undefined,
-        accountHolder: paymentMethod.value === "vbank" ? (userInfo.value?.name || "이름 정보 없음") : undefined,
+        accountHolder:
+          paymentMethod.value === "vbank"
+            ? userInfo.value?.name || "이름 정보 없음"
+            : undefined,
       };
       console.log("paymentData:", paymentData);
 
       IMP.request_pay(paymentData, async (response) => {
         if (response.success && response.imp_uid) {
-          console.log("결제 성공: imp_uid =", response.imp_uid, "orderId =", orderId); // 확인용 로그
+          console.log(
+            "결제 성공: imp_uid =",
+            response.imp_uid,
+            "orderId =",
+            orderId
+          ); // 확인용 로그
 
           const paymentRequest = {
             orderId: orderId,
@@ -197,8 +230,12 @@ const handleSubmit = async () => {
             paymentMethod: paymentMethod.value,
             paymentAmount: response.paid_amount || totalPrice.value,
             bank: paymentMethod.value,
-            accountHolder: paymentMethod.value === "vbank" ? (userInfo.value?.name || "이름 정보 없음") : null,
-            depositDeadline: paymentMethod.value === "vbank" ? getVbankDueDate() : null,
+            accountHolder:
+              paymentMethod.value === "vbank"
+                ? userInfo.value?.name || "이름 정보 없음"
+                : null,
+            depositDeadline:
+              paymentMethod.value === "vbank" ? getVbankDueDate() : null,
             paymentStatus: "COMPLETED",
             paymentDate: new Date().toISOString(),
           };
@@ -206,6 +243,7 @@ const handleSubmit = async () => {
           try {
             await apiClient.post(`/tickets/payment/${orderId}`, paymentRequest);
             alert("결제가 완료되었습니다.");
+            router.push("/");
           } catch (error) {
             console.error("결제 정보 저장 중 오류:", error);
             alert("결제는 성공했으나 처리 중 오류가 발생했습니다.");

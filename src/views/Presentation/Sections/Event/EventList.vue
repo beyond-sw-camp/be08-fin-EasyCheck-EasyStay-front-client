@@ -25,14 +25,17 @@ const paginatedEvents = computed(() => {
 
   const paginated = [];
   for (let i = 0; i < itemsPerPage; i++) {
-    paginated.push(events.value[(currentIndex.value + i) % events.value.length]);
+    paginated.push(
+      events.value[(currentIndex.value + i) % events.value.length]
+    );
   }
   return paginated;
 });
 
 // 이벤트 목록을 순환할 수 있도록 인덱스를 조정
 const goToPreviousEvent = () => {
-  currentIndex.value = (currentIndex.value - 1 + events.value.length) % events.value.length;
+  currentIndex.value =
+    (currentIndex.value - 1 + events.value.length) % events.value.length;
 };
 
 const goToNextEvent = () => {
@@ -57,7 +60,11 @@ onMounted(() => {
     <!-- 좌측 화살표 버튼 -->
     <button @click="goToPreviousEvent" class="pagination-arrow left-arrow">
       <div class="icon-wrapper" data-v-3e37aaed>
-        <span class="carousel-control-prev-icon" aria-hidden="true" data-v-3e37aaed></span>
+        <span
+          class="carousel-control-prev-icon"
+          aria-hidden="true"
+          data-v-3e37aaed
+        ></span>
       </div>
     </button>
 
@@ -75,16 +82,28 @@ onMounted(() => {
         <div class="col-lg-12">
           <div class="d-flex justify-content-center mb-3">
             <div class="row">
-              <div class="col-md-4 image-container" v-for="event in paginatedEvents" :key="event.id">
-                <ExampleCard :image="event.images" :title="event.eventName" @click="fetchEventById(event.id)" />
+              <div
+                class="col-md-4 image-container"
+                v-for="event in paginatedEvents"
+                :key="event.id"
+              >
+                <ExampleCard
+                  :image="event.images"
+                  :title="event.eventName"
+                  @click="fetchEventById(event.id)"
+                />
               </div>
             </div>
           </div>
           <!-- 페이지 인디케이터 -->
           <div class="pagination-indicator mt-6 d-flex justify-content-center">
-            <span v-for="(event, index) in events" :key="index"
-              :class="{ 'active-dot': index === currentIndex % events.length }" class="dot"
-              @click="goToEvent(index)"></span>
+            <span
+              v-for="(event, index) in events"
+              :key="index"
+              :class="{ 'active-dot': index === currentIndex % events.length }"
+              class="dot"
+              @click="goToEvent(index)"
+            ></span>
           </div>
         </div>
       </div>
@@ -93,7 +112,11 @@ onMounted(() => {
     <!-- 우측 화살표 버튼 -->
     <button @click="goToNextEvent" class="pagination-arrow right-arrow">
       <div class="icon-wrapper" data-v-3e37aaed>
-        <span class="carousel-control-next-icon" aria-hidden="true" data-v-3e37aaed></span>
+        <span
+          class="carousel-control-next-icon"
+          aria-hidden="true"
+          data-v-3e37aaed
+        ></span>
       </div>
     </button>
   </section>

@@ -75,6 +75,13 @@ import TicketRefund from "@/views/TicketOrders/TicketRefund.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior() {
+    // 항상 페이지 맨 위로 스크롤
+    return {
+      top: 0,
+      behavior: "instant", // 스크롤 애니메이션 없이 즉시 이동
+    };
+  },
   routes: [
     {
       path: "/",
@@ -267,16 +274,6 @@ const router = createRouter({
       component: ReservationView,
     },
     {
-      path: "/users/signUp",
-      name: "MemberSignUp",
-      component: SignUpView,
-    },
-    {
-      path: "/users/member/info",
-      name: "MemberView",
-      component: MemberView,
-    },
-    {
       path: "/joinComplete",
       name: "JoinComplete",
       component: JoinCompleteView,
@@ -286,31 +283,7 @@ const router = createRouter({
       name: "FindIdAuthentication",
       component: FindIdAuthenticationView,
     },
-    {
-      path: "/users/findId",
-      name: "FindId",
-      component: FindIdView,
-    },
-    {
-      path: "/users/FindPwAuthentication",
-      name: "FindPwAuthentication",
-      component: FindPwAuthenticationView,
-    },
-    {
-      path: "/users/findPw",
-      name: "FindPw",
-      component: FindPwView,
-    },
-    {
-      path: "/users/pwComplete",
-      name: "PwComplete",
-      component: PwComplete,
-    },
-    {
-      path: "/corporate/signUp",
-      name: "CorporateSignUp",
-      component: CorporateView,
-    },
+
     {
       path: "/reservation",
       name: "ReservationPage",
@@ -330,6 +303,7 @@ const router = createRouter({
         return next();
       },
     },
+    // 마이페이지 라우팅
     {
       path: "/users/mypage",
       name: "Mypage",
@@ -425,11 +399,6 @@ const router = createRouter({
       component: ThemeparkReservationList,
     },
     {
-      path: "/users/corporateJoinComplete",
-      name: "CorporateJoinCompleteView",
-      component: CorporateJoinCompleteView,
-    },
-    {
       path: "/ticketrefund",
       name: "TicketRefund",
       component: TicketRefund,
@@ -443,6 +412,60 @@ const router = createRouter({
       path: "/users/themeparkReservationLists/details/:id",
       name: "ThemeparkReservationDetailView",
       component: ThemeparkReservationDetailView,
+    },
+
+    /**
+     * 유저 관련 라우팅
+     * 회원가입, 아이디 찾기, 비밀번호 찾기
+     */
+
+    // 회원가입 안내 페이지
+    {
+      path: "/users/signUp",
+      name: "MemberSignUp",
+      component: SignUpView,
+    },
+    // 일반회원 회원가입 폼 작성 페이지
+    {
+      path: "/users/member/info",
+      name: "MemberView",
+      component: MemberView,
+    },
+    // 법인회원 회원가입 폼 작성 페이지
+    {
+      path: "/corporate/signUp",
+      name: "CorporateSignUp",
+      component: CorporateView,
+    },
+    // 법인회원 회원가입 완료 페이지
+    {
+      path: "/users/corporateJoinComplete",
+      name: "CorporateJoinCompleteView",
+      component: CorporateJoinCompleteView,
+    },
+    // 아이디 찾기 결과 페이지
+    {
+      path: "/users/findId",
+      name: "FindId",
+      component: FindIdView,
+    },
+    // 비밀번호 찾기 이후 휴대폰 인증 페이지
+    {
+      path: "/users/FindPwAuthentication",
+      name: "FindPwAuthentication",
+      component: FindPwAuthenticationView,
+    },
+    // 비밀번호 재설정 페이지
+    {
+      path: "/users/findPw",
+      name: "FindPw",
+      component: FindPwView,
+    },
+    // 변경완료 안내 페이지
+    {
+      path: "/users/pwComplete",
+      name: "PwComplete",
+      component: PwComplete,
     },
   ],
 });

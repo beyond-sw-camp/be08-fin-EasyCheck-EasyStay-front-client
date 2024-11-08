@@ -1,20 +1,39 @@
 <template>
   <div v-if="loading" class="spinner">로딩 중...</div>
 
-  <MainImage class="min-vh-100" v-if="themePark && !loading" :themePark="themePark" />
+  <MainImage
+    class="min-vh-100"
+    v-if="themePark && !loading"
+    :themePark="themePark"
+  />
 
   <div class="container">
-    <section class="accommodation-tabs px-6 pt-6" v-if="accommodations.length && !loading">
+    <section
+      class="accommodation-tabs px-6 pt-6"
+      v-if="accommodations.length && !loading"
+    >
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
             <div class="nav-wrapper position-relative end-0">
-              <ul class="nav nav-tabs p-1 justify-content-center accommodation-nav-tabs" role="tablist">
-                <li class="nav-item" v-for="accommodation in accommodations" :key="accommodation.id">
+              <ul
+                class="nav nav-tabs p-1 justify-content-center accommodation-nav-tabs"
+                role="tablist"
+              >
+                <li
+                  class="nav-item"
+                  v-for="accommodation in accommodations"
+                  :key="accommodation.id"
+                >
                   <transition name="fade">
-                    <button class="nav-link px-4 py-2" :class="{
-                      active: currentAccommodationId === accommodation.id,
-                    }" @click="changeAccommodation(accommodation.id)" role="tab">
+                    <button
+                      class="nav-link px-4 py-2"
+                      :class="{
+                        active: currentAccommodationId === accommodation.id,
+                      }"
+                      @click="changeAccommodation(accommodation.id)"
+                      role="tab"
+                    >
                       {{ accommodation.name }}
                     </button>
                   </transition>
@@ -31,11 +50,18 @@
         <div class="row">
           <div class="col-12">
             <div class="nav-wrapper position-relative end-0">
-              <ul class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs" role="tablist">
+              <ul
+                class="nav nav-tabs p-1 justify-content-center themepark-nav-tabs"
+                role="tablist"
+              >
                 <li class="nav-item" v-for="tab in themeParks" :key="tab.id">
                   <transition name="fade">
-                    <button class="nav-link px-4 py-2" :class="{ active: tab.id === currentThemeParkId }"
-                      @click="changeThemePark(tab.id)" role="tab">
+                    <button
+                      class="nav-link px-4 py-2"
+                      :class="{ active: tab.id === currentThemeParkId }"
+                      @click="changeThemePark(tab.id)"
+                      role="tab"
+                    >
                       {{ tab.name }}
                     </button>
                   </transition>
@@ -49,10 +75,16 @@
   </div>
 
   <div class="container-fluid px-6" v-if="themePark && !loading">
-    <AttractionInfo :themeParkId="Number(themePark.id)" :currentThemePark="themePark" />
+    <AttractionInfo
+      :themeParkId="Number(themePark.id)"
+      :currentThemePark="themePark"
+    />
   </div>
 
-  <div class="container-fluid d-flex justify-content-center my-5" v-if="themePark?.ticketAvailable === 'Y' && !loading">
+  <div
+    class="container-fluid d-flex justify-content-center my-5"
+    v-if="themePark?.ticketAvailable === 'Y' && !loading"
+  >
     <button @click="goToTicketSelectionView" class="reserve-btn">
       {{ themePark.name }} 이용권 구매하기
     </button>
@@ -127,7 +159,6 @@ const goToTicketSelectionView = () => {
 
 <style scoped>
 @media (min-width: 1400px) {
-
   .container {
     max-width: 1320px;
   }

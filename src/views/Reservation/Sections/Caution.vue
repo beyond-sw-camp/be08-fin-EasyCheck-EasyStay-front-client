@@ -74,7 +74,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const goHome = () => {
-  router.push("/"); // Assuming '/' is your home route
+  router.push("/users/roomReservationLists"); // Assuming '/' is your home route
 };
 </script>
 

@@ -12,7 +12,7 @@
             <li
               v-for="(tab, index) in accommodationTabs"
               :key="tab.accommodationId"
-              class="nav-item pe-3"
+              class="nav-item pt-3 pe-2"
             >
               <a
                 class="nav-link mb-0 px-0"

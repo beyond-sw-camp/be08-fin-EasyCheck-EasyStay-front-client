@@ -1,7 +1,7 @@
 <template>
   <section>
-    <room-type-navs />
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-1">
+    <!-- <room-type-navs /> -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="room in availableRooms" :key="room.roomId" class="col">
         <div class="card h-100">
           <img
@@ -73,6 +73,7 @@ import { useRouter } from "vue-router";
 import RoomTypeNavs from "@/views/Rooms/Sections/RoomTypeNavs.vue";
 import { useReservationStore } from "@/stores/reservationStore.js";
 import { userLoginStore } from "@/stores/loginStore.js";
+import { onMounted } from "vue";
 
 const router = useRouter();
 const reservationStore = useReservationStore();
@@ -83,6 +84,10 @@ const { isLoggedIn } = storeToRefs(userStore);
 
 // Computed
 const isRoomSelected = (room) => selectedRoom.value?.roomId === room.roomId;
+
+onMounted(() => {
+  // 객실 타입 조회
+});
 
 const getRoomButtonClasses = (room) => ({
   "btn-primary": isRoomSelected(room),

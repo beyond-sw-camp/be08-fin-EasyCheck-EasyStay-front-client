@@ -9,35 +9,65 @@
         <img src="@/assets/img/003.png" alt="Ad Banner" class="img-fluid" />
       </div>
 
-      <!-- 지점 선택 -->
-      <div class="mb-4">
-        <label for="resort-select" class="form-label">지점 선택</label>
-        <select id="resort-select" v-model="query.branch" class="form-select">
-          <option v-for="branch in accommodations" :key="branch.id" :value="branch.name">
-            {{ branch.name }}
-          </option>
-        </select>
-      </div>
+      <!-- 검색 필터 영역과 Total Notice를 같은 라인에 배치 -->
+      <div class="search-filters mb-4">
+        <!-- Total Notice -->
+        <div class="notice-stats">
+          <div class="stat-card">
+            <span class="stat-label">전체 소식</span>
+            <span class="stat-value">{{ notices.length }}개</span>
+          </div>
+        </div>
 
-      <!-- 검색 영역 -->
-      <div class="mb-4 input-group">
-        <input type="text" v-model="query.content" placeholder="검색어 입력..." class="form-control search-input" />
-        <button class="btn btn-warning search-btn" @click="filterNotices">
-          검색
-        </button>
+        <!-- 지점 선택 -->
+        <div class="select-wrapper">
+          <select v-model="query.branch" class="form-select custom-select">
+            <option value="" disabled selected>지점 선택</option>
+            <option
+              v-for="branch in accommodations"
+              :key="branch.id"
+              :value="branch.name"
+            >
+              {{ branch.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- 검색창 -->
+        <div class="search-wrapper">
+          <input
+            type="text"
+            v-model="query.content"
+            placeholder="검색어를 입력하세요"
+            class="form-control custom-input"
+          />
+          <button class="search-button" @click="filterNotices">검색</button>
+        </div>
       </div>
 
       <!-- 공지사항 총 개수 -->
       <div class="mb-3">
         <p>Total notices: {{ notices.length }}</p>
       </div>
+
       <!-- 공지사항 리스트 -->
       <div v-if="filteredNotices.length > 0" class="notice-list">
-        <div v-for="notice in filteredNotices" :key="notice.id" class="notice-item border p-3 mb-3"
-          @click="goToNoticeDetail(notice.id)" style="cursor: pointer">
-          <h5>{{ notice.title }}</h5>
-          <p>{{ notice.content }}</p>
-          <p>{{ notice.accommodationName }}</p>
+        <div
+          v-for="notice in filteredNotices"
+          :key="notice.id"
+          class="notice-item"
+          @click="goToNoticeDetail(notice.id)"
+        >
+          <div class="notice-content">
+            <div class="notice-header">
+              <h5 class="notice-title">{{ notice.title }}</h5>
+              <span class="notice-date">{{ notice.updatedAt }}</span>
+            </div>
+            <p class="notice-text line-clamp">{{ notice.content }}</p>
+            <div class="notice-footer">
+              <span class="notice-branch">{{ notice.accommodationName }}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div v-else>
@@ -76,75 +106,237 @@ const goToNoticeDetail = (id) => {
   console.log("라우팅 완료"); // 라우팅 시도 후 로그
 };
 </script>
-
 <style lang="scss" scoped>
+// 공지사항 리스트 스타일
 .notice-list {
   .notice-item {
-    background-color: #f8f9fa;
-    border-radius: 4px;
+    background-color: white;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .notice-content {
+      padding: 20px;
+
+      .notice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+
+        .notice-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #2c3e50;
+          margin: 0;
+        }
+
+        .notice-date {
+          font-size: 0.9rem;
+          color: #666;
+        }
+      }
+
+      .notice-text {
+        color: #4a5568;
+        margin-bottom: 12px;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 3.2em;
+      }
+
+      .notice-footer {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        .notice-branch {
+          color: #666;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+      }
+    }
   }
 }
 
-/* 검색 입력 필드 및 버튼 스타일 */
-.search-input {
-  border: 2px solid #ced4da;
-  /* 테두리 추가 */
-  border-radius: 4px 0 0 4px;
-  /* 좌측 모서리 둥글게 */
-  padding: 10px;
-  height: 40px;
-  /* 입력 칸 높이 설정 */
-  margin-right: 50px;
-  margin-top: 10px;
-  transition: border-color 0.2s ease-in-out;
-
-  &:focus {
-    border-color: #007bff;
-    /* 포커스 시 파란색 테두리 */
-  }
-}
-
-.search-btn {
-  background-color: #007bff;
-  /* 파란색 버튼 */
-  border-radius: 0 4px 4px 0;
-  /* 우측 모서리 둥글게 */
-  color: white;
-  padding: 10px 20px;
-  height: 40px;
-  /* 버튼 높이 입력 칸과 동일하게 설정 */
-  margin-top: 25px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-
-  &:hover {
-    // background-color: #0056b3; /* 호버 시 더 어두운 파란색 */
-  }
-}
-
-.input-group {
+// 검색 필터 영역
+.search-filters {
   display: flex;
+  gap: 16px;
   align-items: center;
-  width: 100%;
+  flex-wrap: wrap;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.input-group .form-control {
+// Total Notice 스타일
+.notice-stats {
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    min-width: 140px;
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+  }
+}
+
+// Select 박스 스타일
+.select-wrapper {
+  min-width: 200px;
+  flex: 0 0 auto;
+
+  .custom-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #4a5568;
+    background-color: white;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+  }
+}
+
+// 검색 영역 스타일
+.search-wrapper {
   flex: 1;
+  display: flex;
+  gap: 8px;
+
+  .custom-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #4a5568;
+    background-color: white;
+    transition: all 0.2s;
+
+    &::placeholder {
+      color: #a0aec0;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+  }
+
+  .search-button {
+    padding: 10px 20px;
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #2c5282;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+}
+
+// 헤더와 배너 스타일
+h3 {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1.5rem;
 }
 
 .ad-banner {
-  text-align: center;
-  /* 이미지 중앙 정렬 */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   img {
-    max-width: 100%;
-    /* 반응형으로 이미지 크기 조정 */
+    width: 100%;
     height: auto;
-    /* 높이 자동 조정 */
-    border-radius: 10px;
-    /* 모서리 둥글게 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* 그림자 효과 */
+    display: block;
+  }
+}
+
+// 컨테이너 스타일
+.container {
+  padding: 20px 0;
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .search-filters {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .notice-stats {
+    width: 100%;
+
+    .stat-card {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      .stat-label {
+        font-size: 0.9rem;
+      }
+
+      .stat-value {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .select-wrapper,
+  .search-wrapper {
+    width: 100%;
   }
 }
 </style>

@@ -15,7 +15,7 @@
             <reservation-summary />
           </div>
         </div>
-        <div class="mt-8">
+        <div class="mt-4">
           <room-selection-grid v-if="showRoomSelectionGrid" />
         </div>
         <div class="mt-4">

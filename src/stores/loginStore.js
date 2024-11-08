@@ -149,45 +149,37 @@ export const userLoginStore = defineStore("userStore", {
       }
     },
 
-    // 일반회원 - 로그인
+    // 로그인 요청
     async login(loginData) {
       const mypageStoreInstance = mypageStore();
 
       try {
         const response = await apiClient.post("/users/login", loginData);
-        console.log(response.data);
 
-        if (response && response.data) {
-          localStorage.setItem("accessToken", response.data.accessToken);
-          this.setLoginStatus(true);
-          console.log("로그인 성공, 저장된 토큰:", response.data.accessToken);
-
-          // 사용자 정보 설정
-          this.userData.id = response.data.userId;
-          this.userData.name = response.data.name;
-          this.userData.email = response.data.email;
-
-          // 사용자 정보 로드
-          await this.getUserData();
-          mypageStoreInstance.userData = { ...this.userData };
-
-          // 사용자 정보 가져오기
-          if (localStorage.getItem("accessToken")) {
-            await this.getUserData();
-            mypageStoreInstance.userData.id = this.userData.id;
-            mypageStoreInstance.userData.name = this.userData.name;
-            mypageStoreInstance.userData.email = this.userData.email;
-          }
-
-          // 메인 페이지로 이동
-          router.push("/");
-          return response.data;
-        } else {
-          throw new Error("Unexpected response format");
+        if (!response?.data) {
+          throw new Error("서버 응답 형식이 올바르지 않습니다.");
         }
+
+        const { accessToken, userId, name, email } = response.data;
+
+        // 토큰 저장 및 로그인 상태 업데이트
+        localStorage.setItem("accessToken", accessToken);
+        this.setLoginStatus(true);
+
+        // 사용자 정보 업데이트
+        this.userData = {
+          id: userId,
+          name: name,
+          email: email,
+        };
+
+        // mypage store와 동기화
+        mypageStoreInstance.userData = { ...this.userData };
+
+        return response.data;
       } catch (error) {
         console.error("로그인 실패:", error);
-        alert(error.message || "로그인 실패");
+        throw error; // 에러를 상위로 전달하여 컴포넌트에서 처리
       }
     },
 
