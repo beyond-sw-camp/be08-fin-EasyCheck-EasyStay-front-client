@@ -3,7 +3,7 @@
     <section class="my-3 py-3 position-relative">
       <div class="d-flex justify-content-between align-items-center px-5 mb-5">
         <h3 class="text-start text-black">시설 안내</h3>
-        <button class="reserve-btn" @click="handleUsageGuide">
+        <button v-if="themeParkId === 7" class="reserve-btn" @click="handleUsageGuide">
           이용 안내
         </button>
         <!-- <MaterialButton class="large-button" color="danger" @click="handleUsageGuide">이용 안내</MaterialButton> -->
