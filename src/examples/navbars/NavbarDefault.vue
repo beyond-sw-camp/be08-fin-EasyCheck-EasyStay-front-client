@@ -269,7 +269,7 @@ watch(
   </nav>
 </template>
 
-<style>
+<style scoped>
 @media (max-width: 991px) {
   .navbar-expand-lg .navbar-nav {
     flex-direction: row;
