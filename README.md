@@ -4,7 +4,9 @@
 
 > Team - EasyCheck
 
-> Site - https://be08-fin-easy-check-easy-stay-front-client.vercel.app/
+> Client Site - https://easystay.cloudyong.shop/
+
+> Admin Site - https://easystay-admin.cloudyong.shop/
 
 > Demo - [데모영상 바로가기](https://youtu.be/zhbBtArym6s?si=fwRhxCqIsMut63eD)
 
@@ -16,6 +18,9 @@
 
 ## 📋 Material
 - [Presentation Material](https://github.com/user-attachments/files/17671018/EasyStay_EasyCheck.pdf)
+- Backend Github: https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-server
+- Frontend(Client) Github: https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-client
+- Frontend(Admin) Github: https://github.com/beyond-sw-camp/be08-fin-EasyCheck-EasyStay-front-admin
 <br>
 
 ## 📋 Contents
@@ -226,6 +231,6 @@
 |                  계용운                  | &nbsp; |
 |                  김나현                  | &nbsp; |
 |                  임지훈                  | &nbsp; |
-|                  정진주                  | &nbsp; |
+|                  정진주                  | &nbsp; 최종 프로젝트를 하면서 수업 시간에 배웠던 내용들을 활용하고 응용할 수 있어 뜻깊은 시간이었습니다. 프로젝트를 하면서 아쉬운 부분이나 실수한 부분들도 많았지만 하나씩 해결해나가면서 발전할 수 있었습니다. 발전할 수 있도록 도와준 팀원들과 멘토님! 너무 감사드립니다...!! 좋은 사람들과 프로젝트를 함께 마무리한 것 같아 즐거웠습니다 : ) 이번 프로젝트에서 느낀 점들을 바탕으로 다음 프로젝트에서는 더욱 도전적으로 임할 수 있도록 노력하겠습니다! 파이팅!|
 
 <br>
